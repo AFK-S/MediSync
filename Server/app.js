@@ -17,7 +17,7 @@ app.use(
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Hello World! - Medisync");
+  res.send("Medisync is up and running!!");
 });
 
 async function startServer() {
