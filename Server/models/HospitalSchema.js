@@ -1,4 +1,6 @@
-const { Schema, connection } = require("mongoose");
+import mongoose from "mongoose";
+
+const { Schema, connection } = mongoose;
 
 const HospitalSchema = new Schema(
   {
@@ -77,4 +79,4 @@ const HospitalSchema = new Schema(
   }
 );
 
-module.exports = connection.useDb("MediSync").model("Hospital", HospitalSchema);
+export default connection.useDb("MediSync").model("Hospital", HospitalSchema);

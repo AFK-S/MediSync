@@ -1,7 +1,7 @@
-const crypto = require("crypto");
-const nodemailer = require("nodemailer");
-const HospitalSchema = require("../models/HospitalSchema");
-const { validationResult } = require("express-validator");
+import crypto from "crypto";
+import nodemailer from "nodemailer";
+import HospitalSchema from "../models/HospitalSchema.js";
+import { validationResult } from "express-validator";
 
 const generateRandomString = (length) => {
   return crypto
@@ -87,6 +87,4 @@ const GetAllHospitals = async (req, res) => {
   }
 };
 
-module.exports = { GetAllHospitals };
-
-module.exports = { RegisterHospital };
+export { GetAllHospitals, RegisterHospital };

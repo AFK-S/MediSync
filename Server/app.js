@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import governmentRoutes from "./routes/GovernmentRoutes.js"; // Assuming the route file is in the same directory
 
 const app = express();
 dotenv.config();
@@ -15,6 +16,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use("/api", governmentRoutes);
 
 app.get("/", (req, res) => {
   res.send("Medisync is up and running!!");

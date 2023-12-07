@@ -1,9 +1,12 @@
-const express = require("express");
+import express from "express";
+import {
+  RegisterHospital,
+  GetAllHospitals,
+} from "../controller/GovernmentController.js";
+
 const router = express.Router();
-const { RegisterHospital } = require("../controller/GovernmentController");
-const { GetAllHospitals } = require("../controller/GovernmentController");
 
 router.post("/government/register", RegisterHospital);
 router.get("/government/all", GetAllHospitals);
 
-module.exports = router;
+export default router;
