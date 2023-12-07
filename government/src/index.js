@@ -4,15 +4,22 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { MantineProvider, createTheme } from "@mantine/core";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import RegisterHospital from "./components/RegisterHospital";
+import ViewHospital from "./components/ViewHospital";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const theme = createTheme({});
 root.render(
-  <MantineProvider theme={theme}>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </MantineProvider>
+  <React.StrictMode>
+    <MantineProvider theme={theme} defaultColorScheme="dark">
+      <BrowserRouter>
+        <Routes>
+          <Route path="/*" element={<App />} />
+        </Routes>
+      </BrowserRouter>
+    </MantineProvider>
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

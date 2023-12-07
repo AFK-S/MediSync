@@ -9,7 +9,7 @@ import TopBar from "../components/TopBar/TopBar.js";
 import { setLoading } from "../slice/AppSclice.js";
 import MobileNav from "../components/MobileNav/MobileNav.js";
 import Dashboard from "./Dashboard.js";
-import { SERVER_URL } from "../config.js";
+// import { SERVER_URL } from "../config.js";
 import axios from "axios";
 
 const MainLayout = () => {

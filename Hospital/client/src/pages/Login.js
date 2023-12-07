@@ -19,7 +19,7 @@ import { IconCheck, IconX } from "@tabler/icons-react";
 import { Loader } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { SERVER_URL } from "../config.js";
+// import { SERVER_URL } from "../config.js";
 
 export default function Login(PaperProps) {
   const [loading, setLoading] = useState(false);
@@ -46,52 +46,52 @@ export default function Login(PaperProps) {
 
   const [cookies, setCookie] = useCookies(["token", "userId"]);
 
-  const handleSubmit = async (values) => {
-    setLoading(true);
-    try {
-      const { data } = await axios.post(`${SERVER_URL}/api/auth/login`, values);
-      setNotificationVisible({
-        title: "LoggedIn successfully",
-        visible: true,
-        color: "green",
-        icon: <IconCheck />,
-        message: `Welcome ${data.name}`,
-      });
-      setCookie("token", data.token, {
-        path: "/",
-        maxAge: 604800,
-        expires: new Date(Date.now() + 604800),
-        sameSite: true,
-      });
-      setCookie("userId", data.id, {
-        path: "/",
-        maxAge: 604800,
-        expires: new Date(Date.now() + 604800),
-        sameSite: true,
-      });
-      setTimeout(() => {
-        Navigate("/");
-      }, 1000);
-    } catch (err) {
-      console.log(err);
-      setNotificationVisible({
-        title: "Something went wrong",
-        visible: true,
-        color: "red",
-        icon: <IconX />,
-        message: err.response && err.response.data.msg,
-      });
-    }
-    setLoading(false);
-    form.reset();
-    setTimeout(() => {
-      setNotificationVisible({
-        visible: false,
-        type: "",
-        message: "",
-      });
-    }, 3000);
-  };
+  // const handleSubmit = async (values) => {
+  //   setLoading(true);
+  //   try {
+  //     const { data } = await axios.post(`${SERVER_URL}/api/auth/login`, values);
+  //     setNotificationVisible({
+  //       title: "LoggedIn successfully",
+  //       visible: true,
+  //       color: "green",
+  //       icon: <IconCheck />,
+  //       message: `Welcome ${data.name}`,
+  //     });
+  //     setCookie("token", data.token, {
+  //       path: "/",
+  //       maxAge: 604800,
+  //       expires: new Date(Date.now() + 604800),
+  //       sameSite: true,
+  //     });
+  //     setCookie("userId", data.id, {
+  //       path: "/",
+  //       maxAge: 604800,
+  //       expires: new Date(Date.now() + 604800),
+  //       sameSite: true,
+  //     });
+  //     setTimeout(() => {
+  //       Navigate("/");
+  //     }, 1000);
+  //   } catch (err) {
+  //     console.log(err);
+  //     setNotificationVisible({
+  //       title: "Something went wrong",
+  //       visible: true,
+  //       color: "red",
+  //       icon: <IconX />,
+  //       message: err.response && err.response.data.msg,
+  //     });
+  //   }
+  //   setLoading(false);
+  //   form.reset();
+  //   setTimeout(() => {
+  //     setNotificationVisible({
+  //       visible: false,
+  //       type: "",
+  //       message: "",
+  //     });
+  //   }, 3000);
+  // };
 
   return (
     <div className="login">
@@ -130,7 +130,7 @@ export default function Login(PaperProps) {
 
         <form
           onSubmit={form.onSubmit((value) => {
-            handleSubmit(value);
+            // handleSubmit(value);
             // form.reset();
           })}
         >

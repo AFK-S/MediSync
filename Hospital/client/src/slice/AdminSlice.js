@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { SERVER_URL } from "../config";
+// import { SERVER_URL } from "../config";
 
 export const fetchAdmin = createAsyncThunk(
   "admin/fetchAdmin",
@@ -15,9 +15,9 @@ export const fetchAdmin = createAsyncThunk(
           "x-auth-token": cookies,
         },
       };
-      const response = await axios.get(`${SERVER_URL}/api/auth/verify`, config);
-      dispatch(setAdmin(response.data));
-      return response.data;
+      // const response = await axios.get(`${SERVER_URL}/api/auth/verify`, config);
+      // dispatch(setAdmin(response.data));
+      // return response.data;
     } catch (error) {
       return rejectWithValue("Failed to fetch admin data");
     }

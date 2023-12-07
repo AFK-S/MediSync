@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
-import { SERVER_URL } from "../config.js";
+// import { SERVER_URL } from "../config.js";
 import { Notification } from "@mantine/core";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { Loader } from "@mantine/core";
@@ -43,42 +43,42 @@ export default function Register(PaperProps) {
     },
   });
 
-  const handleSubmit = async (values) => {
-    setLoading(true);
-    try {
-      const { data } = await axios.post(
-        `${SERVER_URL}/api/auth/register`,
-        values
-      );
-      setNotificationVisible({
-        title: "User created successfully",
-        visible: true,
-        color: "green",
-        icon: <IconCheck />,
-        message: data.message,
-      });
-      setTimeout(() => {
-        Navigate("/login");
-      }, 3000);
-    } catch (err) {
-      console.log(err);
-      setNotificationVisible({
-        title: "Something went wrong",
-        visible: true,
-        color: "red",
-        icon: <IconX />,
-        message: err.response && err.response.data.message,
-      });
-    }
-    setLoading(false);
-    setTimeout(() => {
-      setNotificationVisible({
-        visible: false,
-        type: "",
-        message: "",
-      });
-    }, 3000);
-  };
+  // const handleSubmit = async (values) => {
+  //   setLoading(true);
+  //   try {
+  //     const { data } = await axios.post(
+  //       `${SERVER_URL}/api/auth/register`,
+  //       values
+  //     );
+  //     setNotificationVisible({
+  //       title: "User created successfully",
+  //       visible: true,
+  //       color: "green",
+  //       icon: <IconCheck />,
+  //       message: data.message,
+  //     });
+  //     setTimeout(() => {
+  //       Navigate("/login");
+  //     }, 3000);
+  //   } catch (err) {
+  //     console.log(err);
+  //     setNotificationVisible({
+  //       title: "Something went wrong",
+  //       visible: true,
+  //       color: "red",
+  //       icon: <IconX />,
+  //       message: err.response && err.response.data.message,
+  //     });
+  //   }
+  //   setLoading(false);
+  //   setTimeout(() => {
+  //     setNotificationVisible({
+  //       visible: false,
+  //       type: "",
+  //       message: "",
+  //     });
+  //   }, 3000);
+  // };
 
   return (
     <div className="login">
@@ -117,7 +117,7 @@ export default function Register(PaperProps) {
 
         <form
           onSubmit={form.onSubmit((value) => {
-            handleSubmit(value);
+            // handleSubmit(value);
             form.reset();
           })}
         >
