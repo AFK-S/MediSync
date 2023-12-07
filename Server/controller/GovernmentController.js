@@ -41,6 +41,31 @@ const Mailer = (email_address, subject, template) => {
     );
 };
 
+const UpdateHospitalField = async (req, res) => {
+  const { hospitalId } = req.params;
+  const { field, value } = req.query;
+
+  try {
+    const hospital = await HospitalSchema.findById(hospitalId);
+
+    if (!hospital) {
+      return res.status(404).json({ error: "Hospital not found" });
+    }
+
+    if (!hospital[field]) {
+      return res.status(400).json({ error: "Invalid field specified" });
+    }
+
+    hospital[field] = value;
+    await hospital.save();
+
+    res.status(200).json({ message: "Hospital field updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 const RegisterHospital = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -87,4 +112,4 @@ const GetAllHospitals = async (req, res) => {
   }
 };
 
-export { GetAllHospitals, RegisterHospital };
+export { GetAllHospitals, RegisterHospital, UpdateHospitalField };
