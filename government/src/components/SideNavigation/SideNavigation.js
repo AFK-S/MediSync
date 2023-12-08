@@ -6,11 +6,6 @@ import { useNavigate } from "react-router-dom";
 const SideNavigation = () => {
   const navs = [
     {
-      name: "Dashboard",
-      path: "/",
-      icon: "fa-solid fa-user",
-    },
-    {
       name: "Register",
       path: "/register",
       icon: "fa-solid fa-user",
@@ -35,7 +30,7 @@ const SideNavigation = () => {
           );
         })}
       </div>
-
+      {/* 
       <div>
         <div className="divider my-3"></div>
 
@@ -46,7 +41,7 @@ const SideNavigation = () => {
           <i className="fa-solid fa-arrow-right-from-bracket me-2 ms-2"></i>
           <p>Logout</p>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

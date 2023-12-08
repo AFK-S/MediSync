@@ -20,11 +20,6 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
 
   const navs = [
     {
-      name: "Dashboard",
-      path: "/",
-      icon: "fa-solid fa-user",
-    },
-    {
       name: "Register",
       path: "/register",
       icon: "fa-solid fa-user",
@@ -48,7 +43,7 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
           right: "1.8rem",
           top: "1.8rem",
           cursor: "pointer",
-          background: "#228be6",
+          background: "#000000",
           color: "#fff",
           borderRadius: "10px",
         }}
@@ -79,7 +74,7 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
           })}
         </div>
 
-        <div className="pb-4">
+        {/* <div className="pb-4">
           <div className="divider my-3"></div>
 
           <button
@@ -89,7 +84,7 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
             <i className="fa-solid fa-arrow-right-from-bracket me-2 ms-2"></i>
             <p>Logout</p>
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

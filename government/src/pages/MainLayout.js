@@ -4,8 +4,6 @@ import SideNavigation from "../components/SideNavigation/SideNavigation.js";
 import TopBar from "../components/TopBar/TopBar.js";
 import MobileNav from "../components/MobileNav/MobileNav.js";
 import Dashboard from "./Dashboard.js";
-// import { SERVER_URL } from "../config.js";
-import axios from "axios";
 import Register from "../components/Register/Register.js";
 import HospitalList from "../components/HospitalList/HospitalList.js";
 
@@ -34,7 +32,6 @@ const MainLayout = () => {
             <TopBar ToggleMenu={ToggleMenu} />
 
             <Routes>
-              <Route path="/" element={<Dashboard />} />
               <Route path="/register" element={<Register />} />
               <Route path="/hospitals" element={<HospitalList />} />
             </Routes>
