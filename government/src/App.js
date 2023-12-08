@@ -18,6 +18,7 @@ import { FaSun, FaMoon } from "react-icons/fa";
 import RegisterHospital from "./components/RegisterHospital";
 import ViewHospital from "./components/ViewHospital";
 import { Navigate } from "react-router";
+import "@mantine/notifications/styles.css";
 
 function App() {
   const [opened, { toggle }] = useDisclosure();

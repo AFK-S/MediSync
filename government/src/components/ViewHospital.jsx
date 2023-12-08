@@ -1,4 +1,5 @@
 import React from "react";
+import { Accordion } from "@mantine/core";
 
 const DummyHospitalList = [
   {
@@ -16,33 +17,30 @@ const DummyHospitalList = [
 ];
 
 function ViewHospital() {
+
+  const items = DummyHospitalList.map((item) => (
+    <Accordion.Item key={item.id} value={item.name} style={{margin:"20px"}}>
+      <Accordion.Control style={{textAlign : "center" }}>{item.name}</Accordion.Control>
+      <Accordion.Panel style={{textAlign : "left"}}>
+        <p>
+          <strong>City:</strong> {item.city}
+        </p>
+        <p>
+          <strong>Contact:</strong> {item.contact}
+        </p>
+        <p>
+          <strong>Name:</strong> {item.name}
+        </p>
+      
+      </Accordion.Panel>
+    </Accordion.Item>
+  ));
   return (
-    <div className="App">
-      <div style={{ marginTop: "20px" }}>
-        <h2 style={{ color: "#333", borderBottom: "2px solid #333" }}>
-          Hospital List
-        </h2>
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {DummyHospitalList.map((hospital) => (
-            <li
-              key={hospital.id}
-              style={{
-                borderBottom: "1px solid #ccc",
-                marginBottom: "10px",
-                paddingBottom: "10px",
-              }}
-            >
-              <strong style={{ marginRight: "5px" }}>Name:</strong>{" "}
-              {hospital.name} <br />
-              <strong style={{ marginRight: "5px" }}>City:</strong>{" "}
-              {hospital.city} <br />
-              <strong style={{ marginRight: "5px" }}>Contact:</strong>{" "}
-              {hospital.contact}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <Accordion variant="separated">
+    {items}
+  </Accordion>
+
+
   );
 }
 
