@@ -164,12 +164,11 @@ export default function Login(PaperProps) {
           </Stack>
 
           <Group position="apart" mt="xl">
-            <Anchor component="button" type="button" color="dimmed" size="xs">
-              New to Medisync? <NavLink to="/register">Register</NavLink>
-            </Anchor>
-            <Button type="submit" radius="xl">
+            <div className=""></div>
+            {/* <Button type="submit" radius="xl">
               {loading ? <Loader color="white" variant="dots" /> : "Login"}
-            </Button>
+            </Button> */}
+            <NavLink to="/">Login</NavLink>
           </Group>
         </form>
       </Paper>
