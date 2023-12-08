@@ -112,4 +112,43 @@ const GetAllHospitals = async (req, res) => {
   }
 };
 
-export { GetAllHospitals, RegisterHospital, UpdateHospitalField };
+const GetBasicHospitalInfo = async (req, res) => {
+  try {
+    const hospitals = await HospitalSchema.find(
+      {},
+      {
+        name: 1,
+        "address.street": 1,
+        "address.city": 1,
+        "address.state": 1,
+        "address.country": 1,
+        "address.zipCode": 1,
+        "contact.email": 1,
+        "contact.phone": 1,
+      }
+    );
+
+    const basicInfo = hospitals.map((hospital) => ({
+      name: hospital.name,
+      email: hospital.contact.email,
+      street: hospital.address.street,
+      city: hospital.address.city,
+      state: hospital.address.state,
+      country: hospital.address.country,
+      pincode: hospital.address.zipCode,
+      phone: hospital.contact.phone,
+    }));
+
+    res.status(200).json(basicInfo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export {
+  GetAllHospitals,
+  RegisterHospital,
+  UpdateHospitalField,
+  GetBasicHospitalInfo,
+};
