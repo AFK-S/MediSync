@@ -36,7 +36,7 @@ const Table = ({ data, columns }) => {
 };
 
 const Dashboard = () => {
-  const [doctors, setSoctors] = useState([
+  const [doctors, setDoctors] = useState([
     {
       name: "Karandeep Singh Sandhu",
       age: "40",
@@ -244,7 +244,7 @@ const Dashboard = () => {
       <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Doctors Available</h4>
         <Table
-          data={doctors}
+          data={doctors && doctors}
           columns={[
             "Name",
             "Age",
@@ -260,7 +260,7 @@ const Dashboard = () => {
       <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Patients Waiting</h4>
         <Table
-          data={patientsWaiting}
+          data={patientsWaiting && patientsWaiting}
           columns={["Name", "Date", "Doctor", "TimeSlot"]}
         />
       </div>
