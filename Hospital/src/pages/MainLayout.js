@@ -11,6 +11,9 @@ import MobileNav from "../components/MobileNav/MobileNav.js";
 import Dashboard from "./Dashboard.js";
 // import { SERVER_URL } from "../config.js";
 import axios from "axios";
+import Doctors from "./Doctors.js";
+import Appointments from "./Appointments.js";
+import Patients from "./Patients.js";
 
 const MainLayout = () => {
   const [cookies, removeCookie] = useCookies(["token", "userId"]);
@@ -66,7 +69,11 @@ const MainLayout = () => {
             <TopBar ToggleMenu={ToggleMenu} />
 
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<Navigate to="/dashboard" />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/doctors" element={<Doctors />} />
+              <Route path="/appointments" element={<Appointments />} />
+              <Route path="/patients" element={<Patients />} />
             </Routes>
           </div>
         </div>

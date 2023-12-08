@@ -14,7 +14,7 @@ const TopBar = ({ ToggleMenu }) => {
                 cursor: "pointer",
               }}
             ></i>
-            <p className="fw-bold title">MediSync</p>
+            <p className="fw-bold title">Hospital</p>
           </div>
           <div
             className="col-3 col-md-2"

@@ -21,7 +21,22 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
   const navs = [
     {
       name: "Dashboard",
-      path: "/",
+      path: "/dashboard",
+      icon: "fa-solid fa-user",
+    },
+    {
+      name: "Doctors",
+      path: "/doctors",
+      icon: "fa-solid fa-user",
+    },
+    {
+      name: "Appointments",
+      path: "/appointments",
+      icon: "fa-solid fa-user",
+    },
+    {
+      name: "Patients",
+      path: "/patients",
       icon: "fa-solid fa-user",
     },
   ];
