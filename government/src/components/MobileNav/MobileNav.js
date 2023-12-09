@@ -1,32 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-// import { useDispatch, useSelector } from "react-redux";
-// import { logoutAdmin } from "../../slice/AdminSlice.js";
-// import { useCookies } from "react-cookie";
 import "./MobileNav.css";
 
 const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
-  // const dispatch = useDispatch();
-  const navigate = useNavigate();
-  // const [cookies, removeCookie] = useCookies(["token", "userId"]);
-
-  // const handleLogout = () => {
-  //   removeCookie("token");
-  //   removeCookie("userId");
-  //   dispatch(logoutAdmin());
-  //   window.location.href = "/login";
-  // };
-
   const navs = [
     {
-      name: "Register",
-      path: "/register",
+      name: "Hospital List",
+      path: "/",
       icon: "fa-solid fa-user",
     },
     {
-      name: "Hospital List",
-      path: "/hospitals",
+      name: "Register",
+      path: "/register",
       icon: "fa-solid fa-user",
     },
   ];
@@ -73,18 +58,6 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
             );
           })}
         </div>
-
-        {/* <div className="pb-4">
-          <div className="divider my-3"></div>
-
-          <button
-            className="logout-btn flexbox px-3 p-2 w-100 rounded-s"
-            // onClick={handleLogout}
-          >
-            <i className="fa-solid fa-arrow-right-from-bracket me-2 ms-2"></i>
-            <p>Logout</p>
-          </button>
-        </div> */}
       </div>
     </div>
   );

@@ -3,44 +3,38 @@ import { Grid, Card, Group, Badge, Text, TextInput } from "@mantine/core";
 import { IconBuildingHospital } from "@tabler/icons-react";
 import axios from "axios";
 import "./HospitalList.css";
-import { SERVER_URL } from "../../config";
 
-const API_URL = `${SERVER_URL}/api/government/basic-info`;
-
-function HospitalList() {
-  const [hospitalData, setHospitalData] = useState([]);
+function HospitalList({ setLoading }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredHospitalData, setFilteredHospitalData] = useState([]);
+  const [hospitals, setHospitals] = useState([]);
+  const [filteredHospitals, setFilteredHospitals] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    (async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(API_URL);
-        const data = response.data;
-        setHospitalData(data);
-        setFilteredHospitalData(data);
+        const { data } = await axios.get("/api/hospital/all");
+        setHospitals(data);
+        setFilteredHospitals(data);
       } catch (error) {
-        console.error("API Error:", error);
+        console.error(error);
       }
-    };
-
-    fetchData();
+      setLoading(false);
+    })();
   }, []);
 
   useEffect(() => {
-    const filterHospitals = () => {
-      const filteredData = hospitalData.filter((item) =>
+    (() => {
+      const filteredData = hospitals.filter((item) =>
         Object.values(item).some(
           (value) =>
             typeof value === "string" &&
             value.toLowerCase().includes(searchQuery.toLowerCase())
         )
       );
-      setFilteredHospitalData(filteredData);
-    };
-
-    filterHospitals();
-  }, [searchQuery, hospitalData]);
+      setFilteredHospitals(filteredData);
+    })();
+  }, [searchQuery, hospitals]);
 
   return (
     <div>
@@ -52,7 +46,7 @@ function HospitalList() {
       />
 
       <Grid gutterXl={30}>
-        {filteredHospitalData.map((item, index) => {
+        {filteredHospitals.map((item, index) => {
           return (
             <Grid.Col md={4} sm={12} key={index}>
               <Card withBorder padding="lg" radius="md" h={170}>
@@ -65,14 +59,15 @@ function HospitalList() {
                   </Badge>
                 </Group>
                 <Text fz="sm" mt="lg">
-                  Email: {item.email}
+                  Email: {item.contact_details.email_address}
                 </Text>
                 <Text fz="sm" mt={5}>
-                  Phone: {item.phone}
+                  Phone: {item.contact_details.phone_number}
                 </Text>
                 <Text fz="sm" style={{ textTransform: "capitalize" }}>
-                  Location: {item.street}, {item.city}, {item.state},
-                  {item.country},{item.zipCode}
+                  Location: {item.address.street}, {item.address.city},{" "}
+                  {item.address.state},{item.address.country},
+                  {item.address.zipCode}
                 </Text>
               </Card>
             </Grid.Col>

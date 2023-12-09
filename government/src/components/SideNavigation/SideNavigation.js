@@ -1,18 +1,17 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./SideNavigation.css";
-import { useNavigate } from "react-router-dom";
 
 const SideNavigation = () => {
   const navs = [
     {
-      name: "Register",
-      path: "/register",
+      name: "Hospital List",
+      path: "/",
       icon: "fa-solid fa-user",
     },
     {
-      name: "Hospital List",
-      path: "/hospitals",
+      name: "Register",
+      path: "/register",
       icon: "fa-solid fa-user",
     },
   ];
@@ -30,18 +29,6 @@ const SideNavigation = () => {
           );
         })}
       </div>
-      {/* 
-      <div>
-        <div className="divider my-3"></div>
-
-        <button
-          className="logout-btn flexbox px-3 p-2 w-100 rounded-s"
-          // onClick={handleLogout}
-        >
-          <i className="fa-solid fa-arrow-right-from-bracket me-2 ms-2"></i>
-          <p>Logout</p>
-        </button>
-      </div> */}
     </div>
   );
 };
