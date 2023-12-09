@@ -2,11 +2,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar, Text } from "react-native";
 import { useFonts } from "expo-font";
 import React, { useContext } from "react";
-// import Auth from "./screens/auth/AuthScreen";
-// import MainScreen from "./screens/MainScreen";
+import Auth from "./screens/auth/AuthScreen";
+import MainScreen from "./screens/MainScreen";
 import StateContext, { StateProvider } from "./context/StateContext";
 import Login from "./screens/auth/Login";
-// import Loading from "./screens/pages/Loading";
+import Loading from "./screens/pages/Loading";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -29,16 +29,14 @@ const Provider = () => {
   const { isLogin } = useContext(StateContext);
   return (
     <>
-      {!isLogin ? (
+      {isLogin ? (
         <StateProvider>
-          <Login />
+          <MainScreen />
         </StateProvider>
       ) : (
-        // <Auth />
-        <Text>Hello</Text>
+        <Login />
       )}
-      {/* <Loading /> */}
-      <Text>Hii</Text>
+      <Loading />
     </>
   );
 };
