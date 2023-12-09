@@ -7,6 +7,7 @@ import fileupload from "express-fileupload";
 import session from "express-session";
 
 import HospitalRoute from "./routes/Hospital.js";
+import DoctorRoute from "./routes/Doctor.js";
 
 const app = express();
 dotenv.config();
@@ -47,25 +48,18 @@ app.use(
 );
 
 app.get("/api/authentication", async (req, res) => {
-  if (
-    req.session.type_of_user === req.cookies.type_of_user &&
-    req.session._id === req.cookies._id
-  ) {
+  if (req.session._id === req.cookies._id) {
     return res.send(true);
   }
   res.send(false);
 });
 app.get("/api/logout", async (req, res) => {
   req.session.destroy();
-  res
-    .clearCookie("connect.sid")
-    .clearCookie("type_of_user")
-    .clearCookie("_id")
-    .status(200)
-    .end();
+  res.clearCookie("connect.sid").clearCookie("_id").status(200).end();
 });
 
 app.use("/api", HospitalRoute);
+app.use("/api", DoctorRoute);
 
 app.get("/", (req, res) => {
   res.send("MediSync is up and running!!");

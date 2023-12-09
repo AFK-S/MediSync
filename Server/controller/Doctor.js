@@ -1,7 +1,7 @@
 import ShortUniqueId from "short-unique-id";
 import { validationResult } from "express-validator";
 
-import HospitalSchema from "../models/HospitalSchema.js";
+import DoctorSchema from "../models/DoctorSchema.js";
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
 
@@ -13,7 +13,7 @@ const Login = async (req, res) => {
 
   const { user_name, password } = req.body;
   try {
-    const response = await HospitalSchema.findOne({
+    const response = await DoctorSchema.findOne({
       user_id: user_name,
       password: password,
     })
@@ -26,63 +26,49 @@ const Login = async (req, res) => {
     }
 
     req.session._id = response._id;
-    res
-      .cookie("_id", response._id, {
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      })
-      .status(200)
-      .end();
+    res.status(200).send(response._id);
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err });
   }
 };
 
-const Register = async (req, res, next) => {
+const Register = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ error: errors.array() });
   }
 
+  const { hospital_id } = req.params;
   const {
-    hospital_name,
-    coordinates: { latitude, longitude },
-    address: { street, city, state, zipCode, country },
-    contact_details: { phone_number, email_address },
+    doctor_name,
+    specialization,
+    experience,
+    age,
+    availability,
+    gender,
+    fees,
+    phone_number,
   } = req.body;
   const username = randomUUID();
   const password = randomUUID();
 
   try {
-    const hospital = await HospitalSchema.create({
-      name: hospital_name,
-      coordinates: {
-        latitude,
-        longitude,
-      },
-      address: {
-        street,
-        city,
-        state,
-        zipCode,
-        country,
-      },
-      contact_details: {
-        phone_number,
-        email_address,
-      },
+    const doctor = await DoctorSchema.create({
+      hospital_id,
+      name: doctor_name,
+      specialization,
+      experience,
+      age,
+      availability,
+      gender,
+      fees,
+      phone_number,
       username,
       password,
     });
 
-    req.data = {
-      name: hospital_name,
-      email_address,
-      username,
-      password,
-    };
-    res.status(200).send(hospital._id);
-    next();
+    res.status(200).send(doctor._id);
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err });
@@ -95,74 +81,92 @@ const UpdateDetails = async (req, res) => {
     return res.status(400).json({ error: errors.array() });
   }
 
-  const { hospital_id } = req.params;
+  const { doctor_id } = req.params;
   const data = req.body;
 
   try {
-    const hospital = await HospitalSchema.findById(hospital_id);
-    if (!hospital) {
-      return res.status(400).json({ error: "Hospital not found" });
+    const doctor = await DoctorSchema.findById(doctor_id);
+    if (!doctor) {
+      return res.status(400).json({ error: "Doctor not found" });
     }
     for (const [key, value] of Object.entries(data)) {
-      if (hospital[key] && typeof hospital[key] !== "object") {
-        hospital[key] = value;
-      } else if (hospital[key] && typeof hospital[key] === "object") {
+      if (doctor[key] && typeof doctor[key] !== "object") {
+        doctor[key] = value;
+      } else if (doctor[key] && typeof doctor[key] === "object") {
         for (const [subKey, subValue] of Object.entries(value)) {
-          if (hospital[key][subKey]) hospital[key][subKey] = subValue;
+          if (doctor[key][subKey]) doctor[key][subKey] = subValue;
         }
       }
     }
-    await hospital.save();
+    await doctor.save();
 
-    res.status(200).json({ message: "Hospital details updated successfully" });
+    res.status(200).json({ message: "Doctor details updated successfully" });
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err });
   }
 };
 
-const DeleteHospital = async (req, res) => {
+const DeleteDoctor = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
+
+  const { doctor_id } = req.params;
+
+  try {
+    await DoctorSchema.findByIdAndDelete(doctor_id);
+    res.status(200).json({ message: "Doctor successfully deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err });
+  }
+};
+
+const DoctorInfo = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
+
+  const { doctor_id } = req.params;
+  try {
+    const doctor = await DoctorSchema.findById(doctor_id).lean();
+    res.status(200).json(doctor);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err });
+  }
+};
+
+const HospitalDoctorsLList = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ error: errors.array() });
   }
 
   const { hospital_id } = req.params;
-
   try {
-    await HospitalSchema.findByIdAndDelete(hospital_id);
-    res.status(200).json({ message: "Hospital successfully deleted" });
+    const doctors = await DoctorSchema.find({
+      hospital_id,
+    }).lean();
+    res.status(200).json(doctors);
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err });
   }
 };
 
-const HospitalInfo = async (req, res) => {
+const AllDoctors = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ error: errors.array() });
   }
 
-  const { hospital_id } = req.params;
   try {
-    const hospital = await HospitalSchema.findById(hospital_id).lean();
-    res.status(200).json(hospital);
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: err });
-  }
-};
-
-const AllHospitals = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-  
-  try {
-    const hospitals = await HospitalSchema.find().lean();
-    res.status(200).json(hospitals);
+    const doctors = await DoctorSchema.find().lean();
+    res.status(200).json(doctors);
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err });
@@ -173,7 +177,8 @@ export {
   Login,
   Register,
   UpdateDetails,
-  DeleteHospital,
-  HospitalInfo,
-  AllHospitals,
+  DeleteDoctor,
+  DoctorInfo,
+  HospitalDoctorsLList,
+  AllDoctors,
 };
