@@ -4,10 +4,13 @@
     display: none !important
 } */
 
+
 :root {
     --bg-color: #F5F6FA;
     --main-color: #228BE6;
 }
+
+
 
 body {
     font-family: 'Poppins', sans-serif;
@@ -71,6 +74,17 @@ h6 {
     padding: 1rem;
     border-radius: 16px;
     height: 100%;
+}
+
+.navigation .navlink p,
+
+.logout-btn {
+    font-size: 0.9rem;
+}
+
+
+table td {
+    font-size: 0.9rem;
 }
 
 .fw-500 {

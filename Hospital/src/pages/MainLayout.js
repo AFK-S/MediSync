@@ -71,7 +71,7 @@ const MainLayout = () => {
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/doctors" element={<Doctors />} />
+              <Route path="/doctors/*" element={<Doctors />} />
               <Route path="/appointments" element={<Appointments />} />
               <Route path="/patients" element={<Patients />} />
             </Routes>
