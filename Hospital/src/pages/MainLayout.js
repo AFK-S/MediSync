@@ -14,6 +14,7 @@ import axios from "axios";
 import Doctors from "./Doctors.js";
 import Appointments from "./Appointments.js";
 import Patients from "./Patients.js";
+import Register from "./Register.js";
 
 const MainLayout = () => {
   const [cookies, removeCookie] = useCookies(["token", "userId"]);
@@ -74,6 +75,7 @@ const MainLayout = () => {
               <Route path="/doctors/*" element={<Doctors />} />
               <Route path="/appointments" element={<Appointments />} />
               <Route path="/patients/*" element={<Patients />} />
+              <Route path="/reg-doc" element={<Register />} />
             </Routes>
           </div>
         </div>

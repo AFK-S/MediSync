@@ -38,6 +38,11 @@ const SideNavigation = () => {
       path: "/patients",
       icon: "fa-solid fa-user",
     },
+    {
+      name: "Register Doctor",
+      path: "/reg-doc",
+      icon: "fa-solid fa-user",
+    },
   ];
 
   return (
