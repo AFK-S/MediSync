@@ -19,7 +19,9 @@ const TopBar = ({ ToggleMenu }) => {
           <div
             className="col-3 col-md-2"
             style={{ display: "flex", justifyContent: "end" }}
-          ></div>
+          >
+            <div id="google_element"></div>
+          </div>
         </div>
       </div>
     </>
