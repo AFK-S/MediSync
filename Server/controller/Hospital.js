@@ -63,21 +63,42 @@ const UpdateDetails = async (req, res) => {
   }
 
   const { hospital_id } = req.params;
-  const { field, value } = req.query;
+  const data = req.body;
 
   try {
     const hospital = await HospitalSchema.findById(hospital_id);
     if (!hospital) {
       return res.status(400).json({ error: "Hospital not found" });
     }
-    if (!hospital[field]) {
-      return res.status(400).json({ error: "Invalid field specified" });
+    for (const [key, value] of Object.entries(data)) {
+      if (hospital[key] && typeof hospital[key] !== "object") {
+        hospital[key] = value;
+      } else if (hospital[key] && typeof hospital[key] === "object") {
+        for (const [subKey, subValue] of Object.entries(value)) {
+          if (hospital[key][subKey]) hospital[key][subKey] = subValue;
+        }
+      }
     }
-
-    hospital[field] = value;
     await hospital.save();
 
-    res.status(200).json({ message: "Hospital field updated successfully" });
+    res.status(200).json({ message: "Hospital details updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err });
+  }
+};
+
+const DeleteHospital = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array() });
+  }
+
+  const { hospital_id } = req.params;
+
+  try {
+    await HospitalSchema.findByIdAndDelete(hospital_id);
+    res.status(200).json({ message: "Hospital successfully deleted" });
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err });
@@ -110,4 +131,4 @@ const AllHospitals = async (req, res) => {
   }
 };
 
-export { Register, UpdateDetails, HospitalInfo, AllHospitals };
+export { Register, UpdateDetails, DeleteHospital, HospitalInfo, AllHospitals };
