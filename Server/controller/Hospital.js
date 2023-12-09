@@ -3,9 +3,7 @@ import { validationResult } from "express-validator";
 
 import HospitalSchema from "../models/HospitalSchema.js";
 
-const id_generate = new ShortUniqueId({
-  length: 8,
-});
+const { randomUUID } = new ShortUniqueId({ length: 8 });
 
 const Register = async (req, res, next) => {
   const errors = validationResult(req);
@@ -17,10 +15,10 @@ const Register = async (req, res, next) => {
     hospital_name,
     coordinates: { latitude, longitude },
     address: { street, city, state, zipCode, country },
-    contact: { phone_number, email_address },
+    contact_details: { phone_number, email_address },
   } = req.body;
-  const username = id_generate();
-  const password = id_generate();
+  const username = randomUUID();
+  const password = randomUUID();
 
   try {
     const hospital = await HospitalSchema.create({

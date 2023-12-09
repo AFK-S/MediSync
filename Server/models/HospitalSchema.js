@@ -20,10 +20,6 @@ const HospitalSchema = new Schema(
       street: {
         type: String,
         trim: true,
-        match: [
-          /^[a-zA-Z0-9 ]+$/,
-          (props) => `${props.value} is not a valid street address`,
-        ],
         required: [true, "Please add the Street Address"],
       },
       city: {
