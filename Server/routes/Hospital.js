@@ -17,6 +17,6 @@ router.post("/hospital/register", RegisterHospital, RegisterationMail);
 router.put("/hospital/update/:hospital_id", UpdateHospital);
 router.delete("/hospital/delete/:hospital_id", DeleteHospital);
 router.get("/hospital/:hospital_id", HospitalInfo);
-router.get("/hospital/all", AllHospitals);
+router.get("/hospitals", AllHospitals);
 
 export default router;

@@ -22,7 +22,7 @@ function HospitalList({ setLoading }) {
     (async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get("/api/hospital/all");
+        const { data } = await axios.get("/api/hospitals");
         setHospitals(data);
         setFilteredHospitals(data);
       } catch (err) {
@@ -93,7 +93,7 @@ function HospitalList({ setLoading }) {
                   variant="filled"
                   onClick={() => deleteHospital(item._id)}
                 >
-                  Button
+                  Delete
                 </Button>
               </Card>
             </Grid.Col>
