@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Grid, Card, Group, Badge, Text, TextInput } from "@mantine/core";
+import {
+  Grid,
+  Card,
+  Group,
+  Badge,
+  Text,
+  TextInput,
+  Button,
+} from "@mantine/core";
 import { IconBuildingHospital } from "@tabler/icons-react";
 import axios from "axios";
 import "./HospitalList.css";
@@ -8,6 +16,7 @@ function HospitalList({ setLoading }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [hospitals, setHospitals] = useState([]);
   const [filteredHospitals, setFilteredHospitals] = useState([]);
+  const [reFetch, setReFetch] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -21,7 +30,7 @@ function HospitalList({ setLoading }) {
       }
       setLoading(false);
     })();
-  }, []);
+  }, [reFetch]);
 
   useEffect(() => {
     (() => {
@@ -36,6 +45,17 @@ function HospitalList({ setLoading }) {
     })();
   }, [searchQuery, hospitals]);
 
+  const deleteHospital = async (hospital_id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`/api/hospital/delete/${hospital_id}`);
+      setReFetch(!reFetch);
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
   return (
     <div>
       <TextInput
@@ -49,7 +69,7 @@ function HospitalList({ setLoading }) {
         {filteredHospitals.map((item, index) => {
           return (
             <Grid.Col md={4} sm={12} key={index}>
-              <Card withBorder padding="lg" radius="md" h={170}>
+              <Card withBorder padding="lg" radius="md">
                 <Group position="apart">
                   <div className="avatar">
                     <IconBuildingHospital />
@@ -69,6 +89,12 @@ function HospitalList({ setLoading }) {
                   {item.address.state},{item.address.country},
                   {item.address.zipCode}
                 </Text>
+                <Button
+                  variant="filled"
+                  onClick={() => deleteHospital(item._id)}
+                >
+                  Button
+                </Button>
               </Card>
             </Grid.Col>
           );
