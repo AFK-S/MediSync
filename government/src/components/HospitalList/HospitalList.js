@@ -16,8 +16,8 @@ function HospitalList({ setLoading }) {
         const { data } = await axios.get("/api/hospital/all");
         setHospitals(data);
         setFilteredHospitals(data);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
       }
       setLoading(false);
     })();

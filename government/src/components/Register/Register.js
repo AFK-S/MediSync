@@ -1,172 +1,120 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Grid,
-  Col,
-  TextInput,
-  useMantineTheme,
-  Modal,
-} from "@mantine/core";
+import React from "react";
+import { Box, Button, Grid, Col, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import "./Register.css";
-import { SERVER_URL } from "../../config";
 import axios from "axios";
 
-function Register() {
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false); // State for confirmation
-  const [isModalOpen, setModalOpen] = useState(false);
-
+function Register({ setLoading }) {
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
-      name: "",
-      latitude: "",
-      longitude: "",
-      street: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "",
-      phone: "",
-      email: "",
+      hospital_name: "",
+      coordinates: {
+        latitude: "",
+        longitude: "",
+      },
+      address: { street: "", city: "", state: "", zipCode: "", country: "" },
+      contact_details: {
+        phone_number: "",
+        email_address: "",
+      },
     },
     validate: {},
   });
 
-  const API_URL = `${SERVER_URL}/api/government/register`;
-
   const handleSubmit = async (values) => {
+    setLoading(true);
     try {
-      setLoading(true);
-
-      const requestData = {
-        name: values.name,
+      const { data } = await axios.post("/api/hospital/register", {
+        hospital_name: values.hospital_name,
         coordinates: {
-          latitude: parseFloat(values.latitude),
-          longitude: parseFloat(values.longitude),
+          latitude: parseFloat(values.coordinates.latitude),
+          longitude: parseFloat(values.coordinates.longitude),
         },
-        address: {
-          street: values.street,
-          city: values.city,
-          state: values.state,
-          zipCode: values.zipCode,
-          country: values.country,
-        },
-        contact: {
-          phone: values.phone,
-          email: values.email,
-        },
-      };
+        address: values.address,
+        contact_details: values.contact_details,
+      });
+      console.log(data);
 
-      const response = await axios.post(API_URL, requestData);
-
-      console.log("API Response:", response.data);
-
-      // Reset form and show modal
       form.reset();
-      setSubmitted(true);
-      setModalOpen(true);
-
-      notifications.show({
-        message: "Registration successful!",
-        color: "green",
-      });
-    } catch (error) {
-      console.error("Error submitting form:", error);
-
-      notifications.show({
-        message: "Registration failed. Please try again.",
-        color: "red",
-      });
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
     }
-  };
-
-  const handleError = (errors) => {
-    console.log("Form errors:", errors);
-  };
-
-  const handleConfirmationClose = () => {
-    setSubmitted(false);
-    setModalOpen(false);
+    setLoading(false);
   };
 
   return (
-    <Box maxWidth={600} mx="auto" style={{ padding: "40px" }}>
-      <form onSubmit={form.onSubmit(handleSubmit, handleError)}>
+    <Box maxwidth={600} mx="auto" style={{ padding: "40px" }}>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid>
           <Col span={12}>
             <TextInput
-              label="Name"
-              placeholder="Name"
-              {...form.getInputProps("name")}
+              label="Hospital Name"
+              placeholder="Enter hospital name"
+              {...form.getInputProps("hospital_name")}
             />
           </Col>
           <Col sm={12} md={6}>
             <TextInput
               label="Latitude"
               placeholder="Latitude"
-              {...form.getInputProps("latitude")}
+              {...form.getInputProps("coordinates.latitude")}
             />
           </Col>
           <Col sm={12} md={6}>
             <TextInput
               label="Longitude"
               placeholder="Longitude"
-              {...form.getInputProps("longitude")}
+              {...form.getInputProps("coordinates.longitude")}
             />
           </Col>
           <Col sm={12} md={6}>
             <TextInput
-              label="Phone"
-              placeholder="Phone"
-              {...form.getInputProps("phone")}
+              label="Hospital Phone Number"
+              placeholder="Enter hospital phone number"
+              {...form.getInputProps("contact_details.phone_number")}
             />
           </Col>
           <Col sm={12} md={6}>
             <TextInput
-              label="Hospital Email"
-              placeholder="Hospital Email"
-              {...form.getInputProps("email")}
+              label="Hospital Email Address"
+              placeholder="Enter hospital email address"
+              {...form.getInputProps("contact_details.email_address")}
             />
           </Col>
           <Col sm={12} md={8}>
             <TextInput
               label="Street"
               placeholder="Street"
-              {...form.getInputProps("street")}
+              {...form.getInputProps("address.street")}
             />
           </Col>
           <Col sm={12} md={4}>
             <TextInput
               label="City (Hospital)"
               placeholder="City (Hospital)"
-              {...form.getInputProps("city")}
+              {...form.getInputProps("address.city")}
             />
           </Col>
-          <Col span={12}>
+          <Col span={12} md={4}>
             <TextInput
               label="State (Hospital)"
               placeholder="State (Hospital)"
-              {...form.getInputProps("state")}
+              {...form.getInputProps("address.state")}
             />
           </Col>
-          <Col sm={12} md={3}>
+          <Col sm={12} md={4}>
             <TextInput
               label="Zip Code"
               placeholder="Zip Code"
-              {...form.getInputProps("zipCode")}
+              {...form.getInputProps("address.zipCode")}
             />
           </Col>
-          <Col sm={12} md={3}>
+          <Col sm={12} md={4}>
             <TextInput
               label="Country"
               placeholder="Country"
-              {...form.getInputProps("country")}
+              {...form.getInputProps("address.country")}
             />
           </Col>
         </Grid>
@@ -176,26 +124,9 @@ function Register() {
           className="register-button"
           disabled={form.loading}
         >
-          {form.loading ? "Submitting..." : "Submit"}
+          Submit
         </Button>
       </form>
-
-      {/* Confirmation modal */}
-      <Modal
-        title="Hospital has been created!"
-        opened={isModalOpen}
-        onClose={handleConfirmationClose}
-        size="md"
-      >
-        {/* <div>
-          <p>Your registration has been successfully submitted.</p>
-        </div> */}
-        <div className="w-100 d-flex align-item-center justify-content-center">
-          <Button className="register-button" onClick={handleConfirmationClose}>
-            Close
-          </Button>
-        </div>
-      </Modal>
     </Box>
   );
 }
