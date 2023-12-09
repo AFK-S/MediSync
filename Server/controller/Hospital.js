@@ -7,7 +7,7 @@ const id_generate = new ShortUniqueId({
   length: 8,
 });
 
-const Register = async (req, res) => {
+const Register = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ error: errors.array() });
@@ -45,11 +45,13 @@ const Register = async (req, res) => {
     });
 
     req.data = {
+      name: hospital_name,
       email_address,
       username,
       password,
     };
     res.status(200).send(hospital._id);
+    next();
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: err });

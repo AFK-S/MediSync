@@ -2,11 +2,31 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import governmentRoutes from "./routes/GovernmentRoutes.js"; // Assuming the route file is in the same directory
+import cookieParser from "cookie-parser";
+import fileupload from "express-fileupload";
+import session from "express-session";
+
+import HospitalRoute from "./routes/Hospital.js";
 
 const app = express();
 dotenv.config();
 
+try {
+  mongoose.connect(process.env.MONGODB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+} catch (error) {
+  console.log(error);
+}
+
+app.use(express.json());
+app.use(fileupload());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 app.use(
   cors({
     origin: "*",
@@ -14,31 +34,43 @@ app.use(
     credentials: true,
   })
 );
+app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      //  secure: true,
+    },
+  })
+);
 
-app.use(express.json());
-
-app.use("/api", governmentRoutes);
-
-app.get("/", (req, res) => {
-  res.send("Medisync is up and running!!");
+app.get("/api/authentication", async (req, res) => {
+  if (
+    req.session.type_of_user === req.cookies.type_of_user &&
+    req.session._id === req.cookies._id
+  ) {
+    return res.send(true);
+  }
+  res.send(false);
+});
+app.get("/api/logout", async (req, res) => {
+  req.session.destroy();
+  res
+    .clearCookie("connect.sid")
+    .clearCookie("type_of_user")
+    .clearCookie("_id")
+    .status(200)
+    .end();
 });
 
-async function startServer() {
-  try {
-    await mongoose.connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("MongoDB connected");
+app.use("/api", HospitalRoute);
 
-    app.listen(8001, () => {
-      console.log("Server listening on port 8001");
-    });
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-  }
-}
+app.get("/", (req, res) => {
+  res.send("MediSync is up and running!!");
+});
 
-startServer().catch((error) => {
-  console.error("Error starting the server:", error);
+app.listen(8000, () => {
+  console.log("Server listening on port 8000");
 });

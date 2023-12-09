@@ -1,4 +1,5 @@
-import { Schema, connection } from "mongoose";
+import mongoose from "mongoose";
+const { Schema, connection } = mongoose;
 
 const HospitalSchema = new Schema(
   {
