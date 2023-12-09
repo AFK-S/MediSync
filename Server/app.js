@@ -8,6 +8,7 @@ import session from "express-session";
 
 import HospitalRoute from "./routes/Hospital.js";
 import DoctorRoute from "./routes/Doctor.js";
+import TpLinkRoute from "./routes/TpLink.js";
 
 const app = express();
 dotenv.config();
@@ -60,6 +61,7 @@ app.get("/api/logout", async (req, res) => {
 
 app.use("/api", HospitalRoute);
 app.use("/api", DoctorRoute);
+app.use("/api", TpLinkRoute);
 
 app.get("/", (req, res) => {
   res.send("MediSync is up and running!!");
