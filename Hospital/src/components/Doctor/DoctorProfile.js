@@ -108,6 +108,17 @@ const DoctorProfile = () => {
     },
   ]);
 
+  const [docLog, setDocLog] = useState([
+    {
+      time: "18:32",
+      status: "exit",
+    },
+    {
+      time: "18:32",
+      status: "entry",
+    },
+  ]);
+
   return (
     <>
       <div className="container-fluid">
@@ -138,17 +149,16 @@ const DoctorProfile = () => {
 
         {/* Availability & Track */}
         <div className="container-fluid my-4">
-          <div className="row">
+          <div className="row gy-4">
             <div className="col-md-8">
               <AttendanceCalendar />
             </div>
             <div className="col-md-4">
               <div className="c-card">
-                <h4>Doctor Logs</h4>
-                <Table
-                  data={patientsDetails && patientsDetails}
-                  columns={["Name", "Date", "Doctor", "TimeSlot"]}
-                />
+                <h4>Logs</h4>
+                <div className="mt-2">
+                  <Table data={docLog && docLog} columns={["Status", "Time"]} />
+                </div>
               </div>
             </div>
           </div>
