@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css"; // Import the default styles for react-calendar
-import "./Attendance.css";
+import { useDisclosure } from "@mantine/hooks";
+import { Modal, Button } from "@mantine/core";
+import AttendanceCalendar from "../AttendanceCalendar/AttendanceCalendar";
 
 const Table = ({ data, columns }) => {
   return (
     <div
       className="inner-container"
-      style={{ overflowY: "auto", maxHeight: "300px" }}
+      style={{ overflowY: "auto", maxHeight: "40vh" }}
     >
       <table className="table table-hover text-no-wrap">
         <thead>
@@ -36,12 +36,10 @@ const Table = ({ data, columns }) => {
   );
 };
 
-const AttendanceCalendar = () => {
-  // Replace these arrays with the actual data from your backend
-  const attendanceData = ["2023-12-23", "2023-12-13", "2023-10-25"];
-  const upcomingData = ["2023-12-27", "2023-10-28", "2023-12-09"];
+const DoctorProfile = () => {
+  const [opened, { open, close }] = useDisclosure(false);
 
-  const [patientsWaiting, setPatientsWaiting] = useState([
+  const [patientsDetails, setPatientsDetails] = useState([
     {
       name: "Karan",
       doctor: "Dr. XYZ",
@@ -110,45 +108,62 @@ const AttendanceCalendar = () => {
     },
   ]);
 
-  const isDateMarked = (date) => {
-    return attendanceData.includes(date.toISOString().split("T")[0]);
-  };
-
-  const isDateUpcoming = (date) => {
-    return upcomingData.includes(date.toISOString().split("T")[0]);
-  };
-
   return (
-    <div className="c-card">
-      <h4>Attendance Calendar</h4>
-      <div className="row">
-        <div className="col-md-6">
-          <div className="mt-3">
-            <Calendar
-              style={{ width: "100%", borderRadius: "100px", padding: "10px" }}
-              onClickDay={(date, event) => event.preventDefault()}
-              tileClassName={({ date, view }) =>
-                `${isDateMarked(date) ? "marked-date" : ""} ${
-                  isDateUpcoming(date) ? "upcoming-date" : ""
-                } ${view === "month" ? "month-view" : ""}`
-              }
-            />
+    <>
+      <div className="container-fluid">
+        <h2 className="mt-4 fw-600">Dr. Karandeep Singh Sandhu</h2>
+        {/* Stats */}
+        <div className="container-fluid my-4">
+          <div className="row gy-3">
+            <div className="col-md-4">
+              <div className="c-card">
+                <h4>Appointments</h4>
+                <h5>30</h5>
+              </div>
+            </div>
+            <div className="col-md-4">
+              <div className="c-card">
+                <h4>Revenue</h4>
+                <h5>Rs. 30,000</h5>
+              </div>
+            </div>
+            <div className="col-md-4">
+              <div className="c-card">
+                <h4>Patient History</h4>
+                <Button onClick={open}>Open modal</Button>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="col-md-6">
-          <div className=" p-0">
-            <h5 className="mb-2 mt-4 mt-md-0">Upcoming Appointments</h5>
-            <div className="">
-              <Table
-                data={patientsWaiting && patientsWaiting}
-                columns={["Name", "Date", "TimeSlot"]}
-              />
+
+        {/* Availability & Track */}
+        <div className="container-fluid my-4">
+          <div className="row">
+            <div className="col-md-8">
+              <AttendanceCalendar />
+            </div>
+            <div className="col-md-4">
+              <div className="c-card">
+                <h4>Doctor Logs</h4>
+                <Table
+                  data={patientsDetails && patientsDetails}
+                  columns={["Name", "Date", "Doctor", "TimeSlot"]}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Patients Info Modal */}
+      <Modal opened={opened} onClose={close} title="Patient Details">
+        <Table
+          data={patientsDetails && patientsDetails}
+          columns={["Name", "Date", "Doctor", "TimeSlot"]}
+        />
+      </Modal>
+    </>
   );
 };
 
-export default AttendanceCalendar;
+export default DoctorProfile;
