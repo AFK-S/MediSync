@@ -1,51 +1,67 @@
-const { Schema, connection } = require("mongoose");
+import { Schema, connection } from "mongoose";
 
 const DoctorSchema = new Schema(
   {
-    hospital: {
+    hospital_id: {
       type: Schema.Types.ObjectId,
-      ref: "Hospital",
       required: [true, "Please provide a Hospital ID"],
     },
     name: {
       type: String,
       trim: true,
+      match: [/^[a-zA-Z ]+$/, (props) => `${props.value} is not a valid name`],
       required: [true, "Please provide the Doctor's Name"],
     },
     specialization: {
       type: String,
       trim: true,
+      match: [
+        /^[a-zA-Z ]+$/,
+        (props) => `${props.value} is not a valid specialization`,
+      ],
       required: [true, "Please provide the Specialization"],
     },
     experience: {
       type: Number,
+      match: [
+        /^[0-9]+$/,
+        (props) => `${props.value} is not a valid experience`,
+      ],
       required: [true, "Please provide the Experience"],
     },
     age: {
       type: Number,
+      match: [/^[0-9]+$/, (props) => `${props.value} is not a valid age`],
       required: [true, "Please provide the Age"],
     },
     availability: [
       {
         day: {
           type: String,
+          enum: [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+          ],
+          match: [
+            /^[a-zA-Z]+$/,
+            (props) => `${props.value} is not a valid day`,
+          ],
           required: [true, "Please provide the Day"],
         },
         slots: [
           {
             from: {
               type: String,
-              required: [
-                true,
-                "Please provide the starting time of the time slot",
-              ],
+              required: [true, "Please provide the starting time"],
             },
             till: {
               type: String,
-              required: [
-                true,
-                "Please provide the ending time of the time slot",
-              ],
+              required: [true, "Please provide the ending time"],
             },
           },
         ],
@@ -54,26 +70,31 @@ const DoctorSchema = new Schema(
     gender: {
       type: String,
       enum: ["male", "female"],
+      match: [/^[a-zA-Z]+$/, (props) => `${props.value} is not a valid gender`],
       required: [true, "Please provide the Gender"],
     },
     fees: {
       type: Number,
+      match: [/^[0-9]+$/, (props) => `${props.value} is not a valid fees`],
       required: [true, "Please provide the Fees"],
     },
-    contact: {
+    phone_number: {
       type: String,
       trim: true,
-      required: [true, "Please provide the Contact Information"],
+      match: [
+        /^[0-9]{10}$/,
+        (props) => `${props.value} is not a valid phone number`,
+      ],
+      required: [true, "Please add a Phone Number"],
     },
     username: {
       type: String,
-      default: () => Math.random().toString(36).substring(7),
       unique: true,
+      required: [true, "Please add the Username"],
     },
     password: {
       type: String,
-      default: () => Math.random().toString(36).substring(7),
-      required: [true, "Please provide a Password"],
+      required: [true, "Please add the Password"],
     },
   },
   {
@@ -81,4 +102,4 @@ const DoctorSchema = new Schema(
   }
 );
 
-module.exports = connection.useDb("YourDB").model("Doctor", DoctorSchema);
+export default connection.useDb("MediSync").model("Doctor", DoctorSchema);
