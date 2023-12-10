@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LoadingOverlay, MantineProvider, createTheme } from "@mantine/core";
 import { useSelector } from "react-redux";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import MainLayout from "./pages/MainLayout";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
@@ -42,7 +41,6 @@ function App() {
         <Routes>
           <Route path="/*" element={<MainLayout />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
         </Routes>
       </BrowserRouter>
     </MantineProvider>

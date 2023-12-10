@@ -11,7 +11,6 @@ import MobileNav from "../components/MobileNav/MobileNav.js";
 import Home from "./Home/Home.js";
 // import { SERVER_URL } from "../config.js";
 import axios from "axios";
-import Doctors from "./Doctors.js";
 import Appointments from "./Appointments.js";
 import Patients from "./Profile.js";
 import Search from "./Search.js";

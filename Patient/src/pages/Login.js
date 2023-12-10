@@ -75,7 +75,7 @@ export default function Login() {
     try {
       alert(`Welcome ${values.name}! You are now registered.`);
       setTimeout(() => {
-        Navigate("/dashboard");
+        Navigate("/home");
       }, 1000);
     } catch (err) {
       console.log(err);
@@ -98,7 +98,11 @@ export default function Login() {
           maxWidth: 450,
         }}
       >
-        <Text size="lg" weight={500}>
+        <Text
+          size="lg"
+          // weight={700}
+          style={{ color: "black", fontWeight: "bolder" }}
+        >
           Welcome to MediSync
         </Text>
 
@@ -134,7 +138,7 @@ export default function Login() {
             </Stack>
 
             <Group position="apart" mt="xl">
-              <Button type="submit" radius="xl" disabled={loading}>
+              <Button type="submit" radius="lg" disabled={loading}>
                 {loading ? <Loader color="white" variant="dots" /> : "Sign Up"}
               </Button>
             </Group>
@@ -142,6 +146,9 @@ export default function Login() {
         ) : otpSent ? (
           <form onSubmit={form.onSubmit((value) => handleOtpSubmit(value))}>
             <Stack>
+              <Text style={{ color: "black" }}>
+                Enter OTP received on you Phone
+              </Text>
               <PinInput
                 value={form.values.otp}
                 onChange={(otp) => form.setFieldValue("otp", otp)}
@@ -153,7 +160,7 @@ export default function Login() {
             </Stack>
 
             <Group position="apart" mt="xl">
-              <Button type="submit" radius="xl" disabled={loading}>
+              <Button type="submit" radius="lg" disabled={loading}>
                 {loading ? <Loader color="white" variant="dots" /> : "Submit"}
               </Button>
               <NavLink to="/login">Edit Mobile Number</NavLink>
