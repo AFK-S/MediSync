@@ -1,5 +1,4 @@
 import express from "express";
-
 import {
   Register as RegisterDoctor,
   UpdateDetails as UpdateDoctor,
