@@ -1,0 +1,54 @@
+.react-calendar {
+    border-radius: 15px;
+    border: 2px solid;
+    overflow: hidden;
+    width: 320px;
+    padding: 10px;
+}
+
+.marked-date {
+    background-color: rgb(42, 214, 42);
+    color: white;
+}
+
+.upcoming-date {
+    background-color: #228be6;
+    color: white;
+}
+
+.react-calendar__tile.react-calendar__month-view__days__day.month-view {
+    border-radius: 50%;
+    padding: 0.7rem;
+    transform: scale(0.8);
+    font-weight: bold;
+    line-height: 20px;
+    font-size: 1.1rem;
+}
+
+.react-calendar__navigation__label__labelText.react-calendar__navigation__label__labelText--from {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+    text-decoration: none;
+}
+
+.react-calendar__navigation {
+    margin-bottom: 7px;
+}
+
+.react-calendar__tile--now {
+    background-color: rgb(225, 225, 225);
+}
+
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+    background-color: rgb(0, 0, 0);
+    color: #fff;
+}
+
+.react-calendar__tile.react-calendar__tile--active.react-calendar__tile--range.react-calendar__tile--rangeStart.react-calendar__tile--rangeEnd.react-calendar__tile--rangeBothEnds.react-calendar__month-view__days__day.month-view {
+    background-color: #228be64b;
+    color: #0069c4;
+}

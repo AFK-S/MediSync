@@ -1,0 +1,15 @@
+.mobileNav {
+    height: 100vh;
+    margin-left: -100%;
+    position: fixed;
+    top: 0;
+    transition: all 0.4s ease;
+    z-index: 10;
+    overflow: hidden;
+    width: 100%;
+}
+
+.mobileNav.active {
+    margin-left: 0%;
+    display: block;
+}
