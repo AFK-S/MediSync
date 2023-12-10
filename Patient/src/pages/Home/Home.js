@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Divider, Group, Text } from "@mantine/core";
 import Chart from "react-apexcharts";
 import "./Home.css";
-import RescheduleIcon from "../../assets/rescheduling.png";
 
 const Table = ({ data, columns }) => {
   return (
