@@ -51,21 +51,14 @@ const PatientInfo = async (req, res) => {
 const HospitalPatient = async (req, res) => {
   try {
     const { hospital_id } = req.params;
-    const response = await AppointmentSchema.aggregate([
-      {
-        $match: {
-          hospital_id,
-        },
+    const patient_ids = await AppointmentSchema.find({
+      hospital_id,
+    }).distinct("patient_id");
+    const response = await PatientSchema.find({
+      _id: {
+        $in: patient_ids,
       },
-      {
-        $lookup: {
-          from: "patients",
-          localField: "patient_id",
-          foreignField: "_id",
-          as: "patient",
-        },
-      },
-    ]);
+    }).lean();
     res.status(200).json(response);
   } catch (err) {
     console.error(err);
@@ -73,50 +66,17 @@ const HospitalPatient = async (req, res) => {
   }
 };
 
-const TodayDoctorPatient = async (req, res) => {
+const DoctorsPatient = async (req, res) => {
   try {
     const { doctor_id } = req.params;
-    const response = await AppointmentSchema.aggregate([
-      {
-        $match: {
-          doctor_id,
-          date: new Date().toISOString().split("T")[0],
-        },
+    const patient_ids = await AppointmentSchema.find({
+      doctor_id,
+    }).distinct("patient_id");
+    const response = await PatientSchema.find({
+      _id: {
+        $in: patient_ids,
       },
-      {
-        $lookup: {
-          from: "patients",
-          localField: "patient_id",
-          foreignField: "_id",
-          as: "patient",
-        },
-      },
-    ]);
-    res.status(200).json(response);
-  } catch (err) {
-    console.error(err);
-    res.status(400).send(err.message);
-  }
-};
-
-const AllDoctorPatient = async (req, res) => {
-  try {
-    const { doctor_id } = req.params;
-    const response = await AppointmentSchema.aggregate([
-      {
-        $match: {
-          doctor_id,
-        },
-      },
-      {
-        $lookup: {
-          from: "patients",
-          localField: "patient_id",
-          foreignField: "_id",
-          as: "patient",
-        },
-      },
-    ]);
+    }).lean();
     res.status(200).json(response);
   } catch (err) {
     console.error(err);
@@ -139,7 +99,6 @@ export {
   DeletePatient,
   PatientInfo,
   HospitalPatient,
-  TodayDoctorPatient,
-  AllDoctorPatient,
+  DoctorsPatient,
   AllPatients,
 };

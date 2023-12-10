@@ -4,8 +4,7 @@ import {
   DeletePatient,
   PatientInfo,
   HospitalPatient,
-  TodayDoctorPatient,
-  AllDoctorPatient,
+  DoctorsPatient,
   AllPatients,
 } from "../controller/Patient.js";
 import { PatientLogin } from "../controller/Login.js";
@@ -20,8 +19,7 @@ router.put("/patient/update/:phone_number", UpdatePatient);
 router.delete("/patient/delete/:phone_number", DeletePatient);
 router.get("/patient/:phone_number", PatientInfo);
 router.get("/patient/hospital/:hospital_id", HospitalPatient);
-router.get("/patient/doctor/:doctor_id/today", TodayDoctorPatient);
-router.get("/patient/doctor/:doctor_id", AllDoctorPatient);
+router.get("/patient/doctor/:doctor_id", DoctorsPatient);
 router.get("/patients", AllPatients);
 
 export default router;
