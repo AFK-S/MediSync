@@ -73,10 +73,7 @@ export default function Login(PaperProps) {
         radius="md"
         p="xl"
         withBorder
-        sx={{
-          width: "80%",
-          maxWidth: 450,
-        }}
+        style={{ width: "80vw", maxWidth: 450 }}
       >
         <Text size="lg" weight={500}>
           Welcome to MediSync
@@ -115,11 +112,11 @@ export default function Login(PaperProps) {
           </Stack>
 
           <Group position="apart" mt="xl">
-            <div className=""></div>
             <Button type="submit" radius="xl" disabled={loading}>
               {loading ? <Loader color="white" variant="dots" /> : "Login"}
             </Button>
-            <NavLink to="/">Login</NavLink>
+
+            {/* <NavLink to="/">Login</NavLink> */}
           </Group>
         </form>
       </Paper>
