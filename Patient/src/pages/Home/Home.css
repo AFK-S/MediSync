@@ -1,0 +1,21 @@
+.reschedule-btn {
+  background-color: var(--main-color);
+  color: var(--text-color);
+  padding: 5px 10px;
+  border-radius: 10px;
+  margin-bottom: 0;
+}
+
+.upcoming-appointments-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.appointment-card {
+  border: solid 1px #000;
+}
+
+.alert-container {
+  max-height: 200px;
+  overflow-y: auto;
+}
