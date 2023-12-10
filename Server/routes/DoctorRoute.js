@@ -1,14 +1,15 @@
 import express from "express";
 
 import {
-  Login as DoctorLogin,
   Register as RegisterDoctor,
   UpdateDetails as UpdateDoctor,
   DeleteDoctor,
   DoctorInfo,
-  HospitalDoctorsLList,
+  HospitalDoctorsList,
+  AllHospitalDoctorsList,
   AllDoctors,
 } from "../controller/Doctor.js";
+import { DoctorLogin } from "../controller/Login.js";
 
 const router = express.Router();
 
@@ -17,7 +18,8 @@ router.post("/doctor/register", RegisterDoctor);
 router.put("/doctor/update/:doctor_id", UpdateDoctor);
 router.delete("/doctor/delete/:doctor_id", DeleteDoctor);
 router.get("/doctor/:doctor_id", DoctorInfo);
-router.get("/doctor/hospital/:hospital_id", HospitalDoctorsLList);
-router.get("/doctor/all", AllDoctors);
+router.get("/doctor/hospital/:hospital_id", HospitalDoctorsList);
+router.get("/doctors/hospital", AllHospitalDoctorsList);
+router.get("/doctors", AllDoctors);
 
 export default router;

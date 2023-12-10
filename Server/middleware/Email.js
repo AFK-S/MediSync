@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-const RegisterationMail = (req, res) => {
+const RegistrationMail = (req, res) => {
   const { name, email_address, username, password } = req.data;
   const template = `
      <h3>${name} has been successfully registered.</h3>
@@ -39,4 +39,4 @@ const RegisterationMail = (req, res) => {
     );
 };
 
-export { RegisterationMail };
+export { RegistrationMail };
