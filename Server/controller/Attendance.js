@@ -1,104 +1,94 @@
-import { validationResult } from "express-validator";
-
 import AttendanceSchema from "../models/AttendanceSchema.js";
 
 const Register = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { doctor_id } = req.params;
-
   try {
+    const { doctor_id } = req.params;
     const attendance = await AttendanceSchema.create({
       doctor_id,
+      date: new Date(),
     });
-
     res.status(200).send(attendance._id);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
+  }
+};
+
+const DoctorUnavailableRegister = async (req, res) => {
+  try {
+    const { doctor_id } = req.params;
+    const data = req.body;
+    const attendance = await AttendanceSchema.create({
+      doctor_id,
+      absent: true,
+      date: data,
+    });
+    res.status(200).send(attendance._id);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
   }
 };
 
 const DeleteAttendance = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { attendance_id } = req.params;
-
   try {
+    const { attendance_id } = req.params;
     await AttendanceSchema.findByIdAndDelete(attendance_id);
-    res.status(200).json({ message: "Attendance successfully deleted" });
+    res.status(200).send("Attendance successfully deleted");
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
 const AttendanceInfo = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { doctor_id } = req.params;
   try {
-    const doctor = await AttendanceSchema.findById(doctor_id).lean();
-    res.status(200).json(doctor);
+    const { attendance_id } = req.params;
+    const attendance = await AttendanceSchema.findById(attendance_id).lean();
+    res.status(200).json(attendance);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
-const todayDoctorAttendance = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { doctor_id } = req.params;
+const TodayDoctorsAttendance = async (req, res) => {
   try {
-    const doctors = await AttendanceSchema.find({
+    const { doctor_id } = req.params;
+    const attendance = await AttendanceSchema.find({
       doctor_id,
+      absent: false,
     }).lean();
-    res.status(200).json(doctors);
+    res.status(200).json(attendance);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
 const DoctorAttendanceHistory = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { doctor_id } = req.params;
   try {
+    const { doctor_id } = req.params;
     const attendance = await AttendanceSchema.find({
       doctor_id,
       createdAt: {
         $gte: new Date(new Date().setHours(0, 0, 0)),
         $lt: new Date(new Date().setHours(23, 59, 59)),
       },
+      absent: false,
     }).lean();
     res.status(200).json(attendance);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
 export {
   Register,
+  DoctorUnavailableRegister,
   DeleteAttendance,
   AttendanceInfo,
-  todayDoctorAttendance,
+  TodayDoctorsAttendance,
   DoctorAttendanceHistory,
 };
