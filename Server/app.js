@@ -8,6 +8,7 @@ import DoctorRoute from "./routes/DoctorRoute.js";
 import TpLinkRoute from "./routes/TpLinkRoute.js";
 import AttendanceRoute from "./routes/AttendanceRoute.js";
 import PatientRoute from "./routes/PatientRoute.js";
+import AppointmentRoute from "./routes/AppointmentRoute.js";
 
 const app = express();
 dotenv.config();
@@ -41,6 +42,7 @@ app.use("/api", DoctorRoute);
 app.use("/api", TpLinkRoute);
 app.use("/api", AttendanceRoute);
 app.use("/api", PatientRoute);
+app.use("/api", AppointmentRoute);
 
 app.get("/api/logout", async (req, res) => {
   res.clearCookie("_id").status(200).end();
