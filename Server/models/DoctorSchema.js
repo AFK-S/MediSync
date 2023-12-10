@@ -13,6 +13,15 @@ const DoctorSchema = new Schema(
       match: [/^[a-zA-Z ]+$/, (props) => `${props.value} is not a valid name`],
       required: [true, "Please provide the Doctor's Name"],
     },
+    photo: {
+      type: String,
+      trim: true,
+      match: [
+        /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
+        (props) => `${props.value} is not a valid photo`,
+      ],
+      required: [true, "Please provide the Photo"],
+    },
     specialization: {
       type: String,
       trim: true,

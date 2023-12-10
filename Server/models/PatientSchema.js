@@ -24,6 +24,7 @@ const PatientSchema = new Schema(
         /^[0-9]{10}$/,
         (props) => `${props.value} is not a valid phone number`,
       ],
+      unique: true,
       required: [true, "Please add a Phone Number"],
     },
   },

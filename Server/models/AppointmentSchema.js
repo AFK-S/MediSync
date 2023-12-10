@@ -11,6 +11,12 @@ const AppointmentSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: [true, "Please provide a Patient ID"],
     },
+    symptoms: {
+      type: Array,
+    },
+    medical_history: {
+      type: Array,
+    },
     date: {
       type: Date,
       required: [true, "Please provide a Date"],
@@ -18,6 +24,14 @@ const AppointmentSchema = new Schema(
     time_slot: {
       type: String,
       required: [true, "Please provide a Time Slot"],
+    },
+    e_prescription: {
+      type: String,
+      trim: true,
+      match: [
+        /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
+        (props) => `${props.value} is not a valid report`,
+      ],
     },
   },
   { timestamps: true }

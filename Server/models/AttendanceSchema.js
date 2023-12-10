@@ -7,10 +7,19 @@ const AttendanceSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: [true, "Please provide a Doctor ID"],
     },
+    absent: {
+      type: Boolean,
+      default: false,
+      required: [true, "Please provide a Absent"],
+    },
     isPresent: {
       type: Boolean,
       default: true,
       required: [true, "Please provide a Present"],
+    },
+    date: {
+      type: Date,
+      required: [true, "Please provide a Date"],
     },
   },
   { timestamps: true }
