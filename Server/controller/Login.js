@@ -1,5 +1,6 @@
 import HospitalSchema from "../models/HospitalSchema.js";
 import DoctorSchema from "../models/DoctorSchema.js";
+import PatientSchema from "../models/PatientSchema.js";
 
 const HospitalLogin = async (req, res) => {
   try {
@@ -44,4 +45,31 @@ const DoctorLogin = async (req, res) => {
   }
 };
 
-export { HospitalLogin, DoctorLogin };
+const PatientLogin = async (req, res) => {
+  try {
+    const { name, age, phone_number } = req.body;
+    let response = await PatientSchema.findOne({
+      phone_number,
+    })
+      .select(["_id"])
+      .lean();
+    if (response === null) {
+      response = await PatientSchema.create({
+        name,
+        age,
+        phone_number,
+      });
+    }
+    res
+      .cookie("_id", response._id, {
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      })
+      .status(200)
+      .end();
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+export { HospitalLogin, DoctorLogin, PatientLogin };
