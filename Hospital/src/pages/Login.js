@@ -1,69 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "@mantine/form";
 import {
   TextInput,
   PasswordInput,
   Text,
   Paper,
-  Group,
-  PaperProps,
   Button,
   Divider,
-  Anchor,
   Stack,
+  Group,
 } from "@mantine/core";
-import { NavLink } from "react-router-dom";
 import axios from "axios";
-import { IconCheck, IconX } from "@tabler/icons-react";
 import { Loader } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 
-export default function Login(PaperProps) {
+export default function Login() {
   const [loading, setLoading] = useState(false);
+  const [cookies] = useCookies();
   const Navigate = useNavigate();
   const form = useForm({
     initialValues: {
-      email: "",
+      username: "",
       password: "",
     },
-    validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : "Invalid email"),
-      password: (val) =>
-        val.trim().length <= 6
-          ? "Password should include at least 6 characters"
-          : null,
-    },
+    validate: {},
   });
-
-  const [cookies, setCookie] = useCookies(["token", "userId"]);
-
+  useEffect(() => {
+    if (cookies._id !== undefined) Navigate("/");
+  }, [cookies]);
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/auth/login", values);
-      alert(`Welcome ${data.name}`);
-      setCookie("token", data.token, {
-        path: "/",
-        maxAge: 604800,
-        expires: new Date(Date.now() + 604800),
-        sameSite: true,
-      });
-      setCookie("userId", data.id, {
-        path: "/",
-        maxAge: 604800,
-        expires: new Date(Date.now() + 604800),
-        sameSite: true,
-      });
-      setTimeout(() => {
-        Navigate("/");
-      }, 1000);
+      await axios.post("/api/hospital/login", values);
+      form.reset();
+      Navigate("/");
     } catch (err) {
       console.log(err);
-      alert(`Something went wrong: ${err.response && err.response.data.msg}`);
+      alert(`Something went wrong: ${err.response && err.response.data}`);
     } finally {
       setLoading(false);
-      form.reset();
     }
   };
 
@@ -85,13 +61,13 @@ export default function Login(PaperProps) {
           <Stack>
             <TextInput
               required
-              label="Email"
-              placeholder="something@something.dev"
-              value={form.values.email}
+              label="username"
+              placeholder="username"
+              value={form.values.username}
               onChange={(event) =>
-                form.setFieldValue("email", event.currentTarget.value)
+                form.setFieldValue("username", event.currentTarget.value)
               }
-              error={form.errors.email && "Invalid email"}
+              error={form.errors.username && "Invalid username"}
               radius="md"
             />
 
@@ -110,13 +86,10 @@ export default function Login(PaperProps) {
               radius="md"
             />
           </Stack>
-
           <Group position="apart" mt="xl">
             <Button type="submit" radius="xl" disabled={loading}>
               {loading ? <Loader color="white" variant="dots" /> : "Login"}
             </Button>
-
-            {/* <NavLink to="/">Login</NavLink> */}
           </Group>
         </form>
       </Paper>
