@@ -7,15 +7,33 @@
 }
 
 .upcoming-appointments-container {
-  max-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
 }
 
 .appointment-card {
   border: solid 1px #000;
+
+  width: 100%;
 }
 
 .alert-container {
   max-height: 200px;
   overflow-y: auto;
+}
+
+.mantine-Accordion-content {
+  padding: 2px !important;
+}
+
+.card-text {
+  font-size: 12px !important;
+}
+
+.c-card {
+  width: 100% !important;
+}
+
+.mantine-Accordion-label {
+  font-weight: 600 !important;
 }

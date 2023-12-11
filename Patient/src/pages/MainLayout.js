@@ -11,10 +11,9 @@ import MobileNav from "../components/MobileNav/MobileNav.js";
 import Home from "./Home/Home.js";
 // import { SERVER_URL } from "../config.js";
 import axios from "axios";
-import Appointments from "./Appointments.js";
-import Patients from "./Profile.js";
-import Search from "./Search.js";
-
+import Appointments from "./Appointment/Appointments.js";
+import Profile from "./Profile/Profile.js";
+import Search from "./Search/Search.js";
 const MainLayout = () => {
   const [cookies, removeCookie] = useCookies(["token", "userId"]);
 
@@ -73,7 +72,7 @@ const MainLayout = () => {
               <Route path="/home" element={<Home />} />
               <Route path="/search/*" element={<Search />} />
               <Route path="/appointments" element={<Appointments />} />
-              <Route path="/profile" element={<Patients />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </div>
         </div>

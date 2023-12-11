@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Divider, Group, Text } from "@mantine/core";
-import Chart from "react-apexcharts";
+import { Grid, Collapse, Group, Text, Accordion } from "@mantine/core";
 import "./Home.css";
+import { NavLink } from "react-router-dom";
 
 const Table = ({ data, columns }) => {
   return (
@@ -28,6 +28,9 @@ const Table = ({ data, columns }) => {
                     {item[col.toLowerCase()]}
                   </td>
                 ))}
+                <td>
+                  <NavLink to={item.reportlink}>Report</NavLink>
+                </td>
               </tr>
             ))}
         </tbody>
@@ -36,136 +39,119 @@ const Table = ({ data, columns }) => {
   );
 };
 
+const AppointmentCard = ({ value, index }) => {
+  return (
+    <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+      <div key={index} className="c-card h-auto appointment-card ">
+        <div className="p-0">
+          <p className="card-text mt-2">
+            <span className="fw-600">Date: </span>
+            {value.date}
+          </p>
+          <p className="card-text mt-1">
+            {" "}
+            <span className="fw-600">Doctor: </span>
+            {value.doctorname}
+          </p>
+          <p className="card-text mt-1">
+            {" "}
+            <span className="fw-600">Hospital: </span>
+            {value.hospitalname}
+          </p>
+          <p className="card-text mt-1">
+            {" "}
+            <span className="fw-600">Time: </span>
+            {value.timeslot}
+          </p>
+          <Accordion
+            sx={{
+              ".mantine-Accordion-label": { fontWeight: 700 },
+            }}
+          >
+            <Accordion.Item
+              style={{ fontSize: "15px" }}
+              // key={value.doctorName}
+              value="Read More"
+              className="card-text"
+            >
+              <Accordion.Control
+                className="p-0"
+                style={{ color: "blue", fontSize: "10px" }}
+              >
+                More Details
+              </Accordion.Control>
+
+              <Accordion.Panel>
+                <span className="fw-600">Contact: </span>
+                {value.contact}
+              </Accordion.Panel>
+              <Accordion.Panel>
+                <span className="fw-600">Experience: </span>
+                {value.experience}
+              </Accordion.Panel>
+              <Accordion.Panel>
+                <span className="fw-600">Address: </span>
+                {value.address}
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+          <button className="mt-md-4 mt-3 reschedule-btn card-text">
+            Reschedule
+          </button>
+        </div>
+      </div>
+    </Grid.Col>
+  );
+};
+
 const Home = () => {
   const [doctors, setDoctors] = useState([
     {
-      doctorName: "Dr. Karandeep Singh Sandhu",
+      doctorname: "Dr. Karandeep Singh Sandhu",
       specialty: "Cardiologist",
       date: "18/10/2023",
       timeslot: "12:00pm - 03:00pm",
-      hospitalName: "CardioCare Hospital",
-      reportLink: "https://example.com/report",
+      hospitalname: "CardioCare Hospital",
+      address: "Navghar Road, Mulund East, Mumbai",
+      contact: "8169645464",
+      reportlink: "https://example.com/report",
+      experience: 21,
     },
     {
-      doctorName: "Dr. Priya Sharma",
-
-      specialty: "Pediatrician",
-      date: "20/10/2023",
-      timeslot: "10:00am - 12:00pm",
-      hospitalName: "ChildCare Clinic",
-      reportLink: "https://example.com/report",
+      doctorname: "Dr. Karandeep Singh Sandhu",
+      specialty: "Cardiologist",
+      date: "18/10/2023",
+      timeslot: "12:00pm - 03:00pm",
+      hospitalname: "CardioCare Hospital",
+      address: "Navghar Road, Mulund East, Mumbai",
+      contact: "8169645464",
+      reportlink: "https://example.com/report",
+      experience: 21,
     },
     {
-      doctorName: "Dr. Sameer Kapoor",
-
-      specialty: "Dermatologist",
-      date: "22/10/2023",
-      timeslot: "02:00pm - 04:00pm",
-      hospitalName: "SkinCare Center",
-      reportLink: "https://example.com/report",
+      doctorname: "Dr. Karandeep Singh Sandhu",
+      specialty: "Cardiologist",
+      date: "18/10/2023",
+      timeslot: "12:00pm - 03:00pm",
+      hospitalname: "CardioCare Hospital",
+      address: "Navghar Road, Mulund East, Mumbai",
+      contact: "8169645464",
+      reportlink: "https://example.com/report",
+      experience: 21,
     },
     {
-      doctorName: "Dr. Nisha Patel",
-      specialty: "Orthopedic Surgeon",
-      date: "25/10/2023",
-      timeslot: "09:00am - 11:00am",
-      hospitalName: "OrthoCare Hospital",
-      reportLink: "https://example.com/report",
+      doctorname: "Dr. Karandeep Singh Sandhu",
+      specialty: "Cardiologist",
+      date: "18/10/2023",
+      timeslot: "12:00pm - 03:00pm",
+      hospitalname: "CardioCare Hospital",
+      address: "Navghar Road, Mulund East, Mumbai",
+      contact: "8169645464",
+      reportlink: "https://example.com/report",
+      experience: 21,
     },
     // Add more entries as needed
   ]);
-
-  const [patientsWaiting, setPatientsWaiting] = useState([
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-    {
-      name: "Karan",
-      doctor: "Dr. XYZ",
-      timeslot: "10:00am - 10:30am",
-      date: "23/10/2023",
-    },
-  ]);
-
-  const bedsChartData = {
-    series: [40, 60],
-    options: {
-      chart: {
-        type: "donut",
-      },
-      labels: ["Male", "Female"],
-      colors: ["#228be6", "#9ebed8"],
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 300,
-            },
-            legend: false,
-          },
-        },
-      ],
-      legend: false,
-    },
-  };
 
   const appointments = [
     {
@@ -200,66 +186,15 @@ const Home = () => {
 
   return (
     <div>
-      <div className="container-fluid">
+      <div className="container-fluid ">
         <div className="row gy-3">
           <h5>UPCOMING APPOINTMENT</h5>
-          <div className="upcoming-appointments-container p-4">
-            {appointments.map((value, index) => {
-              return (
-                <div
-                  key={index}
-                  className="c-card mt-3 appointment-card d-md-flex justify-content-around"
-                >
-                  <div className="c-card">
-                    <p className="mt-2">
-                      <span className="fw-600">Date: </span>
-                      {value.date}
-                    </p>
-                    <p className="mt-1">
-                      {" "}
-                      <span className="fw-600">Doctor: </span>
-                      {value.doctor}
-                    </p>
-                    <p className="mt-1">
-                      {" "}
-                      <span className="fw-600">Branch: </span>
-                      {value.branch}
-                    </p>
-                    <p className="mt-1">
-                      {" "}
-                      <span className="fw-600">Time: </span>
-                      {value.time}
-                    </p>
-                    <button className="mt-md-4 mt-3 reschedule-btn">
-                      Reschedule
-                    </button>
-                  </div>
-                  <div className="c-card d-md-block d-none">
-                    <h6>DOCTOR INFO : </h6>
-                    <div className="row mt-3">
-                      <div className="col-md-4 col-12 text-capitalize">
-                        <p className="fw-600 mt-2">Doctor Name</p>
-                        <div className="d-md-flex align-items-center justify-content-center w-100 flex-column">
-                          <p className="mt-2">{value.doctor}</p>
-                        </div>
-                      </div>
-                      <div className="col-md-4 col-12 text-capitalize">
-                        <div className="d-md-flex align-items-center justify-content-center w-100 flex-column">
-                          <p className="fw-600 mt-2">Experience</p>
-                          <p className="mt-2">{value.experience}</p>
-                        </div>
-                      </div>
-                      <div className="col-md-4 col-12 text-capitalize">
-                        <div className="d-md-flex align-items-center justify-content-center w-100 flex-column">
-                          <p className="fw-600 mt-2">License Number</p>
-                          <p className="mt-2">{value.licenseNumber}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="upcoming-appointments-container">
+            <Grid>
+              {doctors.map((value, index) => (
+                <AppointmentCard key={index} value={value} index={index} />
+              ))}
+            </Grid>
           </div>
         </div>
       </div>
@@ -269,13 +204,22 @@ const Home = () => {
         <Table
           data={doctors && doctors}
           columns={[
-            "doctorName",
-            "specialty",
-            "date",
-            "timeslot",
-            "hospitalName",
-            "reportLink",
+            "DoctorName",
+            "Specialty",
+            "Date",
+            "Timeslot",
+            "HospitalName",
+            "",
           ]}
+          // doctorname: "Dr. Karandeep Singh Sandhu",
+          // specialty: "Cardiologist",
+          // date: "18/10/2023",
+          // timeslot: "12:00pm - 03:00pm",
+          // hospitalName: "CardioCare Hospital",
+          // address: "Navghar Road, Mulund East, Mumbai",
+          // contact: "8169645464",
+          // reportLink: "https://example.com/report",
+          // experience: 21,
         />
       </div>
       <div className="alert-section">

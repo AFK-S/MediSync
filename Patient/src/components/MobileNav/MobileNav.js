@@ -20,13 +20,13 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
 
   const navs = [
     {
-      name: "Dashboard",
-      path: "/dashboard",
+      name: "Home",
+      path: "/home",
       icon: "fa-solid fa-user",
     },
     {
-      name: "Doctors",
-      path: "/doctors",
+      name: "Search",
+      path: "/search",
       icon: "fa-solid fa-user",
     },
     {
@@ -35,8 +35,8 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
       icon: "fa-solid fa-user",
     },
     {
-      name: "Patients",
-      path: "/patients",
+      name: "Profile",
+      path: "/profile",
       icon: "fa-solid fa-user",
     },
   ];
@@ -44,7 +44,7 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
   return (
     <div className={`mobileNav ${isMenuOpen ? "active" : ""}`}>
       <div
-        className="close-btn d-flex align-items-center justify-content-center"
+        className="close-btn  d-flex align-items-center justify-content-center"
         onClick={ToggleMenu}
         style={{
           width: "40px",
@@ -53,7 +53,7 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
           right: "1.8rem",
           top: "1.8rem",
           cursor: "pointer",
-          background: "#228be6",
+          background: "#1b03a3",
           color: "#fff",
           borderRadius: "10px",
         }}
