@@ -5,7 +5,7 @@ const { randomUUID } = new ShortUniqueId({ length: 8 });
 
 const Register = async (req, res) => {
   try {
-    const { hospital_id } = req.cookies;
+    const { hospital_id } = req.params;
     const {
       doctor_name,
       specialization,
