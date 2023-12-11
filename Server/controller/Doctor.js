@@ -1,59 +1,23 @@
 import ShortUniqueId from "short-unique-id";
-import { validationResult } from "express-validator";
-
 import DoctorSchema from "../models/DoctorSchema.js";
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
 
-const Login = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { user_name, password } = req.body;
-  try {
-    const response = await DoctorSchema.findOne({
-      user_id: user_name,
-      password: password,
-    })
-      .select(["_id"])
-      .lean();
-    if (response === null) {
-      return res.status(400).json({
-        error: "Invalid Credential",
-      });
-    }
-
-    req.session._id = response._id;
-    res.status(200).send(response._id);
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: err });
-  }
-};
-
 const Register = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { hospital_id } = req.params;
-  const {
-    doctor_name,
-    specialization,
-    experience,
-    age,
-    availability,
-    gender,
-    fees,
-    phone_number,
-  } = req.body;
-  const username = randomUUID();
-  const password = randomUUID();
-
   try {
+    const { hospital_id } = req.cookies;
+    const {
+      doctor_name,
+      specialization,
+      experience,
+      age,
+      availability,
+      gender,
+      fees,
+      phone_number,
+    } = req.body;
+    const username = randomUUID();
+    const password = randomUUID();
     const doctor = await DoctorSchema.create({
       hospital_id,
       name: doctor_name,
@@ -67,27 +31,20 @@ const Register = async (req, res) => {
       username,
       password,
     });
-
     res.status(200).send(doctor._id);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
 const UpdateDetails = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { doctor_id } = req.params;
-  const data = req.body;
-
   try {
+    const { doctor_id } = req.params;
+    const data = req.body;
     const doctor = await DoctorSchema.findById(doctor_id);
     if (!doctor) {
-      return res.status(400).json({ error: "Doctor not found" });
+      return res.status(400).send("Doctor not found");
     }
     for (const [key, value] of Object.entries(data)) {
       if (doctor[key] && typeof doctor[key] !== "object") {
@@ -99,86 +56,86 @@ const UpdateDetails = async (req, res) => {
       }
     }
     await doctor.save();
-
-    res.status(200).json({ message: "Doctor details updated successfully" });
+    res.status(200).send("Doctor details updated successfully");
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
 const DeleteDoctor = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { doctor_id } = req.params;
-
   try {
+    const { doctor_id } = req.params;
     await DoctorSchema.findByIdAndDelete(doctor_id);
-    res.status(200).json({ message: "Doctor successfully deleted" });
+    res.status(200).send("Doctor successfully deleted");
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
 const DoctorInfo = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { doctor_id } = req.params;
   try {
+    const { doctor_id } = req.params;
     const doctor = await DoctorSchema.findById(doctor_id).lean();
     res.status(200).json(doctor);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
-const HospitalDoctorsLList = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
-  const { hospital_id } = req.params;
+const HospitalDoctorsList = async (req, res) => {
   try {
+    const { hospital_id } = req.params;
     const doctors = await DoctorSchema.find({
       hospital_id,
     }).lean();
     res.status(200).json(doctors);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
+  }
+};
+
+const AllHospitalDoctorsList = async (req, res) => {
+  try {
+    const response = await DoctorSchema.aggregate([
+      {
+        $lookup: {
+          from: "hospitals",
+          localField: "hospital_id",
+          foreignField: "_id",
+          as: "hospital",
+        },
+      },
+      {
+        $unwind: "$hospital",
+      },
+    ]);
+    res.status(200).json(response);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
   }
 };
 
 const AllDoctors = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ error: errors.array() });
-  }
-
   try {
     const doctors = await DoctorSchema.find().lean();
     res.status(200).json(doctors);
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err });
+    res.status(400).send(err.message);
   }
 };
 
 export {
-  Login,
   Register,
   UpdateDetails,
   DeleteDoctor,
   DoctorInfo,
-  HospitalDoctorsLList,
+  HospitalDoctorsList,
+  AllHospitalDoctorsList,
   AllDoctors,
 };

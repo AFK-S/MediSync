@@ -1,0 +1,27 @@
+import express from "express";
+import {
+  Register as AppointmentRegister,
+  UpdateDetails as UpdateAppointment,
+  DeleteAppointment,
+  AppointmentInfo,
+  TodayHospitalAppointment,
+  HospitalAppointment,
+  TodayDoctorAppointment,
+  AllDoctorAppointment,
+} from "../controller/Appointment.js";
+
+const router = express.Router();
+
+router.post("/appointment/register", AppointmentRegister);
+router.put("/appointment/update/:appointment_id", UpdateAppointment);
+router.delete("/appointment/delete/:appointment_id", DeleteAppointment);
+router.get("/appointment/:appointment_id", AppointmentInfo);
+router.get(
+  "/appointment/hospital/:hospital_id/today",
+  TodayHospitalAppointment
+);
+router.get("/appointment/hospital/:hospital_id", HospitalAppointment);
+router.get("/appointment/doctor/:doctor_id/today", TodayDoctorAppointment);
+router.get("/appointment/doctor/:doctor_id", AllDoctorAppointment);
+
+export default router;

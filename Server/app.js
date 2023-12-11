@@ -3,12 +3,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
-import fileupload from "express-fileupload";
-import session from "express-session";
-
-import HospitalRoute from "./routes/Hospital.js";
-import DoctorRoute from "./routes/Doctor.js";
-import TpLinkRoute from "./routes/TpLink.js";
+import HospitalRoute from "./routes/HospitalRoute.js";
+import DoctorRoute from "./routes/DoctorRoute.js";
+import TpLinkRoute from "./routes/TpLinkRoute.js";
+import AttendanceRoute from "./routes/AttendanceRoute.js";
+import PatientRoute from "./routes/PatientRoute.js";
+import AppointmentRoute from "./routes/AppointmentRoute.js";
 
 const app = express();
 dotenv.config();
@@ -23,7 +23,6 @@ try {
 }
 
 app.use(express.json());
-app.use(fileupload());
 app.use(
   express.urlencoded({
     extended: true,
@@ -37,31 +36,17 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      //  secure: true,
-    },
-  })
-);
-
-app.get("/api/authentication", async (req, res) => {
-  if (req.session._id === req.cookies._id) {
-    return res.send(true);
-  }
-  res.send(false);
-});
-app.get("/api/logout", async (req, res) => {
-  req.session.destroy();
-  res.clearCookie("connect.sid").clearCookie("_id").status(200).end();
-});
 
 app.use("/api", HospitalRoute);
 app.use("/api", DoctorRoute);
 app.use("/api", TpLinkRoute);
+app.use("/api", AttendanceRoute);
+app.use("/api", PatientRoute);
+app.use("/api", AppointmentRoute);
+
+app.get("/api/logout", async (req, res) => {
+  res.clearCookie("_id").status(200).end();
+});
 
 app.get("/", (req, res) => {
   res.send("MediSync is up and running!!");

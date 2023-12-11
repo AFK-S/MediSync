@@ -1,5 +1,4 @@
 import express from "express";
-
 import { DeviceDetails, CheckIP } from "../controller/TpLink.js";
 
 const router = express.Router();

@@ -3,6 +3,10 @@ const { Schema, connection } = mongoose;
 
 const AppointmentSchema = new Schema(
   {
+    hospital_id: {
+      type: Schema.Types.ObjectId,
+      required: [true, "Please provide a Hospital ID"],
+    },
     doctor_id: {
       type: Schema.Types.ObjectId,
       required: [true, "Please provide a Doctor ID"],
@@ -32,6 +36,19 @@ const AppointmentSchema = new Schema(
         /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
         (props) => `${props.value} is not a valid report`,
       ],
+    },
+    report: {
+      type: String,
+      trim: true,
+      match: [
+        /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
+        (props) => `${props.value} is not a valid report`,
+      ],
+    },
+    shift: {
+      type: Number,
+      default: 0,
+      required: [true, "Please provide a Shift"],
     },
   },
   { timestamps: true }
