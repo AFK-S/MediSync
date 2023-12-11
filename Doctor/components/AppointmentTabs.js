@@ -1,6 +1,8 @@
 import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { Text, View } from "react-native";
+import TodaysCompletedPatient from "../screens/TodaysCompletedPatient";
+import TomorrowsPatient from "../screens/TomorrowsPatient";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -28,13 +30,13 @@ const AppointmentTabs = () => {
       }}
     >
       <Tab.Screen
-        name="Today"
-        component={AppointmentsScreen}
-        options={{ tabBarLabel: "Today" }}
+        name="Today Completed"
+        component={TodaysCompletedPatient}
+        options={{ tabBarLabel: "Today's Completed" }}
       />
       <Tab.Screen
         name="Tomorrow"
-        component={AppointmentsScreen}
+        component={TomorrowsPatient}
         options={{ tabBarLabel: "Tomorrow" }}
       />
     </Tab.Navigator>

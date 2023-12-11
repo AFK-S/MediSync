@@ -151,6 +151,7 @@ const AppointmentsScreen = () => {
           </Text>
         </View>
         <TouchableOpacity
+          onPress={toggleModal}
           style={{
             backgroundColor: "#18C37D",
             padding: 14,
@@ -256,7 +257,7 @@ const AppointmentsScreen = () => {
       </View>
 
       <View style={{ marginTop: 60, padding: 20 }}>
-        <View style={{ height: 200 }}>
+        <View style={{ height: "78%" }}>
           <AppointmentTabs />
         </View>
       </View>
