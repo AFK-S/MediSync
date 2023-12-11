@@ -56,7 +56,7 @@ export const StateProvider = ({ children }) => {
 
   useEffect(() => {
     initializeLoginState();
-  }, []); // Run only once on component mount
+  }, []);
 
   const contextValue = {
     ...state,

@@ -2,7 +2,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { TouchableOpacity, Text } from "react-native";
-import Login from "./Login";
+import Login from "./Login.js";
 import Register from "./Register";
 
 const Stack = createNativeStackNavigator();

@@ -19,7 +19,6 @@ const ProfileScreen = () => {
 
   const handleLogout = async () => {
     try {
-      // Clear async storage if needed
       await AsyncStorage.removeItem("isLogin");
     } catch (error) {
       console.error("Error removing login status:", error);
