@@ -6,8 +6,12 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Button,
+  Dimensions,
 } from "react-native";
 import Modal from "react-native-modal";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
+import AppointmentTabs from "../components/AppointmentTabs";
 
 const AppointmentsScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -15,7 +19,7 @@ const AppointmentsScreen = () => {
 
   const patients = [
     {
-      name: "Karandeep Singh bchbxiljcndc",
+      name: "Karandeep Singh Sandhu",
       age: 19,
       image:
         "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
@@ -25,7 +29,7 @@ const AppointmentsScreen = () => {
       time: "10:15pm",
     },
     {
-      name: "Karandeep Singh bchbxiljcndc",
+      name: "Aditya Rai",
       age: 19,
       image:
         "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
@@ -68,12 +72,17 @@ const AppointmentsScreen = () => {
   const renderBottomSheetContent = () => (
     <View style={styles.bottomSheetContent}>
       <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
-        <Text style={styles.closeButtonText}>Close</Text>
+        <View
+          style={{ padding: 5, backgroundColor: "#f2f2f2", borderRadius: 10 }}
+        >
+          <Ionicons name="close" size={20} color="black" />
+        </View>
       </TouchableOpacity>
       <View
         style={{
           marginTop: 20,
           display: "flex",
+          width: "100%",
         }}
       >
         <View
@@ -81,7 +90,6 @@ const AppointmentsScreen = () => {
             display: "flex",
             flexDirection: "row",
             justifyContent: "center",
-            width: "100%",
           }}
         >
           <Image
@@ -96,14 +104,30 @@ const AppointmentsScreen = () => {
             }}
           />
         </View>
-        <View style={{ width: "100%" }}>
-          <Text
-            style={{ fontSize: 20, fontWeight: "600", textAlign: "center" }}
-          >
+        <View
+          style={{
+            width: "100%",
+            display: "flex",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ fontSize: 20, fontWeight: "600" }}>
             {selectedPatient?.name}
           </Text>
         </View>
-        <View style={{ marginTop: 25 }}>
+
+        <View
+          style={{
+            marginTop: 25,
+            width: "100%",
+            backgroundColor: "#f2f2f2",
+            padding: 10,
+            paddingHorizontal: 15,
+            borderRadius: 15,
+          }}
+        >
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
             Age: {selectedPatient?.age}
           </Text>
@@ -126,6 +150,25 @@ const AppointmentsScreen = () => {
             Time: {selectedPatient?.time}
           </Text>
         </View>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#18C37D",
+            padding: 14,
+            borderRadius: 10,
+            marginTop: 20,
+          }}
+        >
+          <Text
+            style={{
+              color: "#fff",
+              fontWeight: "600",
+              textAlign: "center",
+              fontSize: 14,
+            }}
+          >
+            Mark as Attended
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -134,7 +177,18 @@ const AppointmentsScreen = () => {
     <View>
       <View style={styles.topContainer}>
         <View style={styles.innerContainer}>
-          <Text style={styles.title}>MediSync</Text>
+          <View
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexDirection: "row",
+            }}
+          >
+            <Text style={styles.title}>MediSync</Text>
+            <Ionicons name="search" size={20} color="white" />
+          </View>
+
           <View
             style={{
               marginTop: 20,
@@ -144,7 +198,9 @@ const AppointmentsScreen = () => {
               justifyContent: "space-between",
             }}
           >
-            <Text style={styles.title}>Hi, Dr. Karandeep</Text>
+            <Text style={{ ...styles.title, fontSize: 20 }}>
+              Hi, Dr. Karandeep
+            </Text>
             <Text style={{ color: "#fff", fontWeight: "700" }}>
               ABC Hospital
             </Text>
@@ -154,7 +210,7 @@ const AppointmentsScreen = () => {
           <Text
             style={{ color: "#fff", fontWeight: "700", marginHorizontal: 20 }}
           >
-            Upcoming Appointments
+            Upcoming Appointments {`(${patients.length})`}
           </Text>
           <ScrollView
             showsHorizontalScrollIndicator={false}
@@ -186,14 +242,22 @@ const AppointmentsScreen = () => {
                         {patient.name}
                       </Text>
                       <View style={{ marginTop: 10 }}>
-                        <Text style={styles.silent}>Age : 30</Text>
-                        <Text style={styles.silent}>Monday, 01:00 PM</Text>
+                        <Text style={styles.silent}>Age : {patient.age}</Text>
+                        <Text style={{ ...styles.silent, marginTop: 5 }}>
+                          {patient.date}, {patient.time}
+                        </Text>
                       </View>
                     </View>
                   </View>
                 </TouchableOpacity>
               ))}
           </ScrollView>
+        </View>
+      </View>
+
+      <View style={{ marginTop: 60, padding: 20 }}>
+        <View style={{ height: 200 }}>
+          <AppointmentTabs />
         </View>
       </View>
 
@@ -207,9 +271,9 @@ const AppointmentsScreen = () => {
 const styles = StyleSheet.create({
   topContainer: {
     backgroundColor: "#18C37D",
-    height: 220,
+    height: 210,
     borderBottomLeftRadius: 60,
-    // borderBottomRightRadius: 60,
+    borderBottomRightRadius: 60,
   },
   innerContainer: {
     padding: 20,
@@ -240,7 +304,7 @@ const styles = StyleSheet.create({
   silent: {
     color: "#6d6d6d",
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   bottomSheetContent: {
     backgroundColor: "white",
@@ -249,6 +313,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     borderColor: "rgba(0, 0, 0, 0.1)",
+    width: "100%",
   },
   closeButton: {
     position: "absolute",

@@ -33,7 +33,7 @@ const MainScreen = () => {
         },
       })}
       tabBarOptions={{
-        activeTintColor: "#4CAF50",
+        activeTintColor: "#18C37D",
         labelStyle: {
           fontSize: 10,
         },
