@@ -87,7 +87,7 @@ const Register = () => {
         end_time: values.end_time,
       });
     }
-    if (values.availability.length == 0) {
+    if (values.availability.length === 0) {
       return alert("Enter Doctor Available Dates and Time");
     }
 
@@ -97,6 +97,8 @@ const Register = () => {
         `api/doctor/register/${cookies._id}`,
         values
       );
+      form.reset();
+      setSelected([]);
       console.log("Response from server:", data);
     } catch (error) {
       console.error("Error submitting data:", error);

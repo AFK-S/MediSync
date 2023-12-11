@@ -33,9 +33,8 @@ const MainLayout = () => {
       try {
         const { data } = await axios.get(`/api/doctor/hospital/${cookies._id}`);
         setDoctorsList(data);
-        console.log(data);
       } catch (error) {
-        console.error("Failed to fetch admin data: ", error);
+        console.error("Failed to fetch data: ", error);
       }
       setLoading(false);
     })();
