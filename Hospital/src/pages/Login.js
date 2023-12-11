@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "@mantine/form";
 import {
   TextInput,
@@ -13,12 +13,17 @@ import {
 import axios from "axios";
 import { Loader } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
+import { StateContext } from "../context/StateContext";
 
 export default function Login() {
+  const { isLogin, setIsLogin } = useContext(StateContext);
   const [loading, setLoading] = useState(false);
-  const [cookies] = useCookies();
   const Navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLogin) Navigate("/dashboard");
+  }, [isLogin]);
+
   const form = useForm({
     initialValues: {
       username: "",
@@ -26,15 +31,14 @@ export default function Login() {
     },
     validate: {},
   });
-  useEffect(() => {
-    if (cookies._id !== undefined) Navigate("/");
-  }, [cookies]);
+
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
       await axios.post("/api/hospital/login", values);
+      setIsLogin(true);
       form.reset();
-      Navigate("/");
+      Navigate("/dashboard");
     } catch (err) {
       console.log(err);
       alert(`Something went wrong: ${err.response && err.response.data}`);

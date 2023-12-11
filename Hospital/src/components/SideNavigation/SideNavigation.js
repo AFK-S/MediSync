@@ -1,17 +1,16 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useContext } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./SideNavigation.css";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { logoutAdmin } from "../../slice/AdminSlice.js";
-import { useCookies } from "react-cookie";
 import axios from "axios";
+import { StateContext } from "../../context/StateContext.js";
 
 const SideNavigation = () => {
+  const { setIsLogin } = useContext(StateContext);
   const Navigate = useNavigate();
+
   const handleLogout = async () => {
     await axios.get("/api/logout");
-
+    setIsLogin(false);
     Navigate("/login");
   };
 

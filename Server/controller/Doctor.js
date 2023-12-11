@@ -1,5 +1,8 @@
 import ShortUniqueId from "short-unique-id";
 import DoctorSchema from "../models/DoctorSchema.js";
+import mongoose from "mongoose";
+
+const { ObjectId } = mongoose.Types;
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
 
@@ -89,7 +92,7 @@ const HospitalDoctorsList = async (req, res) => {
   try {
     const { hospital_id } = req.params;
     const doctors = await DoctorSchema.find({
-      hospital_id,
+      hospital_id: new ObjectId(hospital_id),
     }).lean();
     res.status(200).json(doctors);
   } catch (err) {
