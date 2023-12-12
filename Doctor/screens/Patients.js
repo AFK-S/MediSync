@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -79,7 +80,12 @@ const Patients = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.topContainer}>
+      <View
+        style={[
+          styles.topContainer,
+          { height: Platform.OS === "ios" ? 220 : 230 },
+        ]}
+      >
         <View style={styles.innerContainer}>
           <View
             style={{
