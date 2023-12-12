@@ -1,15 +1,48 @@
 import React from "react";
-import { View, Text, Button } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useStateContext } from "../context/StateContext";
+import Patients from "./Patients";
+import PatientDetailsScreen from "./PatientDetailsScreen"; // Import the new screen
 import AppointmentsScreen from "./AppointmentsScreen";
 import Profile from "./Profile";
-import Patients from "./Patients";
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+const PatientsStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Patients"
+        component={Patients}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PatientDetails"
+        component={PatientDetailsScreen}
+        options={{ title: "Patient Details" }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const AppointmentStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Appointments"
+        component={AppointmentsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PatientDetails"
+        component={PatientDetailsScreen}
+        options={{ title: "Patient Details" }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const MainScreen = () => {
   return (
@@ -45,13 +78,14 @@ const MainScreen = () => {
       <Tab.Screen
         name="Patient"
         options={{ headerShown: false }}
-        component={Patients}
+        component={PatientsStack}
       />
       <Tab.Screen
         name="Appointments"
-        component={AppointmentsScreen}
+        component={AppointmentStack}
         options={{ headerShown: false }}
       />
+
       <Tab.Screen
         name="Profile"
         component={Profile}
