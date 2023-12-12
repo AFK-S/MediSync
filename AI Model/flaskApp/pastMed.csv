@@ -1,0 +1,43 @@
+Disease,weight
+Fungal infection,2
+Allergy,1
+GERD,2
+Chronic cholestasis,4
+Drug Reaction,3
+Peptic ulcer disease,3
+AIDS,5
+Diabetes,4
+Gastroenteritis,2
+Bronchial Asthma,3
+Hypertension,4
+Migraine,3
+Cervical spondylosis,4
+Paralysis (brain hemorrhage),5
+Jaundice,3
+Malaria,4
+Chickenpox,2
+Dengue,4
+Typhoid,3
+Hepatitis A,3
+Hepatitis B,3
+Hepatitis C,4
+Hepatitis D,4
+Hepatitis E,3
+Alcoholic hepatitis,5
+Tuberculosis,4
+Common Cold,1
+Pneumonia,4
+Dimorphic hemmorhoids(piles),2
+Heart attack,5
+Varicose veins,3
+Hypothyroidism,2
+Hyperthyroidism,3
+Hypoglycemia,3
+Osteoarthritis,3
+Arthritis,3
+Paroxysmal Positional Vertigo,2
+Acne,1
+Urinary tract infection,2
+Psoriasis,3
+Impetigo,1
+NA,0

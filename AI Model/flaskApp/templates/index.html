@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Management</title>
+</head>
+<body>
+    <h1>Patient Management</h1>
+    <form action="/process" method="post">
+        <label for="patient_name">Patient's Name:</label>
+        <input type="text" id="patient_name" name="patient_name"><br><br>
+
+        <label for="age">Age:</label>
+        <input type="text" id="age" name="age"><br><br>
+
+        <label for="symptoms">Symptoms (comma-separated):</label>
+        <input type="text" id="symptoms" name="symptoms"><br><br>
+
+        <label for="past_med">Past Medical Diseases (comma-separated):</label>
+        <input type="text" id="past_med" name="past_med"><br><br>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <h2>Patients</h2>
+    <ul>
+        {% for patient in patients %}
+        <li>Name : {{ patient.name }} - age : {{patient.age}} - Severity: {{ patient.severity_index }}, High severity count: {{ patient.high_severity_count }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
