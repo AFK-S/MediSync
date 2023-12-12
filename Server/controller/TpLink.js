@@ -1,9 +1,10 @@
 import { Builder, By, until } from "selenium-webdriver";
 import cheerio from "cheerio";
 
-const htmlTableToJson = (html) => {
+let driver;
+
+const htmlTableToJson = (html, headers) => {
   const $ = cheerio.load(html);
-  const headers = ["ID", "IP Address", "MAC Address", "Status", "Configure"];
   const rows = [];
   $("tbody tr").each((index, row) => {
     const rowData = {};
@@ -18,7 +19,7 @@ const htmlTableToJson = (html) => {
   return rows;
 };
 
-const RouterLogin = async () => {
+const RouterLogin = async (btn1, a1, btn2, a2) => {
   const driver = await new Builder().forBrowser("chrome").build();
   await driver.get("http://192.168.0.1/");
   await driver.findElement(By.id("userName")).sendKeys("admin");
@@ -26,9 +27,9 @@ const RouterLogin = async () => {
   await driver.findElement(By.id("loginBtn")).click();
   await driver.wait(until.urlContains("/userRpm/Index.htm"), 2000);
   driver.switchTo().frame("bottomLeftFrame");
-  await driver.wait(until.elementLocated(By.id("ol41")), 2000);
-  await driver.findElement(By.id("ol41")).findElement(By.id("a41")).click();
-  await driver.findElement(By.id("ol43")).findElement(By.id("a43")).click();
+  await driver.wait(until.elementLocated(By.id(btn1)), 2000);
+  await driver.findElement(By.id(btn1)).findElement(By.id(a1)).click();
+  await driver.findElement(By.id(btn2)).findElement(By.id(a2)).click();
   await driver.switchTo().defaultContent();
   await driver.switchTo().frame("mainFrame");
   await driver.wait(until.elementLocated(By.id("autoWidth")), 2000);
@@ -36,30 +37,85 @@ const RouterLogin = async () => {
   return data;
 };
 
-const DeviceDetails = async (req, res) => {
-  try {
-    const data = await RouterLogin();
-    const tag = await data.findElement(By.xpath(`//tr[3]/td`));
-    const htmlContent = await tag.getAttribute("innerHTML");
-    const jsonData = htmlTableToJson(htmlContent);
-    res.status(200).json(jsonData);
-  } catch (err) {
-    console.error(err);
-    res.status(400).send(err.message);
-  }
+const DeviceDetails = async () => {
+  const data = await RouterLogin("ol41", "a41", "ol43", "a43");
+  const tag = await data.findElement(By.xpath(`//tr[3]/td`));
+  const htmlContent = await tag.getAttribute("innerHTML");
+  const headers = ["ID", "IP Address", "MAC Address", "Status", "Configure"];
+  const jsonData = htmlTableToJson(htmlContent, headers);
+  driver.quit();
+  return jsonData;
 };
 
-const CheckIP = async (req, res) => {
+const ConnectedDevices = async () => {
+  const data = await RouterLogin("ol7", "a7", "ol12", "a12");
+  const tag = await data.findElement(By.xpath(`//tr[5]/td`));
+  const htmlContent = await tag.getAttribute("innerHTML");
+  const headers = [
+    "id",
+    "mac_address",
+    "current_status",
+    "received_packets",
+    "sent_packets",
+    "configure",
+  ];
+  const jsonData = htmlTableToJson(htmlContent, headers);
+  driver.quit();
+  return jsonData;
+};
+
+const CheckMacAddress = async (req, res) => {
   try {
     const clientIP = req.socket.remoteAddress;
-    const data = await RouterLogin();
-    const tag = await data.findElement(By.xpath(`//tr[3]/td`)).getText();
-    if (!tag.includes(clientIP)) next();
-    res.status(200).end();
+    const data = await ConnectedDevices();
+    let mac_address = "";
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].ip_address === clientIP) {
+        mac_address = data[i].mac_address;
+        break;
+      }
+    }
+    res.status(200).send(mac_address);
   } catch (err) {
     console.error(err);
     res.status(400).send(err.message);
   }
 };
 
-export { DeviceDetails, CheckIP };
+const VerifyConnectedDevices = async (req, res) => {
+  try {
+    const mac_address_list = [];
+    const data = await ConnectedDevices();
+    for (let i = 0; i < data.length; i++) {
+      mac_address_list.push(data[i].mac_address);
+    }
+    const remove_list = result.filter(
+      (value) => !mac_address_list.includes(value)
+    );
+    const new_list = mac_address_list.filter(
+      (value) => !result.includes(value)
+    );
+    console.log("past list", result);
+    console.log("present list", mac_address_list);
+    if (remove_list.length > 0) {
+      console.log("Someone is removed");
+      console.log("Removed list", remove_list);
+    }
+    if (new_list.length > 0) {
+      console.log("Someone is added");
+      console.log("Added list", new_list);
+    }
+    result = mac_address_list;
+    res.status(200).end();
+  } catch (error) {
+    console.error(err);
+    res.status(400).send(error.message);
+  }
+};
+
+export {
+  DeviceDetails,
+  ConnectedDevices,
+  CheckMacAddress,
+  VerifyConnectedDevices,
+};

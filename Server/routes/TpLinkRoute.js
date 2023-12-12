@@ -1,9 +1,12 @@
 import express from "express";
-import { DeviceDetails, CheckIP } from "../controller/TpLink.js";
+import {
+  CheckMacAddress,
+  VerifyConnectedDevices,
+} from "../controller/TpLink.js";
 
 const router = express.Router();
 
-router.get("/tplink", DeviceDetails);
-router.get("/tplink/doctor/:doctor_id", CheckIP);
+router.get("/tplink/doctor/:doctor_id", CheckMacAddress);
+router.get("/tplink/verify/doctor/:doctor_id", VerifyConnectedDevices);
 
 export default router;
