@@ -6,16 +6,16 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Button,
-  Dimensions,
 } from "react-native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
 import AppointmentTabs from "../components/AppointmentTabs";
+import { useNavigation } from "@react-navigation/native";
 
 const AppointmentsScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const navigation = useNavigation();
 
   const patients = [
     {
@@ -187,7 +187,12 @@ const AppointmentsScreen = () => {
             }}
           >
             <Text style={styles.title}>MediSync</Text>
-            <Ionicons name="search" size={20} color="white" />
+            <Ionicons
+              name="search"
+              size={20}
+              color="white"
+              onPress={() => navigation.navigate("Patients")}
+            />
           </View>
 
           <View
@@ -199,15 +204,12 @@ const AppointmentsScreen = () => {
               justifyContent: "space-between",
             }}
           >
-            <Text style={{ ...styles.title, fontSize: 20 }}>
+            <Text style={{ ...styles.title, fontSize: 30 }}>
               Hi, Dr. Karandeep
-            </Text>
-            <Text style={{ color: "#fff", fontWeight: "700" }}>
-              ABC Hospital
             </Text>
           </View>
         </View>
-        <View style={{ marginVertical: 30 }}>
+        <View style={{ marginVertical: 10 }}>
           <Text
             style={{ color: "#fff", fontWeight: "700", marginHorizontal: 20 }}
           >
