@@ -3,9 +3,22 @@ import AttendanceSchema from "../models/AttendanceSchema.js";
 const Register = async (req, res) => {
   try {
     const { doctor_id } = req.params;
-    const attendance = await AttendanceSchema.create({
+    const response = await AttendanceSchema.findOne({
       doctor_id,
+      date: {
+        $gte: new Date(new Date().setHours(0, 0, 0)),
+        $lt: new Date(new Date().setHours(23, 59, 59)),
+      },
+    });
+    if (response) {
+      response.checkOut = new Date();
+      await response.save();
+      return res.status(200).send(response._id);
+    }
+    const attendance = await AttendanceSchema.create({
+      doctor_id: doctor_id,
       date: new Date(),
+      checkIn: new Date(),
     });
     res.status(200).send(attendance._id);
   } catch (err) {
@@ -18,9 +31,17 @@ const DoctorUnavailableRegister = async (req, res) => {
   try {
     const { doctor_id } = req.params;
     const data = req.body;
+    const response = await AttendanceSchema.findOne({
+      doctor_id,
+      isAvailable: false,
+      isPresent: false,
+      date: data,
+    });
+    if (response) return res.status(400).send("Attendance already registered");
     const attendance = await AttendanceSchema.create({
       doctor_id,
-      absent: true,
+      isAvailable: false,
+      isPresent: false,
       date: data,
     });
     res.status(200).send(attendance._id);
@@ -57,7 +78,11 @@ const TodayDoctorsAttendance = async (req, res) => {
     const { doctor_id } = req.params;
     const attendance = await AttendanceSchema.find({
       doctor_id,
-      absent: false,
+      date: {
+        $gte: new Date(new Date().setHours(0, 0, 0)),
+        $lt: new Date(new Date().setHours(23, 59, 59)),
+      },
+      isAvailable: true,
     }).lean();
     res.status(200).json(attendance);
   } catch (err) {
@@ -71,11 +96,7 @@ const DoctorAttendanceHistory = async (req, res) => {
     const { doctor_id } = req.params;
     const attendance = await AttendanceSchema.find({
       doctor_id,
-      createdAt: {
-        $gte: new Date(new Date().setHours(0, 0, 0)),
-        $lt: new Date(new Date().setHours(23, 59, 59)),
-      },
-      absent: false,
+      isAvailable: true,
     }).lean();
     res.status(200).json(attendance);
   } catch (err) {

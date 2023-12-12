@@ -7,9 +7,9 @@ const AttendanceSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: [true, "Please provide a Doctor ID"],
     },
-    absent: {
+    isAvailable: {
       type: Boolean,
-      default: false,
+      default: true,
       required: [true, "Please provide a Absent"],
     },
     isPresent: {
@@ -20,6 +20,12 @@ const AttendanceSchema = new Schema(
     date: {
       type: Date,
       required: [true, "Please provide a Date"],
+    },
+    checkIn: {
+      type: Date,
+    },
+    checkOut: {
+      type: Date,
     },
   },
   { timestamps: true }
