@@ -1,24 +1,131 @@
-import { View, Text, Button } from "react-native";
 import React from "react";
-import { useStateContext } from "../context/StateContext";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
+import { Linking } from "react-native";
 
 const Profile = () => {
-  const { setLogin } = useStateContext();
-
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("isLogin");
-    } catch (error) {
-      console.error("Error removing login status:", error);
-    }
-    setLogin(false);
+  const patient = {
+    name: "Dr. Karandeep Singh Sandhu",
+    age: 19,
+    image:
+      "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
+    medical_history: "NA",
+    symptoms: ["Cough", "Fever"],
+    date: "23-10-2023",
+    time: "10:15pm",
   };
+
   return (
-    <View>
-      <Text>Profile</Text>
-      <Button title="Logout" onPress={handleLogout} />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <View style={styles.topContainer}>
+        <View
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row",
+            padding: 20,
+          }}
+        >
+          <Text style={styles.title}>MediSync</Text>
+        </View>
+        <View
+          style={{
+            paddingHorizontal: 20,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text style={{ ...styles.title, fontSize: 30 }}>Profile</Text>
+        </View>
+        <View
+          style={{
+            padding: 20,
+            flexDirection: "row",
+            alignItems: "center",
+            maxWidth: "100%",
+          }}
+        >
+          <Image source={{ uri: patient.image }} style={styles.avatar} />
+          <Text
+            style={{
+              fontSize: 30,
+              marginStart: 20,
+              width: "60%",
+              fontWeight: "700",
+              color: "#fff",
+            }}
+          >
+            {patient.name}
+          </Text>
+        </View>
+      </View>
+      <ScrollView style={{ flex: 1, backgroundColor: "#fff" }}>
+        <View
+          style={{ flex: 1, padding: 20, paddingTop: 0, alignItems: "center" }}
+        >
+          <View
+            style={{
+              width: "100%",
+              marginTop: 30,
+              backgroundColor: "#f2f2f2",
+              padding: 20,
+              borderRadius: 20,
+            }}
+          >
+            <Text style={styles.infoText}>Age: {patient.age}</Text>
+            <Text style={styles.infoText}>
+              Medical History: {patient.medical_history}
+            </Text>
+            <Text style={styles.infoText}>
+              Symptoms: {patient.symptoms.join(", ")}
+            </Text>
+            <Text style={styles.infoText}>Date: {patient.date}</Text>
+            <Text style={styles.infoText}>Time: {patient.time}</Text>
+          </View>
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 export default Profile;
+
+const styles = StyleSheet.create({
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  infoText: {
+    fontWeight: "600",
+    fontSize: 16,
+    marginTop: 10,
+  },
+  title: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 18,
+  },
+
+  previousVisitItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  topContainer: {
+    backgroundColor: "#18C37D",
+    height: 240,
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+  },
+});
