@@ -5,12 +5,20 @@ import {
   Image,
   StyleSheet,
   ScrollView,
-  FlatList,
   TouchableOpacity,
 } from "react-native";
-import { Linking } from "react-native";
+import { useStateContext } from "../context/StateContext";
 
 const Profile = () => {
+  const { setLogin } = useStateContext();
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("isLogin");
+    } catch (error) {
+      console.error("Error removing login status:", error);
+    }
+    setLogin(false);
+  };
   const patient = {
     name: "Dr. Karandeep Singh Sandhu",
     age: 19,
@@ -92,6 +100,11 @@ const Profile = () => {
             <Text style={styles.infoText}>Date: {patient.date}</Text>
             <Text style={styles.infoText}>Time: {patient.time}</Text>
           </View>
+          <TouchableOpacity onPress={handleLogout} style={styles.logout}>
+            <Text style={{ color: "#fff", fontWeight: "700", fontSize: 18 }}>
+              Logout
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -127,5 +140,15 @@ const styles = StyleSheet.create({
     height: 240,
     borderBottomLeftRadius: 50,
     borderBottomRightRadius: 50,
+  },
+  logout: {
+    backgroundColor: "#FF3636",
+    width: "100%",
+    borderRadius: 16,
+    padding: 15,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30,
   },
 });
