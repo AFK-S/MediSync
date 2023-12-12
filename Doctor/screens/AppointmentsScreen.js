@@ -156,7 +156,7 @@ const AppointmentsScreen = () => {
             backgroundColor: "#18C37D",
             padding: 14,
             borderRadius: 10,
-            marginTop: 20,
+            marginTop: 40,
           }}
         >
           <Text
@@ -168,6 +168,31 @@ const AppointmentsScreen = () => {
             }}
           >
             Mark as Attended
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            toggleModal();
+            navigation.navigate("PatientDetails", { patient: selectedPatient });
+          }}
+          style={{
+            backgroundColor: "#fff",
+            borderWidth: 2,
+            borderColor: "#18C37D",
+            padding: 14,
+            borderRadius: 10,
+            marginTop: 20,
+          }}
+        >
+          <Text
+            style={{
+              color: "#18C37D",
+              fontWeight: "600",
+              textAlign: "center",
+              fontSize: 14,
+            }}
+          >
+            View Full Info{" "}
           </Text>
         </TouchableOpacity>
       </View>
@@ -211,7 +236,12 @@ const AppointmentsScreen = () => {
         </View>
         <View style={{ marginVertical: 10 }}>
           <Text
-            style={{ color: "#fff", fontWeight: "700", marginHorizontal: 20 }}
+            style={{
+              color: "#fff",
+              fontWeight: "700",
+              marginHorizontal: 20,
+              fontSize: 16,
+            }}
           >
             Upcoming Appointments {`(${patients.length})`}
           </Text>

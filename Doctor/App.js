@@ -36,7 +36,7 @@ const AppNavigator = () => {
     const checkAsyncStorage = async () => {
       try {
         const isLoginValue = await AsyncStorage.getItem("isLogin");
-        setAsyncStorageExists(!!isLoginValue); // !! converts value to boolean
+        setAsyncStorageExists(!!isLoginValue);
 
         console.log("isLoginValue:", isLoginValue);
       } catch (error) {

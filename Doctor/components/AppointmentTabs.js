@@ -6,14 +6,6 @@ import TomorrowsPatient from "../screens/TomorrowsPatient";
 
 const Tab = createMaterialTopTabNavigator();
 
-const AppointmentsScreen = ({ route }) => {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>{route.name} Screen Content</Text>
-    </View>
-  );
-};
-
 const AppointmentTabs = () => {
   return (
     <Tab.Navigator
