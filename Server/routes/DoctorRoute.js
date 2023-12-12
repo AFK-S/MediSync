@@ -13,7 +13,7 @@ import { DoctorLogin } from "../controller/Login.js";
 const router = express.Router();
 
 router.post("/doctor/login", DoctorLogin);
-router.post("/doctor/register", RegisterDoctor);
+router.post("/doctor/register/:hospital_id", RegisterDoctor);
 router.put("/doctor/update/:doctor_id", UpdateDoctor);
 router.delete("/doctor/delete/:doctor_id", DeleteDoctor);
 router.get("/doctor/:doctor_id", DoctorInfo);

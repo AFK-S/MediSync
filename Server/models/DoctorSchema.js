@@ -16,10 +16,6 @@ const DoctorSchema = new Schema(
     photo: {
       type: String,
       trim: true,
-      match: [
-        /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
-        (props) => `${props.value} is not a valid photo`,
-      ],
       default: "https://www.pexels.com/photo/man-in-brown-polo-shirt-614810/",
       required: [true, "Please provide the Photo"],
     },
@@ -47,31 +43,18 @@ const DoctorSchema = new Schema(
     },
     availability: [
       {
-        day: {
+        date: {
           type: String,
-          enum: [
-            "monday",
-            "tuesday",
-            "wednesday",
-            "thursday",
-            "friday",
-            "saturday",
-            "sunday",
-          ],
-          required: [true, "Please provide the Day"],
+          required: [true, "Please provide the Date"],
         },
-        slots: [
-          {
-            from: {
-              type: String,
-              required: [true, "Please provide the starting time"],
-            },
-            till: {
-              type: String,
-              required: [true, "Please provide the ending time"],
-            },
-          },
-        ],
+        start_time: {
+          type: String,
+          required: [true, "Please provide the Starting Time"],
+        },
+        end_time: {
+          type: String,
+          required: [true, "Please provide the Ending Time"],
+        },
       },
     ],
     gender: {

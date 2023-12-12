@@ -1,55 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import SideNavigation from "../components/SideNavigation/SideNavigation.js";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { fetchAdmin, logoutAdmin } from "../slice/AdminSlice.js";
-import { useCookies } from "react-cookie";
 import TopBar from "../components/TopBar/TopBar.js";
-import { setLoading } from "../slice/AppSclice.js";
 import MobileNav from "../components/MobileNav/MobileNav.js";
 import Dashboard from "./Dashboard.js";
-// import { SERVER_URL } from "../config.js";
 import axios from "axios";
 import Doctors from "./Doctors.js";
 import Appointments from "./Appointments.js";
 import Patients from "./Patients.js";
 import Register from "./Register.js";
+import { StateContext } from "../context/StateContext.js";
+import { useCookies } from "react-cookie";
 
 const MainLayout = () => {
-  const [cookies, removeCookie] = useCookies(["token", "userId"]);
+  const [cookies] = useCookies();
+  const { isLogin, setDoctorsList, setLoading } = useContext(StateContext);
+  const Navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLogin) Navigate("/login");
+  }, [isLogin]);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const ToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      dispatch(setLoading(true));
-
-      if (!cookies.token || !cookies.userId) {
-        removeCookie("token");
-        removeCookie("userId");
-        dispatch(logoutAdmin());
-        window.location.href = "/login";
-      }
-
+    (async () => {
+      setLoading(true);
       try {
-        await dispatch(fetchAdmin(cookies.token)).unwrap();
+        const { data } = await axios.get(`/api/doctor/hospital/${cookies._id}`);
+        setDoctorsList(data);
       } catch (error) {
-        console.error("Failed to fetch admin data: ", error);
-        navigate("/login");
-      } finally {
-        dispatch(setLoading(false));
+        console.error("Failed to fetch data: ", error);
       }
-    };
-
-    fetchData();
+      setLoading(false);
+    })();
   }, []);
 
   return (
@@ -70,7 +58,6 @@ const MainLayout = () => {
             <TopBar ToggleMenu={ToggleMenu} />
 
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/doctors/*" element={<Doctors />} />
               <Route path="/appointments" element={<Appointments />} />

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
+import { StateContext } from "../../context/StateContext";
 
 const Table = ({ data, columns }) => {
   return (
@@ -31,11 +32,12 @@ const Table = ({ data, columns }) => {
                   marginBottom: "1rem",
                 }}
               >
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex}>{item[col.toLowerCase()]}</td>
-                ))}
+                <td>{item.name}</td>
+                <td>{item.age}</td>
+                <td>{item.specialization}</td>
+                <td>{item.experience}</td>
                 <td>
-                  <NavLink to={`profile/${item.id}`}>View More</NavLink>
+                  <NavLink to={`profile/${item._id}`}>View More</NavLink>
                 </td>
               </tr>
             ))}
@@ -46,29 +48,8 @@ const Table = ({ data, columns }) => {
 };
 
 const AllDcotors = () => {
-  const [doctors, setDoctors] = useState([
-    {
-      id: 1,
-      name: "Karandeep",
-      speciality: "ABC",
-      age: 30,
-      experience: "20+",
-    },
-    {
-      id: 2,
-      name: "Karandeep",
-      speciality: "ABC",
-      age: 30,
-      experience: "20+",
-    },
-    {
-      id: 3,
-      name: "Karandeep",
-      speciality: "ABC",
-      age: 30,
-      experience: "20+",
-    },
-  ]);
+  const { doctorsList } = useContext(StateContext);
+
   return (
     <div>
       <div className="w-100 d-flex align-items-center justify-content-between">
@@ -87,8 +68,8 @@ const AllDcotors = () => {
       </div>
       <div className="mt-4">
         <Table
-          data={doctors && doctors}
-          columns={["Name", "Age", "Speciality", "Experience", ""]}
+          data={doctorsList}
+          columns={["Name", "Age", "Specialization", "Experience", ""]}
         />
       </div>
     </div>

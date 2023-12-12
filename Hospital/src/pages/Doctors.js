@@ -8,7 +8,7 @@ const Doctors = () => {
     <>
       <Routes>
         <Route path="/" element={<AllDcotors />} />
-        <Route path="/profile/:id" element={<DoctorProfile />} />
+        <Route path="/profile/:doctor_id" element={<DoctorProfile />} />
       </Routes>
     </>
   );
