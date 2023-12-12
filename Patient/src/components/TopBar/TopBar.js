@@ -14,12 +14,14 @@ const TopBar = ({ ToggleMenu }) => {
                 cursor: "pointer",
               }}
             ></i>
-            <p className="fw-bold title">Patient</p>
+            <p className="fw-bold title">MediSync</p>
           </div>
           <div
             className="col-3 col-md-2"
             style={{ display: "flex", justifyContent: "end" }}
-          ></div>
+          >
+            <div id="google_element"></div>
+          </div>
         </div>
       </div>
     </>

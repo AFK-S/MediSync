@@ -1,0 +1,23 @@
+.icon {
+  color: light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-3));
+}
+
+.name {
+  font-family: Greycliff CF, var(--mantine-font-family);
+}
+
+.profile-text {
+  margin-top: 7px !important;
+  color: black !important;
+  font-size: 17px !important;
+}
+.verticalLine {
+  border-right: 2px solid #ddd; /* Specify the color of the line */
+  height: 100%; /* Adjust the height as needed */
+  margin-right: 10px; /* Adjust the margin as needed */
+}
+
+.mantine-FileInput-input {
+  /* color: black !important; */
+  /* background-color: var(--main-color) !important; */
+}
