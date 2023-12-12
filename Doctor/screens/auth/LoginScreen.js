@@ -3,7 +3,7 @@ import { View, Text, Button } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useStateContext } from "../../context/StateContext";
 
-const Login = ({ navigation }) => {
+const LoginScreen = ({ navigation }) => {
   const { setLogin } = useStateContext();
 
   const handleLogin = async () => {
@@ -35,4 +35,4 @@ const Login = ({ navigation }) => {
   );
 };
 
-export default Login;
+export default LoginScreen;
