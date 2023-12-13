@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useStateContext } from "../context/StateContext";
+import axios from "axios";
+import Timeline from "react-native-timeline-flatlist";
 
 const Profile = () => {
   const { setLogin } = useStateContext();
@@ -29,6 +31,34 @@ const Profile = () => {
     date: "23-10-2023",
     time: "10:15pm",
   };
+
+  const [timeline, setTimeline] = useState([
+    {
+      time: "12/01/20",
+      title: "Hospital ABC",
+      description: "2:30PM - 02:30PM",
+    },
+    {
+      time: "12/01/20",
+      title: "Hospital ABC",
+      description: "2:30PM - 02:30PM",
+    },
+    {
+      time: "12/01/20",
+      title: "Hospital ABC",
+      description: "2:30PM - 02:30PM",
+    },
+    {
+      time: "12/01/20",
+      title: "Hospital ABC",
+      description: "2:30PM - 02:30PM",
+    },
+    {
+      time: "12/01/20",
+      title: "Hospital ABC",
+      description: "2:30PM - 02:30PM",
+    },
+  ]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -100,6 +130,39 @@ const Profile = () => {
             <Text style={styles.infoText}>Date: {patient.date}</Text>
             <Text style={styles.infoText}>Time: {patient.time}</Text>
           </View>
+          <View
+            style={{
+              width: "100%",
+              marginTop: 30,
+              marginLeft: 20,
+            }}
+          >
+            <Text style={{ fontSize: 30, fontWeight: "600", marginBottom: 10 }}>
+              Schedule
+            </Text>
+            <Timeline
+              style={{ padding: 20 }}
+              data={timeline}
+              circleSize={20}
+              circleColor="#18C37D"
+              lineColor="#18C37D"
+              timeContainerStyle={{ minWidth: 52, marginTop: -5 }}
+              timeStyle={{
+                textAlign: "center",
+                backgroundColor: "#18C37D",
+                color: "white",
+                fontWeight: "600",
+                padding: 8,
+                borderRadius: 15,
+              }}
+              descriptionStyle={{ color: "gray" }}
+              options={{
+                style: { paddingTop: 5 },
+              }}
+              isUsingFlatlist={true}
+              innerCircle={"dot"}
+            />
+          </View>
           <TouchableOpacity onPress={handleLogout} style={styles.logout}>
             <Text style={{ color: "#fff", fontWeight: "700", fontSize: 18 }}>
               Logout
@@ -149,6 +212,5 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 30,
   },
 });
