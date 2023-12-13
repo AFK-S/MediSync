@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useForm } from "@mantine/form";
+import { auth } from "../firebase.js"; // Update the path accordingly
+import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
+
 import {
   TextInput,
   PasswordInput,
@@ -20,11 +23,14 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otpConfirm, setOtpConfirm] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otp, setOtp] = useState("");
+  const [user, setUser] = useState(null);
+
   const Navigate = useNavigate();
   const form = useForm({
     initialValues: {
       mobile: "",
-      otp: "",
       name: "",
       age: "",
     },
@@ -39,34 +45,33 @@ export default function Login() {
 
   const [cookies, setCookie] = useCookies(["token", "userId"]);
 
-  const handleMobileSubmit = (values) => {
-    // setLoading(true);
+  const handleSendOTP = async () => {
     try {
-      form.reset();
+      const PhoneNumber = "+91" + phoneNumber;
+      const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        PhoneNumber,
+        recaptcha
+      );
+
+      console.log(confirmation);
+      setUser(confirmation);
       alert("OTP sent successfully!");
       setOtpSent(true);
-    } catch (err) {
-      console.log(err);
-      alert(`Something went wrong: ${err.response && err.response.data.msg}`);
-    } finally {
-      // setLoading(false);
+    } catch (error) {
+      console.error("Error sending OTP:", error);
     }
   };
 
-  const handleOtpSubmit = (values) => {
-    setLoading(true);
+  const handleVerifyOTP = async () => {
     try {
-      // Implement logic to verify OTP
-      // For example, you can make an API call to verify OTP
-
-      // Simulating successful OTP verification
+      await user.confirm(otp);
       alert("OTP verified successfully!");
       setOtpConfirm(true);
-    } catch (err) {
-      console.log(err);
-      alert(`Invalid OTP. Please try again.`);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      alert("Invalid OTP. Please try again.");
     }
   };
 
@@ -98,11 +103,7 @@ export default function Login() {
           maxWidth: 450,
         }}
       >
-        <Text
-          size="lg"
-          // weight={700}
-          style={{ color: "black", fontWeight: "bolder" }}
-        >
+        <Text size="lg" style={{ color: "black", fontWeight: "bolder" }}>
           Welcome to MediSync
         </Text>
 
@@ -144,18 +145,19 @@ export default function Login() {
             </Group>
           </form>
         ) : otpSent ? (
-          <form onSubmit={form.onSubmit((value) => handleOtpSubmit(value))}>
+          <form onSubmit={form.onSubmit(handleVerifyOTP)}>
             <Stack>
               <Text style={{ color: "black" }}>
                 Enter OTP received on you Phone
               </Text>
-              <PinInput
-                value={form.values.otp}
-                onChange={(otp) => form.setFieldValue("otp", otp)}
-                aria-label="One time code"
+              <TextInput
+                onChange={(event) => setOtp(event.target.value)}
+                label={"Enter OTP"}
                 type={/^[0-9]*$/}
-                inputType="tel"
-                inputMode="numeric"
+                radius="md"
+                required
+                value={otp}
+                placeholder="Enter Your OTP"
               />
             </Stack>
 
@@ -167,20 +169,18 @@ export default function Login() {
             </Group>
           </form>
         ) : (
-          <form onSubmit={form.onSubmit(handleMobileSubmit)}>
+          <form onSubmit={form.onSubmit(handleSendOTP)}>
             <Stack>
               <TextInput
                 required
                 type="tel"
                 label="Mobile Number"
                 placeholder="Enter your mobile number"
-                value={form.values.mobile}
-                onChange={(event) =>
-                  form.setFieldValue("mobile", event.currentTarget.value)
-                }
-                error={form.errors.mobile && form.errors.mobile}
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value)}
                 radius="md"
               />
+              <div id="recaptcha"></div>
             </Stack>
 
             <Group position="apart" mt="xl">
