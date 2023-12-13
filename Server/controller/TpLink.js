@@ -1,6 +1,6 @@
 import { Builder, By, until } from "selenium-webdriver";
 import cheerio from "cheerio";
-import DoctorSchema from "../models/DoctorSchema";
+import DoctorSchema from "../models/DoctorSchema.js";
 
 let driver;
 
