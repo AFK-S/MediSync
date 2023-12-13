@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  VerifyPatient,
   UpdateDetails as UpdatePatient,
   DeletePatient,
   PatientInfo,
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.put("/otp/:phone_number", SendOTP);
 router.put("/otp/verify/:otp", VerifyOTP);
+router.get("/patient/verify/:phone_number", VerifyPatient);
 router.post("/patient/login", PatientLogin);
 router.put("/patient/update/:phone_number", UpdatePatient);
 router.delete("/patient/delete/:phone_number", DeletePatient);
