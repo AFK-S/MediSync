@@ -18,7 +18,7 @@ cloudinary_urls = [
 
 cap = cv2.VideoCapture(0)
 
-threshold_distance = 0.75
+threshold_distance = 0.9
 
 last_response_time = datetime.now() - timedelta(minutes=2)
 
@@ -47,7 +47,7 @@ while True:
         # Extract only the name without the file extension
         name = os.path.splitext(detected_name)[0]
 
-        cv2.putText(frame, f"{name} - Dist: {face_distance:.3f}", (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1,
+        cv2.putText(frame, f"{name}", (x1, y1 - 10), cv2.FONT_HERSHEY_DUPLEX, 1,
                     (0, 0, 200), 2)
         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 200), 4)
 

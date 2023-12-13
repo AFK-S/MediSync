@@ -13,7 +13,7 @@ class SimpleFacerec:
         img = self.load_image_from_cloudinary(image_url)
         rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        filename = image_url.split("/")[-1]  # Extract filename from URL
+        filename = image_url.split("/")[-1]  
 
         img_encoding = face_recognition.face_encodings(rgb_img)[0]
 
