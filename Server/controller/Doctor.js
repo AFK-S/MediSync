@@ -20,10 +20,9 @@ const Register = async (req, res) => {
       fees,
       phone_number,
     } = req.body;
-    const { file } = req.files;
+    const file = req.file;
     if (!file) return res.status(400).send("No file uploaded.");
-    console.log(file);
-    const blob = bucket.file(file.name);
+    const blob = bucket.file(file.originalname);
     const blobStream = blob.createWriteStream();
     blobStream.on("error", (err) => {
       return res.status(400).send("Error uploading file.");
@@ -33,7 +32,6 @@ const Register = async (req, res) => {
         action: "read",
         expires: "03-09-2491",
       });
-      console.log(downloadUrl);
       const username = randomUUID();
       const password = randomUUID();
       const doctor = await DoctorSchema.create({
