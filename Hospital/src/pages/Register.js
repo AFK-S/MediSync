@@ -1,5 +1,14 @@
 import React, { useState, useRef } from "react";
-import { Button, TextInput, Select, ActionIcon, rem } from "@mantine/core";
+import {
+  Button,
+  TextInput,
+  Select,
+  ActionIcon,
+  rem,
+  Text,
+  FileInput,
+  Group,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Calendar } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -14,15 +23,18 @@ const Register = () => {
     initialValues: {
       doctor_name: "",
       phone_number: "",
-      image: "",
+      file: "",
       specialization: "",
       age: "",
       experience: "",
+      license_number: "",
+      rfid_tag: "",
       gender: "",
       fees: "",
       availability: [],
       start_time: "",
       end_time: "",
+      average_time: "",
     },
   });
 
@@ -30,11 +42,12 @@ const Register = () => {
   const refEnd = useRef(null);
 
   const [imagePreview, setImagePreview] = useState(null);
+  // const [file, setFile] = useState(null);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
 
-    form.setFieldValue("image", file);
+    form.setFieldValue("file", file);
 
     const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
@@ -91,19 +104,83 @@ const Register = () => {
       return alert("Enter Doctor Available Dates and Time");
     }
 
+    console.log(values.availability);
     console.log(values);
-    try {
-      const { data } = await axios.post(
-        `api/doctor/register/${cookies._id}`,
-        values
-      );
-      form.reset();
-      setSelected([]);
-      console.log("Response from server:", data);
-    } catch (error) {
-      console.error("Error submitting data:", error);
-    }
+    const formData = new FormData();
+
+    formData.append("doctor_name", values.doctor_name);
+    formData.append("phone_number", values.phone_number);
+    formData.append("specialization", values.specialization);
+    formData.append("age", values.age);
+    formData.append("experience", values.experience);
+    formData.append("license_number", values.license_number);
+    formData.append("rfid_tag", values.rfid_tag);
+    formData.append("gender", values.gender);
+    formData.append("fees", values.fees);
+    formData.append("availability", values.availability);
+    // formData.availability
+    formData.append("start_time", values.start_time);
+    formData.append("end_time", values.end_time);
+    formData.append("average_time", values.average_time);
+    formData.append("file", values.file);
+
+    console.log(formData.availability);
+    //     doctor_name: "",
+    // phone_number: "",
+    // phone_number: "",
+    // specialization: "",
+    // age: "",
+    // experience: "",
+    // licence_number: "",
+    // rfid_tag: "",
+    // gender: "",
+    // fees: "",
+    // availability: [],
+    // start_time: "",
+    // end_time: "",
+    // avg_time: "",
+
+    // try {
+    //   const { data } = await axios.post(
+    //     `api/doctor/register/${cookies._id}`,
+    //     formData,
+    //     {
+    //       headers: {
+    //         "Content-Type": "multipart/form-data",
+    //       },
+    //     }
+    //   );
+    //   form.reset();
+    //   setSelected([]);
+    //   console.log("Response from server:", data);
+    // } catch (error) {
+    //   console.error("Error submitting data:", error);
+    // }
   };
+
+  const specializationOptions = [
+    { label: "Dermatologist", value: "dermatologist" },
+    { label: "Gastroenterologist", value: "gastroenterologist" },
+    { label: "Hepatologist", value: "hepatologist" },
+    { label: "Osteopathic", value: "osteopathic" },
+    { label: "Endocrinologist", value: "endocrinologist" },
+    { label: "Pulmonologist", value: "pulmonologist" },
+    { label: "Neurologist", value: "neurologist" },
+    { label: "Pediatrician", value: "pediatrician" },
+    { label: "Cardiologist", value: "cardiologist" },
+    { label: "Phlebologist", value: "phlebologist" },
+    { label: "Osteoarthristis", value: "osteoarthristis" },
+    { label: "Rheumatologists", value: "rheumatologists" },
+    { label: "Otolaryngologist", value: "otolaryngologist" },
+    { label: "Gynecologist", value: "gynecologist" },
+    { label: "General", value: "general" },
+  ];
+
+  const [fileName, setFileName] = useState("");
+
+  // const handleFileChange = (e) => {
+  //   setFile(e.target.files[0]);
+  // };
 
   return (
     <div className="register overflow-hidden">
@@ -133,15 +210,18 @@ const Register = () => {
                 />
               </div>
               <div className="col-md-6">
-                <TextInput
-                  label="Specialization"
-                  type="text"
-                  placeholder="Enter your specialization"
-                  required
+                <Text fw={500}>Specialization</Text>
+
+                <Select
                   {...form.getInputProps("specialization")}
-                  error={form.errors.specialization}
+                  placeholder="Select specialization"
+                  mt={-23}
+                  data={specializationOptions}
+                  value={(option) => option.value}
+                  label={(option) => option.label}
                 />
               </div>
+
               <div className="col-md-6">
                 <TextInput
                   label="Age"
@@ -170,6 +250,26 @@ const Register = () => {
                   required
                   {...form.getInputProps("fees")}
                   error={form.errors.fees}
+                />
+              </div>
+              <div className="col-md-6">
+                <TextInput
+                  label="Licence Number"
+                  type="number"
+                  placeholder="Enter Licence Number"
+                  required
+                  {...form.getInputProps("license_number")}
+                  error={form.errors.license_number}
+                />
+              </div>
+              <div className="col-md-6">
+                <TextInput
+                  label="RFID Tag No."
+                  type="text"
+                  placeholder="Enter RFID Tag"
+                  required
+                  {...form.getInputProps("rfid_tag")}
+                  error={form.errors.rfid_tag}
                 />
               </div>
               <div className="row gx-2 " style={{ marginTop: "1rem" }}>
@@ -223,6 +323,16 @@ const Register = () => {
                 />
               </div>
               <div className="col-md-6">
+                <TextInput
+                  label="Average Time for Appointment"
+                  type="number"
+                  placeholder="Enter Time"
+                  {...form.getInputProps("average_time")}
+                  error={form.errors.average_time}
+                />
+              </div>
+
+              <div className="col-md-6">
                 <div className="custom-file-input">
                   <label
                     htmlFor="image"
@@ -230,12 +340,14 @@ const Register = () => {
                   >
                     Upload Doctor's Image:{" "}
                   </label>
+
                   <input
                     type="file"
                     id="image"
                     accept="image/*"
                     onChange={handleImageUpload}
                   />
+
                   {form.errors.image && (
                     <div style={{ color: "red" }}>{form.errors.image}</div>
                   )}
