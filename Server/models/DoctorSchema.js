@@ -7,11 +7,20 @@ const DoctorSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: [true, "Please provide a Hospital ID"],
     },
+    rfid_tag: {
+      type: String,
+      unique: true,
+      trim: true,
+      required: [true, "Please provide the RFID Tag"],
+    },
     name: {
       type: String,
       trim: true,
       match: [/^[a-zA-Z ]+$/, (props) => `${props.value} is not a valid name`],
-      required: [true, "Please provide the Doctor's Name"],
+    },
+    mac_address: {
+      type: String,
+      unique: true,
     },
     photo: {
       type: String,
@@ -22,8 +31,25 @@ const DoctorSchema = new Schema(
     specialization: {
       type: String,
       trim: true,
+      enum: [
+        "dermatologist",
+        "allergist",
+        "gastroenterologist",
+        "hepatologist",
+        "osteopathic",
+        "endocrinologist",
+        "pulmonologist",
+        "cardiologist",
+        "neurologist",
+        "pediatrician",
+        "phlebologist",
+        "rheumatologists",
+        "otolaryngologist",
+        "gynecologist",
+        "general",
+      ],
       match: [
-        /^[a-zA-Z ]+$/,
+        /^[a-zA-Z]+$/,
         (props) => `${props.value} is not a valid specialization`,
       ],
       required: [true, "Please provide the Specialization"],
@@ -41,10 +67,19 @@ const DoctorSchema = new Schema(
       match: [/^[0-9]+$/, (props) => `${props.value} is not a valid age`],
       required: [true, "Please provide the Age"],
     },
+    license_number: {
+      type: String,
+      trim: true,
+      match: [
+        /^[a-zA-Z0-9]+$/,
+        (props) => `${props.value} is not a valid license number`,
+      ],
+      required: [true, "Please provide the License Number"],
+    },
     availability: [
       {
         date: {
-          type: String,
+          type: Date,
           required: [true, "Please provide the Date"],
         },
         start_time: {
@@ -57,9 +92,17 @@ const DoctorSchema = new Schema(
         },
       },
     ],
+    average_time: {
+      type: Number,
+      match: [
+        /^[0-9]+$/,
+        (props) => `${props.value} is not a valid average time`,
+      ],
+      required: [true, "Please provide the Average Time"],
+    },
     gender: {
       type: String,
-      enum: ["male", "female"],
+      enum: ["male", "female", "other"],
       required: [true, "Please provide the Gender"],
     },
     fees: {

@@ -1,8 +1,5 @@
 import ShortUniqueId from "short-unique-id";
 import DoctorSchema from "../models/DoctorSchema.js";
-import mongoose from "mongoose";
-
-const { ObjectId } = mongoose.Types;
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
 
@@ -10,10 +7,12 @@ const Register = async (req, res) => {
   try {
     const { hospital_id } = req.params;
     const {
+      rfid_tag,
       doctor_name,
       specialization,
       experience,
       age,
+      license_number,
       availability,
       gender,
       fees,
@@ -23,18 +22,25 @@ const Register = async (req, res) => {
     const password = randomUUID();
     const doctor = await DoctorSchema.create({
       hospital_id,
+      rfid_tag,
       name: doctor_name,
       specialization,
       experience,
       age,
+      license_number,
       availability,
+      average_time,
       gender,
       fees,
       phone_number,
       username,
       password,
     });
-    res.status(200).send(doctor._id);
+    res.status(200).json({
+      _id: doctor._id,
+      username,
+      password,
+    });
   } catch (err) {
     console.error(err);
     res.status(400).send(err.message);
@@ -92,7 +98,7 @@ const HospitalDoctorsList = async (req, res) => {
   try {
     const { hospital_id } = req.params;
     const doctors = await DoctorSchema.find({
-      hospital_id: new ObjectId(hospital_id),
+      hospital_id: hospital_id,
     }).lean();
     res.status(200).json(doctors);
   } catch (err) {
