@@ -1,6 +1,7 @@
 import HospitalSchema from "../models/HospitalSchema.js";
 import DoctorSchema from "../models/DoctorSchema.js";
 import PatientSchema from "../models/PatientSchema.js";
+import { CheckMacAddress } from "./TpLink.js";
 
 const HospitalLogin = async (req, res) => {
   try {
@@ -26,7 +27,7 @@ const HospitalLogin = async (req, res) => {
   }
 };
 
-const DoctorLogin = async (req, res) => {
+const DoctorLogin = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const response = await DoctorSchema.findOne({
@@ -39,6 +40,7 @@ const DoctorLogin = async (req, res) => {
       return res.status(400).send("Invalid Credential");
     }
     res.status(200).send(response._id);
+    next();
   } catch (err) {
     console.error(err);
     res.status(400).send(err.message);

@@ -1,5 +1,6 @@
 import { Builder, By, until } from "selenium-webdriver";
 import cheerio from "cheerio";
+import DoctorSchema from "../models/DoctorSchema";
 
 let driver;
 
@@ -41,7 +42,7 @@ const DeviceDetails = async () => {
   const data = await RouterLogin("ol41", "a41", "ol43", "a43");
   const tag = await data.findElement(By.xpath(`//tr[3]/td`));
   const htmlContent = await tag.getAttribute("innerHTML");
-  const headers = ["ID", "IP Address", "MAC Address", "Status", "Configure"];
+  const headers = ["id", "id_address", "mac_address", "status", "configure"];
   const jsonData = htmlTableToJson(htmlContent, headers);
   driver.quit();
   return jsonData;
@@ -66,19 +67,23 @@ const ConnectedDevices = async () => {
 
 const CheckMacAddress = async (req, res) => {
   try {
-    const clientIP = req.socket.remoteAddress;
-    const data = await ConnectedDevices();
-    let mac_address = "";
+    const { username, password } = req.body;
+    const clientIP = req.socket.remoteAddress.split(":")[3];
+    const data = await DeviceDetails();
     for (let i = 0; i < data.length; i++) {
       if (data[i].ip_address === clientIP) {
-        mac_address = data[i].mac_address;
+        await DoctorSchema.findOneAndUpdate(
+          {
+            username,
+            password,
+          },
+          { mac_address: data[i].mac_address }
+        );
         break;
       }
     }
-    res.status(200).send(mac_address);
   } catch (err) {
     console.error(err);
-    res.status(400).send(err.message);
   }
 };
 
