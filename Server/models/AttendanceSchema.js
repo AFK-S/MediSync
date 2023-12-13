@@ -10,12 +10,7 @@ const AttendanceSchema = new Schema(
     isAvailable: {
       type: Boolean,
       default: true,
-      required: [true, "Please provide a Absent"],
-    },
-    isPresent: {
-      type: Boolean,
-      default: true,
-      required: [true, "Please provide a Present"],
+      required: [true, "Please provide a Availability"],
     },
     date: {
       type: Date,
@@ -23,6 +18,7 @@ const AttendanceSchema = new Schema(
     },
     checkIn: {
       type: Date,
+      required: [true, "Please provide a Check In"],
     },
     checkOut: {
       type: Date,

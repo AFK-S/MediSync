@@ -40,7 +40,11 @@ const Register = async (req, res, next) => {
       username,
       password,
     };
-    res.status(200).send(hospital._id);
+    res.status(200).json({
+      _id: hospital._id,
+      username,
+      password,
+    });
     next();
   } catch (err) {
     console.error(err);
