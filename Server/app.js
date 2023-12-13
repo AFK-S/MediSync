@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
-import fileupload from "express-fileupload";
 import HospitalRoute from "./routes/HospitalRoute.js";
 import DoctorRoute from "./routes/DoctorRoute.js";
 import TpLinkRoute from "./routes/TpLinkRoute.js";
@@ -24,7 +23,6 @@ try {
 }
 
 app.use(express.json());
-app.use(fileupload());
 app.use(
   express.urlencoded({
     extended: true,
@@ -53,12 +51,6 @@ app.get("/api/logout", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("MediSync is up and running!!");
 });
-
-// app.get("/api/test", (req, res) => {
-//   const clientIp = req.socket.remoteAddress.split(":")[3];
-//   console.log(clientIp);
-//   res.send(clientIp);
-// });
 
 app.listen(8000, () => {
   console.log("Server listening on port 8000");
