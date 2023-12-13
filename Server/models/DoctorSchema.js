@@ -20,9 +20,9 @@ const DoctorSchema = new Schema(
     },
     mac_address: {
       type: String,
-      unique: true,
+      // unique: true,
     },
-    photo: {
+    photo_url: {
       type: String,
       trim: true,
       default: "https://www.pexels.com/photo/man-in-brown-polo-shirt-614810/",

@@ -1,5 +1,6 @@
 import ShortUniqueId from "short-unique-id";
 import DoctorSchema from "../models/DoctorSchema.js";
+import bucket from "../firebase.js";
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
 
@@ -14,33 +15,51 @@ const Register = async (req, res) => {
       age,
       license_number,
       availability,
-      gender,
-      fees,
-      phone_number,
-    } = req.body;
-    const username = randomUUID();
-    const password = randomUUID();
-    const doctor = await DoctorSchema.create({
-      hospital_id,
-      rfid_tag,
-      name: doctor_name,
-      specialization,
-      experience,
-      age,
-      license_number,
-      availability,
       average_time,
       gender,
       fees,
       phone_number,
-      username,
-      password,
+    } = req.body;
+    const { file } = req.files;
+    if (!file) return res.status(400).send("No file uploaded.");
+    console.log(file);
+    const blob = bucket.file(file.name);
+    const blobStream = blob.createWriteStream();
+    blobStream.on("error", (err) => {
+      return res.status(400).send("Error uploading file.");
     });
-    res.status(200).json({
-      _id: doctor._id,
-      username,
-      password,
+    blobStream.on("finish", async () => {
+      const downloadUrl = await blob.getSignedUrl({
+        action: "read",
+        expires: "03-09-2491",
+      });
+      console.log(downloadUrl);
+      const username = randomUUID();
+      const password = randomUUID();
+      const doctor = await DoctorSchema.create({
+        hospital_id,
+        rfid_tag,
+        name: doctor_name,
+        photo_url: downloadUrl[0],
+        specialization,
+        experience,
+        age,
+        license_number,
+        availability: JSON.parse(availability),
+        average_time,
+        gender,
+        fees,
+        phone_number,
+        username,
+        password,
+      });
+      return res.status(200).json({
+        _id: doctor._id,
+        username,
+        password,
+      });
     });
+    blobStream.end(file.buffer);
   } catch (err) {
     console.error(err);
     res.status(400).send(err.message);
