@@ -16,18 +16,15 @@ const LoginScreen = ({ navigation }) => {
   const { setLogin } = useStateContext();
 
   const handleLogin = async () => {
-    // Set isLogin to true in the context
     setLogin(true);
 
-    // Set isLogin to true in AsyncStorage
     try {
-      // Use boolean value instead of a string
       await AsyncStorage.setItem("isLogin", JSON.stringify(true));
+      await AsyncStorage.setItem("_id", JSON.stringify(1));
     } catch (error) {
       console.error("Error storing login status:", error);
     }
 
-    // Navigate to MainScreen
     navigation.navigate("MainScreen");
   };
 
