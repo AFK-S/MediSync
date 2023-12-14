@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -10,25 +10,32 @@ import {
   Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useStateContext } from "../../context/StateContext";
+import StateContext from "../../context/StateContext";
 
 const LoginScreen = ({ navigation }) => {
-  const { setLogin } = useStateContext();
+  const { Login, FirstTimeLogin, isLogin, setIsLogin } =
+    useContext(StateContext);
+  const [login, setLogin] = useState({
+    username: "",
+    password: "",
+  });
+
+  useEffect(() => {
+    if (isLogin) navigation.navigate("MainScreen");
+  }, []);
 
   const handleLogin = async () => {
-    // Set isLogin to true in the context
-    setLogin(true);
-
-    // Set isLogin to true in AsyncStorage
     try {
-      // Use boolean value instead of a string
-      await AsyncStorage.setItem("isLogin", JSON.stringify(true));
+      const mac_address = await AsyncStorage.getItem("mac_address");
+      console.log(mac_address);
+      if (mac_address == null)
+        await FirstTimeLogin(login.username, login.password);
+      else await Login(login.username, login.password, mac_address);
+      setIsLogin(true);
+      navigation.navigate("MainScreen");
     } catch (error) {
-      console.error("Error storing login status:", error);
+      console.log(error);
     }
-
-    // Navigate to MainScreen
-    navigation.navigate("MainScreen");
   };
 
   const handleGoToRegister = () => {
@@ -50,11 +57,18 @@ const LoginScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Username or Email"
+            value={login.username}
+            onChangeText={(text) => setLogin({ ...login, username: text })}
+            required
+
             // Add onChangeText prop to handle input changes
           />
           <TextInput
             style={styles.input}
             placeholder="Password"
+            value={login.password}
+            onChangeText={(text) => setLogin({ ...login, password: text })}
+            required
             secureTextEntry={true}
             // Add onChangeText prop to handle input changes
           />

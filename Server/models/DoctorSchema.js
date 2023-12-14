@@ -20,7 +20,9 @@ const DoctorSchema = new Schema(
     },
     mac_address: {
       type: String,
-      // unique: true,
+      trim: true,
+      unique: true,
+      required: [true, "Please provide the MAC Address"],
     },
     photo_url: {
       type: String,

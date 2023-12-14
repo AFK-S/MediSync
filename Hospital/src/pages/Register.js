@@ -103,7 +103,11 @@ const Register = () => {
     formData.append("start_time", values.start_time);
     formData.append("end_time", values.end_time);
     formData.append("average_time", values.average_time);
-    formData.append("file", values.file);
+    formData.append(
+      "file",
+      values.file,
+      values.doctor_name + "." + values.file.type.split("/")[1]
+    );
     try {
       const { data } = await axios.post(
         `api/doctor/register/${cookies._id}`,
@@ -164,6 +168,7 @@ const Register = () => {
                   required
                   pattern="[0-9]*"
                   max={9999999999}
+                  min={1000000000}
                   {...form.getInputProps("phone_number")}
                   error={form.errors.phone_number}
                 />

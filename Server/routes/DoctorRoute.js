@@ -8,7 +8,7 @@ import {
   AllHospitalDoctorsList,
   AllDoctors,
 } from "../controller/Doctor.js";
-import { DoctorLogin } from "../controller/Login.js";
+import { FirstTimeDoctorLogin, DoctorLogin } from "../controller/Login.js";
 import { CheckMacAddress } from "../controller/TpLink.js";
 import multer from "multer";
 
@@ -17,7 +17,8 @@ const upload = multer({ storage: storage });
 
 const router = express.Router();
 
-router.post("/doctor/login", DoctorLogin, CheckMacAddress);
+router.post("/doctor/first_time/login", FirstTimeDoctorLogin, CheckMacAddress);
+router.post("/doctor/login", DoctorLogin);
 router.post(
   "/doctor/register/:hospital_id",
   upload.single("file"),
