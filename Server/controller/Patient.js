@@ -9,7 +9,13 @@ const VerifyPatient = async (req, res) => {
     })
       .select(["_id"])
       .lean();
-    res.select(200).json(response !== null);
+    if (!response) return res.status(201).send(false);
+    res
+      .cookie("_id", response._id, {
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      })
+      .status(200)
+      .send(response._id);
   } catch (err) {
     console.error(err);
     res.status(400).send(err.message);
