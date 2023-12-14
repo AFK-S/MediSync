@@ -1,70 +1,56 @@
-import React, { createContext, useContext, useReducer, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { SERVER_URL } from "../config.js";
 
-// Initial state
-const initialState = {
-  isLogin: false,
-};
-
-// Action types
-const actionTypes = {
-  SET_LOGIN: "SET_LOGIN",
-};
-
-// Reducer function
-const reducer = (state, action) => {
-  switch (action.type) {
-    case actionTypes.SET_LOGIN:
-      return { ...state, isLogin: action.payload };
-    default:
-      return state;
-  }
-};
-
-// Context
 const StateContext = createContext();
+export default StateContext;
 
-// Context Provider
 export const StateProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-  // Actions
-  const setLogin = async (isLogin) => {
-    dispatch({ type: actionTypes.SET_LOGIN, payload: isLogin });
-    try {
-      // Save the login state to AsyncStorage
-      await AsyncStorage.setItem("isLogin", JSON.stringify(isLogin));
-    } catch (error) {
-      console.error("Error saving login state:", error);
-    }
-  };
-
-  // Initialize login state from AsyncStorage
-  const initializeLoginState = async () => {
-    try {
-      const storedLoginState = await AsyncStorage.getItem("isLogin");
-      if (storedLoginState !== null) {
-        dispatch({
-          type: actionTypes.SET_LOGIN,
-          payload: JSON.parse(storedLoginState),
-        });
-      }
-    } catch (error) {
-      console.error("Error initializing login state:", error);
-    }
-  };
+  const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
-    initializeLoginState();
+    (async () => {
+      const _id = await AsyncStorage.getItem("_id");
+      const mac_address = await AsyncStorage.getItem("mac_address");
+
+      if (_id == null || mac_address == null) setIsLogin(false);
+      else setIsLogin(true);
+    })();
   }, []);
 
-  const contextValue = {
-    ...state,
-    setLogin,
+  const Login = async (username, password, mac_address) => {
+    const { data } = await axios.post(`${SERVER_URL}/api/doctor/login`, {
+      username,
+      password,
+      mac_address,
+    });
+    console.log(data);
+    await AsyncStorage.setItem("_id", data);
+  };
+
+  const FirstTimeLogin = async (username, password) => {
+    const { data } = await axios.post(
+      `${SERVER_URL}/api/doctor/first_time/login`,
+      {
+        username,
+        password,
+      }
+    );
+    console.log(data);
+    await AsyncStorage.setItem("_id", data._id);
+    await AsyncStorage.setItem("mac_address", data.mac_address);
   };
 
   return (
-    <StateContext.Provider value={contextValue}>
+    <StateContext.Provider
+      value={{
+        isLogin,
+        setIsLogin,
+        Login,
+        FirstTimeLogin,
+      }}
+    >
       {children}
     </StateContext.Provider>
   );

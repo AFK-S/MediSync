@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -6,6 +6,7 @@ import Patients from "./Patients";
 import PatientDetailsScreen from "./PatientDetailsScreen"; // Import the new screen
 import AppointmentsScreen from "./AppointmentsScreen";
 import Profile from "./Profile";
+import StateContext from "../context/StateContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -45,6 +46,10 @@ const AppointmentStack = () => {
 };
 
 const MainScreen = () => {
+  const { isLogin } = useContext(StateContext);
+  useEffect(() => {
+    if (!isLogin) navigation.navigate("Login");
+  }, []);
   return (
     <Tab.Navigator
       initialRouteName="Appointments"

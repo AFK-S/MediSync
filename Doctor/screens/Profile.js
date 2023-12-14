@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -7,19 +7,21 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { useStateContext } from "../context/StateContext";
+import StateContext from "../context/StateContext";
 import axios from "axios";
 import Timeline from "react-native-timeline-flatlist";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Profile = () => {
-  const { setLogin } = useStateContext();
+const Profile = ({ navigation }) => {
+  const { setIsLogin } = useContext(StateContext);
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem("isLogin");
+      await AsyncStorage.removeItem("_id");
+      setIsLogin(false);
+      navigation.navigate("Login");
     } catch (error) {
       console.error("Error removing login status:", error);
     }
-    setLogin(false);
   };
   const patient = {
     name: "Dr. Karandeep Singh Sandhu",
