@@ -83,7 +83,7 @@ const Patients = () => {
       <View
         style={[
           styles.topContainer,
-          { height: Platform.OS === "ios" ? 220 : 230 },
+          { height: Platform.OS === "ios" ? 200 : 220 },
         ]}
       >
         <View style={styles.innerContainer}>
@@ -144,8 +144,8 @@ const styles = StyleSheet.create({
   topContainer: {
     backgroundColor: "#18C37D",
     height: 210,
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50,
+    borderBottomLeftRadius: 45,
+    borderBottomRightRadius: 45,
   },
   innerContainer: {
     padding: 20,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   searchInput: {
     backgroundColor: "#fff",
     marginTop: 20,
-    padding: 20,
+    padding: 15,
     borderRadius: 60,
     fontWeight: "600",
     fontSize: 17,

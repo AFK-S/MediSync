@@ -32,10 +32,13 @@ const FirstTimeDoctorLogin = async (req, res, next) => {
       username,
       password,
     })
-      .select(["_id"])
+      .select(["_id", "mac_address"])
       .lean();
     if (response === null) {
       return res.status(400).send("Invalid Credential");
+    }
+    if (!response.mac_address.includes("AFKS")) {
+      return res.status(400).send("Already Registered");
     }
     req._id = response._id;
     next();

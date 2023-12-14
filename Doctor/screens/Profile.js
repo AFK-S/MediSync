@@ -143,7 +143,7 @@ const Profile = ({ navigation }) => {
               Schedule
             </Text>
             <Timeline
-              style={{ padding: 20 }}
+              style={{ flex: 1, backgroundColor: "#fff", padding: 20 }}
               data={timeline}
               circleSize={20}
               circleColor="#18C37D"

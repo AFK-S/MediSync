@@ -12,6 +12,26 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const PatientsStack = () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const isLoginString = await AsyncStorage.getItem("isLogin");
+        const _idString = await AsyncStorage.getItem("_id");
+
+        if (isLoginString !== null && _idString !== null) {
+          const isLogin = JSON.parse(isLoginString);
+          const _id = JSON.parse(_idString);
+
+          console.log("isLogin:", isLogin);
+          console.log("_id:", _id);
+        }
+      } catch (error) {
+        console.error("Error retrieving data from AsyncStorage:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <Stack.Navigator>
       <Stack.Screen
