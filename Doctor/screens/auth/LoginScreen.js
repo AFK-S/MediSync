@@ -21,6 +21,10 @@ const LoginScreen = ({ navigation }) => {
   });
 
   useEffect(() => {
+    // (async () => {
+    //   await AsyncStorage.clear();
+    // })();
+
     if (isLogin) navigation.navigate("MainScreen");
   }, []);
 
@@ -58,7 +62,9 @@ const LoginScreen = ({ navigation }) => {
             style={styles.input}
             placeholder="Username or Email"
             value={login.username}
-            onChangeText={(text) => setLogin({ ...login, username: text })}
+            onChangeText={(text) =>
+              setLogin({ ...login, username: text.toLowerCase() })
+            }
             required
 
             // Add onChangeText prop to handle input changes

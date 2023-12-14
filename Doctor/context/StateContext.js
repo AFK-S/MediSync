@@ -8,6 +8,8 @@ export default StateContext;
 
 export const StateProvider = ({ children }) => {
   const [isLogin, setIsLogin] = useState(false);
+  const [doctorId, setDoctorId] = useState();
+  const [doctorData, setDoctorData] = useState();
 
   useEffect(() => {
     (async () => {
@@ -15,7 +17,10 @@ export const StateProvider = ({ children }) => {
       const mac_address = await AsyncStorage.getItem("mac_address");
 
       if (_id == null || mac_address == null) setIsLogin(false);
-      else setIsLogin(true);
+      else {
+        setDoctorId(_id);
+        setIsLogin(true);
+      }
     })();
   }, []);
 
@@ -42,6 +47,11 @@ export const StateProvider = ({ children }) => {
     await AsyncStorage.setItem("mac_address", data.mac_address);
   };
 
+  const getProfile = async () => {
+    const { data } = await axios.get(`${SERVER_URL}/api/doctor/${doctorId}`);
+    setDoctorData(data);
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -49,6 +59,8 @@ export const StateProvider = ({ children }) => {
         setIsLogin,
         Login,
         FirstTimeLogin,
+        getProfile,
+        doctorData,
       }}
     >
       {children}
