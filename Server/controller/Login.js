@@ -32,7 +32,7 @@ const FirstTimeDoctorLogin = async (req, res, next) => {
       username,
       password,
     })
-      .select(["_id"])
+      .select(["_id", "mac_address"])
       .lean();
     if (response === null) {
       return res.status(400).send("Invalid Credential");

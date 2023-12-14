@@ -21,7 +21,7 @@ const htmlTableToJson = (html, headers) => {
 };
 
 const RouterLogin = async (btn1, a1, btn2, a2) => {
-  const driver = await new Builder().forBrowser("chrome").build();
+  driver = await new Builder().forBrowser("chrome").build();
   await driver.get("http://192.168.0.1/");
   await driver.findElement(By.id("userName")).sendKeys("admin");
   await driver.findElement(By.id("pcPassword")).sendKeys("admin");
@@ -42,7 +42,7 @@ const DeviceDetails = async () => {
   const data = await RouterLogin("ol41", "a41", "ol43", "a43");
   const tag = await data.findElement(By.xpath(`//tr[3]/td`));
   const htmlContent = await tag.getAttribute("innerHTML");
-  const headers = ["id", "id_address", "mac_address", "status", "configure"];
+  const headers = ["id", "mac_address", "ip_address", "status", "configure"];
   const jsonData = htmlTableToJson(htmlContent, headers);
   driver.quit();
   return jsonData;
