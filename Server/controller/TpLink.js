@@ -79,9 +79,13 @@ const CheckMacAddress = async (req, res) => {
           },
           { mac_address: data[i].mac_address }
         );
-        break;
+        return res.status(200).json({
+          _id: req._id,
+          mac_address: data[i].mac_address,
+        });
       }
     }
+    res.status(400).send("Invalid IP Address");
   } catch (err) {
     console.error(err);
   }
