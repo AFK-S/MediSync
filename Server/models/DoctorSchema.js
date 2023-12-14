@@ -22,7 +22,6 @@ const DoctorSchema = new Schema(
       type: String,
       trim: true,
       unique: true,
-      default: new Date().getTime().toString(36),
       required: [true, "Please provide the MAC Address"],
     },
     photo_url: {
