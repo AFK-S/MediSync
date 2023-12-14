@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 
 const doctors = ["Dr. XYZ", "Dr. ABC", "Dr. PQR"];
+const specialization = ["ortho", "pedia", "cardio"];
 const timeSlots = ["10:00am - 10:30am", "11:00am - 11:30am", "2:00pm - 2:30pm"];
 
 const Table = ({ data, columns }) => {
@@ -48,12 +49,30 @@ const Table = ({ data, columns }) => {
 };
 
 const Appointments = () => {
-  const groceries = ["sneezing", "coughing", "headache"];
+  const symptoms = [
+    "sneezing",
+    "coughing",
+    "headache",
+    "coughing",
+    "headache",
+    "coughing",
+    "headache",
+
+    "coughing",
+    "headache",
+
+    "coughing",
+    "headache",
+
+    "coughing",
+    "headache",
+  ];
 
   const form = useForm({
     initialValues: {
       hospital: "",
       doctor: "",
+      specialization: "",
       symptoms: "",
       phone_number: "",
       date: "",
@@ -92,7 +111,7 @@ const Appointments = () => {
     </Pill>
   ));
 
-  const options = groceries
+  const options = symptoms
     .filter((item) => item.toLowerCase().includes(search.trim().toLowerCase()))
     .map((item) => (
       <Combobox.Option value={item} key={item} active={value.includes(item)}>
@@ -105,7 +124,7 @@ const Appointments = () => {
 
   const isHospitalSelected = form.values.hospital;
   const isDoctorSelected = form.values.doctor;
-
+  const isSpecializationSelected = form.values.specialization;
   return (
     <div>
       <div className="container-fluid">
@@ -134,6 +153,21 @@ const Appointments = () => {
               </div>
               <div className="col-md-6 mt-3 mt-md-0">
                 <Select
+                  label="Select Specialization"
+                  placeholder="Select Specialization"
+                  data={specialization.map((specialization) => ({
+                    value: specialization,
+                    label: specialization,
+                  }))}
+                  onChange={(value) =>
+                    form.setValues({ ...form.values, specialization: value })
+                  }
+                  value={form.values.doctor}
+                  disabled={!isHospitalSelected}
+                />
+              </div>
+              <div className="col-md-6 mt-3 mt-md-0">
+                <Select
                   label="Select Doctor"
                   placeholder="Select Doctor"
                   data={doctors.map((doctor) => ({
@@ -143,8 +177,32 @@ const Appointments = () => {
                   onChange={(value) =>
                     form.setValues({ ...form.values, doctor: value })
                   }
+                  mt="md"
                   value={form.values.doctor}
-                  disabled={!isHospitalSelected}
+                  disabled={!isSpecializationSelected}
+                />
+              </div>
+
+              <div className="col-md-6">
+                <DateInput
+                  mt="md"
+                  label="Select Date"
+                  placeholder="Select Date"
+                  disabled={!isDoctorSelected}
+                  {...form.getInputProps("date")}
+                />
+              </div>
+              <div className="col-md-6">
+                <Select
+                  mt="md"
+                  label="Select Time Slot"
+                  placeholder="Select Time Slot"
+                  disabled={!isDoctorSelected}
+                  data={timeSlots.map((slot) => ({ value: slot, label: slot }))}
+                  onChange={(value) =>
+                    form.setValues({ ...form.values, timeslot: value })
+                  }
+                  value={form.values.timeslot}
                 />
               </div>
               <div className="col-md-6">
@@ -198,38 +256,6 @@ const Appointments = () => {
                     </Combobox.Options>
                   </Combobox.Dropdown>
                 </Combobox>
-              </div>
-              <div className="col-md-6">
-                <NumberInput
-                  mt="md"
-                  label="Phone Number"
-                  placeholder="Phone Number"
-                  disabled={!isDoctorSelected}
-                  {...form.getInputProps("phone_number")}
-                />
-              </div>
-
-              <div className="col-md-6">
-                <DateInput
-                  mt="md"
-                  label="Select Date"
-                  placeholder="Select Date"
-                  disabled={!isDoctorSelected}
-                  {...form.getInputProps("date")}
-                />
-              </div>
-              <div className="col-md-6">
-                <Select
-                  mt="md"
-                  label="Select Time Slot"
-                  placeholder="Select Time Slot"
-                  disabled={!isDoctorSelected}
-                  data={timeSlots.map((slot) => ({ value: slot, label: slot }))}
-                  onChange={(value) =>
-                    form.setValues({ ...form.values, timeslot: value })
-                  }
-                  value={form.values.timeslot}
-                />
               </div>
             </div>
             <Group justify="end" mt="xl">

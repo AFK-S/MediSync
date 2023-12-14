@@ -24,39 +24,39 @@ export const fetchAdmin = createAsyncThunk(
   }
 );
 
-const adminInitialState = {
+const userInitialState = {
   user: null,
   loading: "idle",
   error: null,
 };
 
-const AdminSlice = createSlice({
-  name: "admin",
-  initialState: adminInitialState,
+const UserSlice = createSlice({
+  name: "user",
+  initialState: userInitialState,
   reducers: {
-    setAdmin: (state, action) => {
+    setUser: (state, action) => {
       state.user = action.payload;
     },
-    logoutAdmin: (state) => {
+    logoutUser: (state) => {
       state.user = null;
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchAdmin.pending, (state) => {
-        state.loading = "pending";
-        state.error = null;
-      })
-      .addCase(fetchAdmin.fulfilled, (state, action) => {
-        state.loading = "fulfilled";
-        state.error = null;
-      })
-      .addCase(fetchAdmin.rejected, (state, action) => {
-        state.loading = "rejected";
-        state.error = action.payload;
-      });
-  },
+  // extraReducers: (builder) => {
+  //   builder
+  //     .addCase(fetchAdmin.pending, (state) => {
+  //       state.loading = "pending";
+  //       state.error = null;
+  //     })
+  //     .addCase(fetchAdmin.fulfilled, (state, action) => {
+  //       state.loading = "fulfilled";
+  //       state.error = null;
+  //     })
+  //     .addCase(fetchAdmin.rejected, (state, action) => {
+  //       state.loading = "rejected";
+  //       state.error = action.payload;
+  //     });
+  // },
 });
 
-export const { setAdmin, logoutAdmin } = AdminSlice.actions;
-export default AdminSlice.reducer;
+export const { setUser, logoutUser } = UserSlice.actions;
+export default UserSlice.reducer;

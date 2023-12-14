@@ -3,10 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import SideNavigation from "../components/SideNavigation/SideNavigation.js";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { fetchAdmin, logoutAdmin } from "../slice/AdminSlice.js";
-import { useCookies } from "react-cookie";
 import TopBar from "../components/TopBar/TopBar.js";
-import { setLoading } from "../slice/AppSclice.js";
 import MobileNav from "../components/MobileNav/MobileNav.js";
 import Home from "./Home/Home.js";
 // import { SERVER_URL } from "../config.js";
@@ -14,41 +11,26 @@ import axios from "axios";
 import Appointments from "./Appointment/Appointments.js";
 import Profile from "./Profile/Profile.js";
 import Search from "./Search/Search.js";
+import { useCookies } from "react-cookie";
 const MainLayout = () => {
-  const [cookies, removeCookie] = useCookies(["token", "userId"]);
+  const navigate = useNavigate();
+  const [cookies] = useCookies(["_id"]);
+
+  useEffect(() => {
+    console.log(cookies);
+    if (!cookies._id) {
+      console.log("cookies from main: ", cookies._id);
+      navigate("/login");
+    }
+  }, [cookies]);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const ToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      dispatch(setLoading(true));
-
-      if (!cookies.token || !cookies.userId) {
-        removeCookie("token");
-        removeCookie("userId");
-        dispatch(logoutAdmin());
-        window.location.href = "/login";
-      }
-
-      try {
-        await dispatch(fetchAdmin(cookies.token)).unwrap();
-      } catch (error) {
-        console.error("Failed to fetch admin data: ", error);
-        navigate("/login");
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <>
@@ -68,7 +50,6 @@ const MainLayout = () => {
             <TopBar ToggleMenu={ToggleMenu} />
 
             <Routes>
-              <Route path="/" element={<Navigate to="/home" />} />
               <Route path="/home" element={<Home />} />
               <Route path="/search/*" element={<Search />} />
               <Route path="/appointments" element={<Appointments />} />

@@ -11,6 +11,8 @@ import {
 } from "@mantine/core";
 import { IconFile } from "@tabler/icons-react";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 const Table = ({ data, columns }) => {
   return (
@@ -109,6 +111,25 @@ const Profile = () => {
     // Add more sample image URLs as needed
   ];
 
+  const [cookies] = useCookies();
+
+  const [patient, setPatient] = useState(null);
+
+  useEffect(() => {
+    // Fetch patient information using the patient ID from cookies
+    const fetchPatientInfo = async () => {
+      try {
+        const response = await axios.get(`/api/patient/${cookies._id}`);
+        setPatient(response.data);
+        // console.log(response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchPatientInfo();
+  }, []);
+
   const [uploadedFiles, setUploadedFiles] = useState([]);
 
   const handleFileUpload = ({ files }) => {
@@ -139,81 +160,87 @@ const Profile = () => {
 
   return (
     <div>
-      <Group wrap="nowrap">
-        <Grid>
-          <Grid.Col span={{ xs: 12, sm: 12, md: 6, lg: 6 }}>
-            <div className="d-flex w-100 justify-content-center align-item-center">
-              <Grid className="c-card">
-                <Grid.Col
-                  className="d-flex w-100 justify-content-center align-item-center"
-                  span={{ xs: 12, sm: 6, md: 6, lg: 6 }}
-                >
-                  <Avatar src="" size={200} style={{ borderRadius: "200px" }} />
-                </Grid.Col>
-                <Grid.Col
-                  className="d-flex w-100 justify-content-center align-item-center "
-                  span={{ xs: 12, sm: 6, md: 6, lg: 6 }}
-                >
-                  <div className="d-flex w-100 justify-content-center align-item-center flex-column">
-                    <Text
-                      className="profile-text"
-                      tt="uppercase"
-                      fw={700}
-                      c="dimmed"
-                    >
-                      Name : Aditya Rai
-                    </Text>
+      {patient && (
+        <Group wrap="nowrap">
+          <Grid>
+            <Grid.Col span={{ xs: 12, sm: 12, md: 6, lg: 6 }}>
+              <div className="d-flex w-100 justify-content-center align-item-center">
+                <Grid className="c-card">
+                  <Grid.Col
+                    className="d-flex w-100 justify-content-center align-item-center"
+                    span={{ xs: 12, sm: 6, md: 6, lg: 6 }}
+                  >
+                    <Avatar
+                      src=""
+                      size={200}
+                      style={{ borderRadius: "200px" }}
+                    />
+                  </Grid.Col>
+                  <Grid.Col
+                    className="d-flex w-100 justify-content-center align-item-center "
+                    span={{ xs: 12, sm: 6, md: 6, lg: 6 }}
+                  >
+                    <div className="d-flex w-100 justify-content-center align-item-center flex-column">
+                      <Text
+                        className="profile-text"
+                        tt="uppercase"
+                        fw={700}
+                        c="dimmed"
+                      >
+                        Name : {patient.name}
+                      </Text>
 
-                    <Text className="profile-text" fz="xl" fw={500}>
-                      Age : 21
-                    </Text>
+                      <Text className="profile-text" fz="xl" fw={500}>
+                        Age : {patient.age}
+                      </Text>
 
-                    <Text className="profile-text" fz="lg" c="dimmed">
-                      Phone : 8169645464
-                    </Text>
-                  </div>
-                </Grid.Col>
-              </Grid>
-            </div>
-          </Grid.Col>
-          <Grid.Col span={{ xs: 12, sm: 12, md: 6, lg: 6 }}>
-            <div className="c-card">
-              <Text fw={700} className="profile-text">
-                Medical History
-              </Text>
-              {/* Display fetched images */}
-              <Text className="profile-text">Uploaded Files</Text>
-              <div className="d-flex flex-wrap">
-                {uploadedFiles.map((file, index) => (
-                  <Image
-                    style={{ width: "80px", margin: "5px" }}
-                    key={index}
-                    src={file.preview}
-                    alt={`Image ${index}`}
-                  />
-                ))}
+                      <Text className="profile-text" fz="lg" c="dimmed">
+                        Phone : {patient.phone_number}
+                      </Text>
+                    </div>
+                  </Grid.Col>
+                </Grid>
               </div>
-              {/* File upload component */}
-              <Group className="d-flex w-100 flex-row">
-                <FileInput
-                  rightSection={icon}
-                  style={{ width: "157px", color: "black" }}
-                  accept="image/*" // Allow only image files
-                  onChange={(files) => handleFileUpload(files)}
-                  maxFiles={5} // Set a maximum number of files allowed
-                  label="Upload Images"
-                  placeholder="Upload your file"
-                  description="You can upload up to 5 images."
-                  format={(file) => file.name} // Display file names
-                />
-                <Button style={{ background: "#1b03a3", marginTop: "55px" }}>
-                  Upload
-                </Button>
-              </Group>
-            </div>
-          </Grid.Col>
-        </Grid>
-      </Group>
+            </Grid.Col>
+            <Grid.Col span={{ xs: 12, sm: 12, md: 6, lg: 6 }}>
+              <div className="c-card">
+                <Text fw={700} className="profile-text">
+                  Medical History
+                </Text>
+                {/* Display fetched images */}
+                <Text className="profile-text">Uploaded Files</Text>
+                <div className="d-flex flex-wrap">
+                  {uploadedFiles.map((file, index) => (
+                    <Image
+                      style={{ width: "80px", margin: "5px" }}
+                      key={index}
+                      src={file.preview}
+                      alt={`Image ${index}`}
+                    />
+                  ))}
+                </div>
+                {/* File upload component */}
+                <Group className="d-flex w-100 flex-row">
+                  <FileInput
+                    rightSection={icon}
+                    style={{ width: "157px", color: "black" }}
+                    accept="image/*" // Allow only image files
+                    onChange={(files) => handleFileUpload(files)}
+                    maxFiles={5} // Set a maximum number of files allowed
+                    label="Upload Images"
+                    placeholder="Upload your file"
+                    description="You can upload up to 5 images."
+                    format={(file) => file.name} // Display file names
+                  />
+                  <Button style={{ background: "#1b03a3", marginTop: "55px" }}>
+                    Upload
+                  </Button>
+                </Group>
+              </div>
+            </Grid.Col>
+          </Grid>
+        </Group>
+      )}
       <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Past Visit to Doctor</h4>
         <Table
@@ -226,15 +253,6 @@ const Profile = () => {
             "HospitalName",
             "",
           ]}
-          // doctorname: "Dr. Karandeep Singh Sandhu",
-          // specialty: "Cardiologist",
-          // date: "18/10/2023",
-          // timeslot: "12:00pm - 03:00pm",
-          // hospitalName: "CardioCare Hospital",
-          // address: "Navghar Road, Mulund East, Mumbai",
-          // contact: "8169645464",
-          // reportLink: "https://example.com/report",
-          // experience: 21,
         />
       </div>
     </div>

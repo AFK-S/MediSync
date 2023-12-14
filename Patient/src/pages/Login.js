@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "@mantine/form";
 import { auth } from "../firebase.js"; // Update the path accordingly
 import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
@@ -16,49 +16,55 @@ import {
 import { PinInput } from "@mantine/core";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Loader } from "@mantine/core";
 import { useCookies } from "react-cookie";
 
+import { useDispatch, useSelector } from "react-redux";
+
 export default function Login() {
-  const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otpConfirm, setOtpConfirm] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [user, setUser] = useState(null);
 
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+  const [cookies] = useCookies();
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.user);
+
+  useEffect(() => {
+    console.log("login");
+    console.log(cookies._id);
+    if (cookies._id) {
+      console.log("cookies hai: ", cookies._id);
+      navigate("/home");
+    }
+  }, [cookies]);
+
   const form = useForm({
     initialValues: {
-      mobile: "",
       name: "",
       age: "",
+      phone_number: "",
     },
-    validate: {
-      // mobile: (val) => (/^\d{10}$/.test(val) ? null : "Invalid mobile number"),
-      // otp: (val) => (val.trim().length === 6 ? null : "Invalid OTP"),
-      // name: (val) => (val.trim() === "" ? "Name is required" : null),
-      // age: (val) =>
-      //   isNaN(val) || val <= 0 ? "Age should be a positive number" : null,
-    },
+    validate: {},
   });
-
-  const [cookies, setCookie] = useCookies(["token", "userId"]);
 
   const handleSendOTP = async () => {
     try {
-      const PhoneNumber = "+91" + phoneNumber;
-      const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        PhoneNumber,
-        recaptcha
-      );
+      // const PhoneNumber = "+91" + form.values.phone_number;
+      // const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
+      // const confirmation = await signInWithPhoneNumber(
+      //   auth,
+      //   PhoneNumber,
+      //   recaptcha
+      // );
 
-      console.log(confirmation);
-      setUser(confirmation);
+      // console.log(confirmation);
+      // setUser(confirmation);
       alert("OTP sent successfully!");
+
       setOtpSent(true);
+      console.log(form.values);
     } catch (error) {
       console.error("Error sending OTP:", error);
     }
@@ -66,27 +72,35 @@ export default function Login() {
 
   const handleVerifyOTP = async () => {
     try {
-      await user.confirm(otp);
-      alert("OTP verified successfully!");
-      setOtpConfirm(true);
+      // await user.confirm(otp);
+      const response = await axios.get(
+        `/api/patient/verify/${form.values.phone_number}`
+      );
+
+      if (response.status == 200) {
+        navigate("/home");
+      } else {
+        setOtpConfirm(true);
+        alert("OTP verified!");
+      }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      alert("Invalid OTP. Please try again.");
     }
   };
 
-  const handleSignUpSubmit = (values) => {
-    setLoading(true);
+  const handleSignUpSubmit = async (values) => {
+    console.log(form);
     try {
+      const { data } = await axios.post("api/patient/login/", form);
+      console.log(data);
+
       alert(`Welcome ${values.name}! You are now registered.`);
-      setTimeout(() => {
-        Navigate("/home");
-      }, 1000);
+      navigate("/home");
+      console.log(form);
     } catch (err) {
       console.log(err);
       alert(`Something went wrong: ${err.response && err.response.data.msg}`);
     } finally {
-      setLoading(false);
       form.reset();
     }
   };
@@ -106,9 +120,7 @@ export default function Login() {
         <Text size="lg" style={{ color: "black", fontWeight: "bolder" }}>
           Welcome to MediSync
         </Text>
-
         <Divider my="lg"></Divider>
-
         {otpConfirm ? (
           <form onSubmit={form.onSubmit((value) => handleSignUpSubmit(value))}>
             <Stack>
@@ -139,8 +151,8 @@ export default function Login() {
             </Stack>
 
             <Group position="apart" mt="xl">
-              <Button type="submit" radius="lg" disabled={loading}>
-                {loading ? <Loader color="white" variant="dots" /> : "Sign Up"}
+              <Button type="submit" radius="lg">
+                Sign Up
               </Button>
             </Group>
           </form>
@@ -162,8 +174,8 @@ export default function Login() {
             </Stack>
 
             <Group position="apart" mt="xl">
-              <Button type="submit" radius="lg" disabled={loading}>
-                {loading ? <Loader color="white" variant="dots" /> : "Submit"}
+              <Button type="submit" radius="lg">
+                Submit
               </Button>
               <NavLink to="/login">Edit Mobile Number</NavLink>
             </Group>
@@ -176,9 +188,11 @@ export default function Login() {
                 type="tel"
                 label="Mobile Number"
                 placeholder="Enter your mobile number"
-                value={phoneNumber}
-                onChange={(event) => setPhoneNumber(event.target.value)}
                 radius="md"
+                value={form.values.phone_number}
+                onChange={(event) =>
+                  form.setFieldValue("phone_number", event.currentTarget.value)
+                }
               />
               <div id="recaptcha"></div>
             </Stack>

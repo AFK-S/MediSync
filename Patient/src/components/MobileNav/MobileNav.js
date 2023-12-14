@@ -2,20 +2,23 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutAdmin } from "../../slice/AdminSlice.js";
+import { logoutUser } from "../../slice/UserSlice.js";
 import { useCookies } from "react-cookie";
 import "./MobileNav.css";
+import axios from "axios";
 
 const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [cookies, removeCookie] = useCookies(["token", "userId"]);
 
-  const handleLogout = () => {
-    removeCookie("token");
-    removeCookie("userId");
-    dispatch(logoutAdmin());
-    window.location.href = "/login";
+  const handleLogout = async () => {
+    try {
+      await axios.get("/api/logout");
+      navigate("/login");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const navs = [
