@@ -38,7 +38,7 @@ const Register = async (req, res) => {
         hospital_id,
         rfid_tag,
         name: doctor_name,
-        mac_address: randomUUID(),
+        mac_address: "AFKS" + randomUUID(),
         photo_url: downloadUrl[0],
         specialization,
         experience,

@@ -85,7 +85,7 @@ const CheckMacAddress = async (req, res) => {
         });
       }
     }
-    res.status(400).send("Invalid IP Address");
+    res.status(400).send("First time login should be from hospital network");
   } catch (err) {
     console.error(err);
   }

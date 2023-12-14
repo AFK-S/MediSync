@@ -37,6 +37,9 @@ const FirstTimeDoctorLogin = async (req, res, next) => {
     if (response === null) {
       return res.status(400).send("Invalid Credential");
     }
+    if (!response.mac_address.includes("AFKS")) {
+      return res.status(400).send("Already Registered");
+    }
     req._id = response._id;
     next();
   } catch (err) {
