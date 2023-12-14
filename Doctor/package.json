@@ -26,7 +26,8 @@
     "react-native-reanimated": "^3.6.1",
     "react-native-safe-area-context": "^4.8.0",
     "react-native-screens": "^3.29.0",
-    "react-native-timeline-flatlist": "^0.8.0"
+    "react-native-timeline-flatlist": "^0.8.0",
+    "expo-image-picker": "~14.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

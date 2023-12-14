@@ -48,7 +48,9 @@ const AppNavigator = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "white", paddingBottom: 12 }}
+    >
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{

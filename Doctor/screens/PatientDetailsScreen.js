@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,46 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import { Linking } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 const PatientDetailsScreen = ({ route }) => {
   const { patient } = route.params;
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = () => {
+    // Implement your upload logic here
+    // For example, you can use a library like axios or fetch to upload the image to a server.
+    // After successful upload, you may want to close the modal and update your state accordingly.
+    // For demonstration purposes, we'll just simulate an upload delay.
+    setUploading(true);
+    setTimeout(() => {
+      setUploading(false);
+      setModalVisible(false);
+      // Add any additional logic you need after a successful upload.
+    }, 2000);
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      aspect: undefined,
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setSelectedImage(result.uri);
+    }
+  };
+
+  const closePreview = () => {
+    setModalVisible(false);
+  };
 
   const prevVisits = [
     {
@@ -180,7 +215,84 @@ const PatientDetailsScreen = ({ route }) => {
         </View>
 
         <View style={{ width: "100%", marginTop: 40 }}>
-          <Text style={styles.title}>Reports</Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.title}>Reports</Text>
+
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row-reverse",
+                alignItems: "center",
+              }}
+            >
+              {!selectedImage ? (
+                <TouchableOpacity onPress={pickImage} style={styles.AddButton}>
+                  <Text
+                    style={{ color: "#fff", fontSize: 16, fontWeight: "700" }}
+                  >
+                    Add
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedImage(null);
+                    setModalVisible(false);
+                  }}
+                  style={styles.AddButton}
+                >
+                  <Text
+                    style={{ color: "#fff", fontSize: 16, fontWeight: "700" }}
+                  >
+                    Upload
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {selectedImage && (
+                <View style={{ marginRight: 20 }}>
+                  <TouchableOpacity onPress={() => setModalVisible(true)}>
+                    <Image
+                      source={{ uri: selectedImage }}
+                      style={{ width: 50, height: 50, borderRadius: 10 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+            {/* Modal */}
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={closePreview}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Image
+                    source={{ uri: selectedImage }}
+                    style={{ width: "100%", height: "100%", borderRadius: 10 }}
+                  />
+                  <TouchableOpacity
+                    onPress={closePreview}
+                    style={styles.closeButton}
+                  >
+                    <Text
+                      style={{ color: "#fff", fontSize: 16, fontWeight: "700" }}
+                    >
+                      Close
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
           <View
             style={{
               backgroundColor: "#f2f2f2",
@@ -268,5 +380,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
+  },
+  AddButton: {
+    backgroundColor: "#18C37D",
+    paddingHorizontal: 25,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+  },
+  modalContent: {
+    width: "80%",
+    height: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "black",
+    padding: 10,
+    borderRadius: 5,
   },
 });
