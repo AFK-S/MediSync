@@ -1,26 +1,39 @@
 import AttendanceSchema from "../models/AttendanceSchema.js";
 import DoctorSchema from "../models/DoctorSchema.js";
+import LogSchema from "../models/LogSchema.js";
 
 const Register = async (req, res) => {
   try {
     const { rfid_tag } = req.params;
     const doctor = await DoctorSchema.findOne({ rfid_tag });
+    if (!doctor) return res.status(400).send("Doctor not found");
     const response = await AttendanceSchema.findOne({
       doctor_id: doctor._id,
       date: {
         $gte: new Date(new Date().setHours(0, 0, 0)),
         $lt: new Date(new Date().setHours(23, 59, 59)),
       },
+      checkOut: { $exists: false },
     });
     if (response) {
       response.checkOut = new Date();
       await response.save();
+      await LogSchema.create({
+        doctor_id: doctor._id,
+        type: "RFID",
+        status: "Check Out",
+      });
       return res.status(200).send(response._id);
     }
     const attendance = await AttendanceSchema.create({
       doctor_id: doctor._id,
       date: new Date(),
       checkIn: new Date(),
+    });
+    await LogSchema.create({
+      doctor_id: doctor._id,
+      type: "RFID",
+      status: "Check In",
     });
     res.status(200).send(attendance._id);
   } catch (err) {
@@ -76,7 +89,7 @@ const AttendanceInfo = async (req, res) => {
 const TodayDoctorAttendance = async (req, res) => {
   try {
     const { doctor_id } = req.params;
-    const attendance = await AttendanceSchema.findOne({
+    const attendance = await AttendanceSchema.find({
       doctor_id,
       date: {
         $gte: new Date(new Date().setHours(0, 0, 0)),

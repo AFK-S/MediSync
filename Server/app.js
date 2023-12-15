@@ -9,6 +9,9 @@ import TpLinkRoute from "./routes/TpLinkRoute.js";
 import AttendanceRoute from "./routes/AttendanceRoute.js";
 import PatientRoute from "./routes/PatientRoute.js";
 import AppointmentRoute from "./routes/AppointmentRoute.js";
+import LogRoute from "./routes/LogRoute.js";
+import { VerifyConnectedDevices } from "./controller/TpLink.js";
+import { WIFIRegister } from "./controller/Log.js";
 
 const app = express();
 dotenv.config();
@@ -43,6 +46,7 @@ app.use("/api", TpLinkRoute);
 app.use("/api", AttendanceRoute);
 app.use("/api", PatientRoute);
 app.use("/api", AppointmentRoute);
+app.use("/api", LogRoute);
 
 app.get("/api/logout", async (req, res) => {
   res.clearCookie("_id").status(200).end();
@@ -52,6 +56,17 @@ app.get("/", (req, res) => {
   res.send("MediSync is up and running!!");
 });
 
-app.listen(8000, () => {
+const interval = 1 * 60 * 1000;
+let result = [];
+
+app.listen(8000, async () => {
   console.log("Server listening on port 8000");
+
+  // setInterval(async () => {
+  //   const { mac_address_list, remove_list } = await VerifyConnectedDevices(
+  //     result
+  //   );
+  //   if (remove_list.length > 0) await WIFIRegister(remove_list);
+  //   result = mac_address_list;
+  // }, interval);
 });
