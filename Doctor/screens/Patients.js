@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -11,12 +11,14 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import StateContext from "../context/StateContext";
 
 const Patients = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setSearchFocused] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
+  const { doctorData } = useContext(StateContext);
   const patientData = [
     {
       name: "Karandeep Singh Sandhu",
@@ -61,7 +63,12 @@ const Patients = () => {
       style={styles.cardContainer}
       onPress={() => navigation.navigate("PatientDetails", { patient: item })}
     >
-      <Image source={{ uri: item.image }} style={styles.avatar} />
+      <Image
+        source={{
+          uri: "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
+        }}
+        style={styles.avatar}
+      />
       <View style={styles.textContainer}>
         <Text
           numberOfLines={1}
@@ -71,9 +78,11 @@ const Patients = () => {
           {item.name}
         </Text>
         <Text style={{ ...styles.labelText, marginTop: 10 }}>
-          Date: {item.date}
+          Age: {item.age}
         </Text>
-        <Text style={styles.labelText}>Time: {item.time}</Text>
+        <Text style={{ ...styles.labelText, marginTop: 6 }}>
+          Time: {item.phone_number}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -126,7 +135,7 @@ const Patients = () => {
       <ScrollView style={{ padding: 20 }}>
         <View style={{ height: "100%" }}>
           <FlatList
-            data={searchQuery ? filteredData : patientData}
+            data={searchQuery ? filteredData : doctorData.treated_patient}
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
             showsVerticalScrollIndicator={false}

@@ -93,6 +93,24 @@ const DoctorSchema = new Schema(
         },
       },
     ],
+    slot_count: {
+      online: {
+        type: Number,
+        match: [
+          /^[0-9]+$/,
+          (props) => `${props.value} is not a valid slot count`,
+        ],
+        required: [true, "Please provide the Online Slot Count"],
+      },
+      walk_in: {
+        type: Number,
+        match: [
+          /^[0-9]+$/,
+          (props) => `${props.value} is not a valid slot count`,
+        ],
+        required: [true, "Please provide the Walk In Slot Count"],
+      },
+    },
     average_time: {
       type: Number,
       match: [

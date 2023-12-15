@@ -15,39 +15,38 @@ function App() {
   });
 
   return (
-    <StateProvider>
-      <MantineProvider theme={theme}>
-        <LoadingOverlay
-          sx={{
-            position: "fixed",
-            ".mantine-Overlay-root": {
-              background: "#000",
-              opacity: 0.4,
-            },
-          }}
-          visible={loading}
-          zIndex={1000}
-          overlayProps={{ radius: "sm", blur: 2 }}
-          loaderProps={{ color: "dark" }}
-        />
-
-        <style>
-          {`
+    <>
+      <StateProvider>
+        <MantineProvider theme={theme}>
+          <LoadingOverlay
+            sx={{
+              ".mantine-LoadingOverlay-overlay.m-9814e45f.mantine-Overlay-root":
+                {
+                  position: "fixed !important",
+                },
+            }}
+            visible={loading}
+            zIndex={1000}
+            overlayProps={{ radius: "sm", blur: 2 }}
+          />
+          <style>
+            {`
           body {
             background-color: #F5F6FA; 
           }
-        `}
-        </style>
+          `}
+          </style>
 
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Navigate to="/login" />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/*" element={<MainLayout />} />
-          </Routes>
-        </BrowserRouter>
-      </MantineProvider>
-    </StateProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Navigate to="/login" />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/*" element={<MainLayout />} />
+            </Routes>
+          </BrowserRouter>
+        </MantineProvider>
+      </StateProvider>
+    </>
   );
 }
 

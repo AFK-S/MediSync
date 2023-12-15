@@ -19,10 +19,6 @@ const PatientDetailsScreen = ({ route }) => {
   const [uploading, setUploading] = useState(false);
 
   const handleUpload = () => {
-    // Implement your upload logic here
-    // For example, you can use a library like axios or fetch to upload the image to a server.
-    // After successful upload, you may want to close the modal and update your state accordingly.
-    // For demonstration purposes, we'll just simulate an upload delay.
     setUploading(true);
     setTimeout(() => {
       setUploading(false);
@@ -153,7 +149,12 @@ const PatientDetailsScreen = ({ route }) => {
             maxWidth: "100%",
           }}
         >
-          <Image source={{ uri: patient.image }} style={styles.avatar} />
+          <Image
+            source={{
+              uri: "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
+            }}
+            style={styles.avatar}
+          />
           <Text
             style={{
               fontSize: 30,
@@ -176,13 +177,24 @@ const PatientDetailsScreen = ({ route }) => {
         >
           <Text style={styles.infoText}>Age: {patient.age}</Text>
           <Text style={styles.infoText}>
-            Medical History: {patient.medical_history}
+            Phone Number: {patient.phone_number}
           </Text>
-          <Text style={styles.infoText}>
-            Symptoms: {patient.symptoms.join(", ")}
-          </Text>
-          <Text style={styles.infoText}>Date: {patient.date}</Text>
-          <Text style={styles.infoText}>Time: {patient.time}</Text>
+          {patient.medical_history && (
+            <Text style={styles.infoText}>
+              Medical History: {patient.medical_history}
+            </Text>
+          )}
+          {patient.symptoms && (
+            <Text style={styles.infoText}>
+              Symptoms: {patient.symptoms.join(", ")}
+            </Text>
+          )}
+          {patient.date && (
+            <Text style={styles.infoText}>Date: {patient.date}</Text>
+          )}
+          {patient.time && (
+            <Text style={styles.infoText}>Time: {patient.time}</Text>
+          )}
         </View>
 
         <View style={{ width: "100%", marginTop: 40 }}>

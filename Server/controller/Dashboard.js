@@ -3,6 +3,10 @@ import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
 const Doctor = async (req, res) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
   try {
     const { doctor_id } = req.params;
     const response = await DoctorSchema.aggregate([
@@ -34,7 +38,10 @@ const Doctor = async (req, res) => {
             {
               $match: {
                 doctor_id: new ObjectId(doctor_id),
-                date: new Date().toISOString().split("T")[0] + "T00:00:00.000Z",
+                date: {
+                  $gte: today,
+                  $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+                },
               },
             },
             {
@@ -59,10 +66,39 @@ const Doctor = async (req, res) => {
             {
               $match: {
                 doctor_id: new ObjectId(doctor_id),
+                treated: true,
               },
             },
           ],
           as: "all_appointment",
+        },
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          pipeline: [
+            {
+              $match: {
+                doctor_id: new ObjectId(doctor_id),
+                treated: false,
+                date: {
+                  $gte: tomorrow,
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "patients",
+                localField: "patient_id",
+                foreignField: "_id",
+                as: "patient",
+              },
+            },
+            {
+              $unwind: "$patient",
+            },
+          ],
+          as: "upcoming_appointment",
         },
       },
       {
@@ -78,7 +114,7 @@ const Doctor = async (req, res) => {
           treated_patient_count: {
             $size: "$treated_patient",
           },
-          today_patient_count: {
+          today_appointment_count: {
             $size: "$today_appointment",
           },
         },

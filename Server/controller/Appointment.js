@@ -1,29 +1,17 @@
-import PatientSchema from "../models/PatientSchema.js";
 import AppointmentSchema from "../models/AppointmentSchema.js";
-import { time } from "console";
 
 const Register = async (req, res) => {
   try {
-    console.log(req.body);
-    const {
-      date,
-      doctor,
-      doctor_id,
-      hospital,
-      hospital_id,
-      patient_id,
-      specialization,
-      symptoms,
-      time_slot,
-    } = req.body;
+    const { hospital_id, doctor_id, patient_id, date, time_slot, symptoms } =
+      req.body;
 
-    console.log(time_slot);
     const appointment = await AppointmentSchema.create({
       hospital_id,
       doctor_id,
       patient_id,
+      type: "online",
       symptoms,
-      date,
+      date: date,
       time_slot,
     });
     res.status(200).send(appointment._id);

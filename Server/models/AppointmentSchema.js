@@ -15,6 +15,21 @@ const AppointmentSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: [true, "Please provide a Patient ID"],
     },
+    type: {
+      type: String,
+      trim: true,
+      enum: ["online", "walk_in"],
+      match: [
+        /^[a-zA-Z]+$/,
+        (props) => `${props.value} is not a valid appointment type`,
+      ],
+      required: [true, "Please provide the Appointment Type"],
+    },
+    severity_index: {
+      type: Number,
+      default: 0,
+      required: [true, "Please provide a Severity Index"],
+    },
     treated: {
       type: Boolean,
       default: false,
