@@ -67,12 +67,18 @@ const AppointmentStack = () => {
   );
 };
 
-const MainScreen = () => {
+const MainScreen = ({ navigation }) => {
   const { isLogin, getProfile } = useContext(StateContext);
 
   useEffect(() => {
-    getProfile();
-  }, []);
+    if (!isLogin) {
+      // If not logged in, navigate to the "Login" screen
+      navigation.navigate("Login");
+    } else {
+      // If logged in, fetch the profile
+      getProfile();
+    }
+  }, [isLogin, navigation]);
 
   return (
     <Tab.Navigator
