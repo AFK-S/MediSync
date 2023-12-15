@@ -1,10 +1,12 @@
 import AppointmentSchema from "../models/AppointmentSchema.js";
+import DoctorSchema from "../models/DoctorSchema.js";
+import mongoose from "mongoose";
+const { ObjectId } = mongoose.Types;
 
 const Register = async (req, res) => {
   try {
     const { hospital_id, doctor_id, patient_id, date, time_slot, symptoms } =
       req.body;
-
     const appointment = await AppointmentSchema.create({
       hospital_id,
       doctor_id,
@@ -170,6 +172,57 @@ const AllDoctorAppointment = async (req, res) => {
   }
 };
 
+const DoctorAvailableSlots = async (req, res) => {
+  try {
+    const { doctor_id, type } = req.params;
+    const { date } = req.body;
+    const appointment_date = new Date(date);
+    appointment_date.setHours(0, 0, 0, 0);
+    const response = await DoctorSchema.aggregate([
+      {
+        $match: {
+          _id: new ObjectId(doctor_id),
+        },
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          pipeline: [
+            {
+              $match: {
+                doctor_id: new ObjectId(doctor_id),
+                type,
+                date: {
+                  $gte: appointment_date,
+                  $lte: new Date(
+                    appointment_date.getTime() + 24 * 60 * 60 * 1000
+                  ),
+                },
+              },
+            },
+          ],
+          as: "appointment",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          slot_booked: {
+            $size: "$appointment",
+          },
+          "slot_count.online": 1,
+          "slot_count.walk_in": 1,
+        },
+      },
+    ]);
+    if (response.length === 0) return res.status(400).send("Doctor not found");
+    res.status(200).json(response[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   Register,
   UpdateDetails,
@@ -179,4 +232,5 @@ export {
   HospitalAppointment,
   TodayDoctorAppointment,
   AllDoctorAppointment,
+  DoctorAvailableSlots,
 };

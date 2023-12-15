@@ -8,6 +8,7 @@ import {
   HospitalAppointment,
   TodayDoctorAppointment,
   AllDoctorAppointment,
+  DoctorAvailableSlots,
 } from "../controller/Appointment.js";
 
 const router = express.Router();
@@ -23,5 +24,6 @@ router.get(
 router.get("/appointment/hospital/:hospital_id", HospitalAppointment);
 router.get("/appointment/doctor/:doctor_id/today", TodayDoctorAppointment);
 router.get("/appointment/doctor/:doctor_id", AllDoctorAppointment);
+router.post("/appointment/doctor/slots/:type/:doctor_id", DoctorAvailableSlots);
 
 export default router;
