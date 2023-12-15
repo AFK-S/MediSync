@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { SERVER_URL } from "../config.js";
+import { Alert } from "react-native";
 
 const StateContext = createContext();
 export default StateContext;
@@ -10,6 +11,7 @@ export const StateProvider = ({ children }) => {
   const [isLogin, setIsLogin] = useState(false);
   const [doctorId, setDoctorId] = useState();
   const [doctorData, setDoctorData] = useState();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -48,8 +50,15 @@ export const StateProvider = ({ children }) => {
   };
 
   const getProfile = async () => {
-    const { data } = await axios.get(`${SERVER_URL}/api/doctor/${doctorId}`);
-    setDoctorData(data);
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`${SERVER_URL}/api/doctor/${doctorId}`);
+      setDoctorData(data);
+    } catch (error) {
+      Alert.alert("Error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,6 +70,8 @@ export const StateProvider = ({ children }) => {
         FirstTimeLogin,
         getProfile,
         doctorData,
+        loading,
+        setLoading,
       }}
     >
       {children}
