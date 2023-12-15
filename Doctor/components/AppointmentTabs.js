@@ -9,7 +9,13 @@ const Tab = createMaterialTopTabNavigator();
 
 const AppointmentTabs = () => {
   const { doctorData } = useContext(StateContext);
-
+  function formatDate(dateString) {
+    const dateObject = new Date(dateString);
+    const day = dateObject.getDate().toString().padStart(2, "0");
+    const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
+    const year = dateObject.getFullYear().toString();
+    return `${day}-${month}-${year}`;
+  }
   return (
     <Tab.Navigator
       tabBarOptions={{
@@ -27,13 +33,16 @@ const AppointmentTabs = () => {
       <Tab.Screen
         name="Today Completed"
         component={TodaysCompletedPatient}
+        // options={{
+        //   tabBarLabel:
+        //     doctorData &&
+        //     doctorData.today_appointment &&
+        //     doctorData.today_appointment[0]
+        //       ? doctorData.today_appointment[0].date
+        //       : "today",
+        // }}
         options={{
-          tabBarLabel:
-            doctorData &&
-            doctorData.today_appointment &&
-            doctorData.today_appointment[0]
-              ? doctorData.today_appointment[0].date
-              : "today",
+          tabBarLabel: "Today",
         }}
       />
 
@@ -45,7 +54,7 @@ const AppointmentTabs = () => {
             doctorData &&
             doctorData.availability.length > 1 &&
             doctorData.availability[1].date
-              ? doctorData.availability[1].date
+              ? formatDate(doctorData.availability[1].date)
               : "None",
         }}
       />

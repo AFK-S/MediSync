@@ -19,28 +19,6 @@ const Patients = () => {
   const [isSearchFocused, setSearchFocused] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const { doctorData } = useContext(StateContext);
-  const patientData = [
-    {
-      name: "Karandeep Singh Sandhu",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-    {
-      name: "Aditya Rai",
-      age: 32,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-  ];
 
   const handleFocus = () => {
     setSearchFocused(true);
@@ -52,7 +30,7 @@ const Patients = () => {
 
   const handleSearch = (text) => {
     setSearchQuery(text);
-    const filteredPatients = patientData.filter((patient) =>
+    const filteredPatients = doctorData.treated_patient.filter((patient) =>
       patient.name.toLowerCase().includes(text.toLowerCase())
     );
     setFilteredData(filteredPatients);
@@ -134,18 +112,51 @@ const Patients = () => {
 
       <ScrollView style={{ padding: 20 }}>
         <View style={{ height: "100%" }}>
-          <FlatList
-            data={searchQuery ? filteredData : doctorData.treated_patient}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-          />
+          {searchQuery ? (
+            filteredData.length > 0 ? (
+              <FlatList
+                data={filteredData}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                showsVerticalScrollIndicator={false}
+              />
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  marginTop: 80,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text>No results found</Text>
+              </View>
+            )
+          ) : doctorData.treated_patient &&
+            doctorData.treated_patient.length > 0 ? (
+            <FlatList
+              data={doctorData.treated_patient}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => index.toString()}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                marginTop: 80,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text>No patients treated</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
