@@ -2,12 +2,10 @@ import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
-  Button,
   TextInput,
   StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
-  Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StateContext from "../../context/StateContext";
@@ -21,22 +19,27 @@ const LoginScreen = ({ navigation }) => {
   });
 
   useEffect(() => {
-    // (async () => {
-    //   await AsyncStorage.clear();
-    // })();
+    const checkLoginStatus = async () => {
+      if (isLogin) {
+        navigation.navigate("MainScreen");
+      }
+    };
 
-    if (isLogin) navigation.navigate("MainScreen");
-  }, []);
+    checkLoginStatus();
+  }, [isLogin, navigation]);
 
-  const handleLogin = async () => {
+  const handleLoginPress = async () => {
     try {
       const mac_address = await AsyncStorage.getItem("mac_address");
       console.log(mac_address);
-      if (mac_address == null)
+
+      if (mac_address == null) {
         await FirstTimeLogin(login.username, login.password);
-      else await Login(login.username, login.password, mac_address);
-      setIsLogin(true);
-      navigation.navigate("MainScreen");
+      } else {
+        await Login(login.username, login.password, mac_address);
+        setIsLogin(true);
+        navigation.navigate("MainScreen");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -47,58 +50,41 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <>
-      {/* <Image
-        source={require("../../assets/logo.png")}
-        style={{ width: 150, height: 150, borderRadius: 100 }}
-      /> */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.innerContainer}
-      >
-        <View style={styles.container}>
-          <Text style={styles.title}>Login</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Username or Email"
-            value={login.username}
-            onChangeText={(text) =>
-              setLogin({ ...login, username: text.toLowerCase() })
-            }
-            required
-
-            // Add onChangeText prop to handle input changes
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={login.password}
-            onChangeText={(text) => setLogin({ ...login, password: text })}
-            required
-            secureTextEntry={true}
-            // Add onChangeText prop to handle input changes
-          />
-          <TouchableOpacity
-            style={styles.button}
-            title="Login"
-            onPress={handleLogin}
-          >
-            <Text style={styles.btnText}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            title="Go to Register"
-            onPress={handleGoToRegister}
-          />
-        </View>
-      </KeyboardAvoidingView>
-    </>
+    <KeyboardAvoidingView behavior="padding" style={styles.innerContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Login</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Username or Email"
+          value={login.username}
+          onChangeText={(text) =>
+            setLogin({ ...login, username: text.toLowerCase() })
+          }
+          required
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={login.password}
+          onChangeText={(text) => setLogin({ ...login, password: text })}
+          required
+          secureTextEntry={true}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+          <Text style={styles.btnText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleGoToRegister}>
+          <Text style={styles.registerLink}>Go to Register</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
-    justifyContent: "center", // Center vertically
+    justifyContent: "center",
     alignItems: "center",
   },
   container: {
@@ -107,7 +93,6 @@ const styles = StyleSheet.create({
     marginBottom: 80,
     borderRadius: 30,
   },
-
   title: {
     fontSize: 24,
     marginBottom: 16,
@@ -136,6 +121,11 @@ const styles = StyleSheet.create({
   btnText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  registerLink: {
+    color: "#18C37D",
+    marginTop: 10,
+    textAlign: "center",
   },
 });
 
