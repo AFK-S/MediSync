@@ -35,14 +35,13 @@ const LoginScreen = ({ navigation }) => {
 
       const mac_address = await AsyncStorage.getItem("mac_address");
       console.log(mac_address);
-
       if (mac_address == null) {
         await FirstTimeLogin(login.username, login.password);
       } else {
         await Login(login.username, login.password, mac_address);
-        setIsLogin(true);
-        navigation.navigate("MainScreen");
       }
+      setIsLogin(true);
+      navigation.navigate("MainScreen");
     } catch (error) {
       console.log(error);
     } finally {

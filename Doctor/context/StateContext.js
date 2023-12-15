@@ -13,6 +13,12 @@ export const StateProvider = ({ children }) => {
   const [doctorData, setDoctorData] = useState();
   const [loading, setLoading] = useState(false);
 
+  // useEffect(() => {
+  //   (async () => {
+  //     await AsyncStorage.clear();
+  //   })();
+  // }, []);
+
   useEffect(() => {
     (async () => {
       const _id = await AsyncStorage.getItem("_id");
