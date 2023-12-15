@@ -59,8 +59,23 @@ export const StateProvider = ({ children }) => {
     setLoading(true);
     const id = await AsyncStorage.getItem("_id");
     try {
-      const { data } = await axios.get(`${SERVER_URL}/api/doctor/${id}`);
-      setDoctorData(data);
+      const { data } = await axios.get(
+        `${SERVER_URL}/api/dashboard/doctor/${id}`
+      );
+
+      // Sort availability by date
+      const sortedAvailability = data.availability.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+      });
+
+      console.log(sortedAvailability);
+
+      setDoctorData({
+        ...data,
+        availability: sortedAvailability,
+      });
     } catch (error) {
       Alert.alert("Error");
     } finally {
