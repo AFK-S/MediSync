@@ -15,6 +15,11 @@ const AppointmentSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: [true, "Please provide a Patient ID"],
     },
+    treated: {
+      type: Boolean,
+      default: false,
+      required: [true, "Please provide a Treated"],
+    },
     symptoms: {
       type: Array,
     },
@@ -32,18 +37,6 @@ const AppointmentSchema = new Schema(
     e_prescription: {
       type: String,
       trim: true,
-      match: [
-        /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
-        (props) => `${props.value} is not a valid report`,
-      ],
-    },
-    report: {
-      type: String,
-      trim: true,
-      match: [
-        /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
-        (props) => `${props.value} is not a valid report`,
-      ],
     },
     shift: {
       type: Number,
