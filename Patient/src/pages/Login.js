@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "@mantine/form";
-import { auth } from "../firebase.js"; // Update the path accordingly
+import {auth} from "../firebase.js"
+
 import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
 
 import {
@@ -89,9 +90,9 @@ export default function Login() {
   };
 
   const handleSignUpSubmit = async (values) => {
-    console.log(form);
+    console.log(form.values);
     try {
-      const { data } = await axios.post("api/patient/login/", form);
+      const { data } = await axios.post("api/patient/login/", form.values);
       console.log(data);
 
       alert(`Welcome ${values.name}! You are now registered.`);
