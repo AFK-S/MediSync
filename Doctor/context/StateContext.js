@@ -70,7 +70,7 @@ export const StateProvider = ({ children }) => {
         return dateA - dateB;
       });
 
-      console.log(sortedAvailability);
+      // console.log(sortedAvailability);
 
       setDoctorData({
         ...data,

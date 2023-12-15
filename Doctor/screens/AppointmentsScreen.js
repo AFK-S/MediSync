@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -11,11 +11,25 @@ import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
 import AppointmentTabs from "../components/AppointmentTabs";
 import { useNavigation } from "@react-navigation/native";
+import StateContext from "../context/StateContext";
 
 const AppointmentsScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const { doctorData } = useContext(StateContext);
   const navigation = useNavigation();
+
+  const getTitleAndFirstName = (fullName) => {
+    if (!fullName) {
+      return ""; // Handle the case where fullName is undefined or null
+    }
+
+    const title = fullName.split(" ")[0].trim(); // Assuming that the title ends with a dot
+    const firstName = fullName.split(" ")[1];
+
+    // Return the formatted string
+    return `${title} ${firstName}`;
+  };
 
   const patients = [
     {
@@ -230,7 +244,7 @@ const AppointmentsScreen = () => {
             }}
           >
             <Text style={{ ...styles.title, fontSize: 30 }}>
-              Hi, Dr. Karandeep
+              Hi, {doctorData && getTitleAndFirstName(doctorData.name)}
             </Text>
           </View>
         </View>
