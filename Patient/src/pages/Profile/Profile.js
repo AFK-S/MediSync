@@ -8,7 +8,11 @@ import {
   Image,
   FileInput,
   Button,
+  TextInput,
+  Select,
+  MultiSelect,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { IconFile } from "@tabler/icons-react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
@@ -96,32 +100,18 @@ const Profile = () => {
       reportlink: "https://example.com/report",
       experience: 21,
     },
-    // Add more entries as needed
   ]);
-
-  const sampleImages = [
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    // Add more sample image URLs as needed
-  ];
 
   const [cookies] = useCookies();
 
   const [patient, setPatient] = useState(null);
 
   useEffect(() => {
-    // Fetch patient information using the patient ID from cookies
     const fetchPatientInfo = async () => {
       try {
         const response = await axios.get(`/api/patient/${cookies._id}`);
         setPatient(response.data);
-        // console.log(response);
+        console.log(response);
       } catch (error) {
         console.error(error);
       }
@@ -130,29 +120,31 @@ const Profile = () => {
     fetchPatientInfo();
   }, []);
 
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([
+    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
+    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
+    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
+    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
+    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
+    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
+    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
+    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
+  ]);
 
-  const handleFileUpload = ({ files }) => {
-    // Add the newly uploaded files to the existing files
-    setUploadedFiles([...uploadedFiles, ...files]);
+  const [imagePreview, setImagePreview] = useState([]);
+
+  const handleImageUpload = (file) => {
+    form.setFieldValue("file", file);
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
   };
 
-  const handleUploadButtonClick = () => {
-    // You can perform the upload logic here
-    console.log("Uploading files:", uploadedFiles);
-    // Reset the uploaded files state if needed
-    setUploadedFiles([]);
-  };
-
-  useEffect(() => {
-    // Initialize the state with sample images when the component mounts
-    setUploadedFiles(
-      sampleImages.map((url, index) => ({
-        preview: url,
-        name: `Sample Image ${index + 1}`,
-      }))
-    );
-  }, []);
+  const form = useForm({
+    initialValues: {
+      file: [],
+      pastMedicalCondition: "",
+    },
+  });
 
   const icon = (
     <IconFile style={{ width: "25px", height: "25px" }} stroke={1.5} />
@@ -164,8 +156,8 @@ const Profile = () => {
         <Group wrap="nowrap">
           <Grid>
             <Grid.Col span={{ xs: 12, sm: 12, md: 6, lg: 6 }}>
-              <div className="d-flex w-100 justify-content-center align-item-center">
-                <Grid className="c-card">
+              <div className="c-card w-100">
+                <Grid>
                   <Grid.Col
                     className="d-flex w-100 justify-content-center align-item-center"
                     span={{ xs: 12, sm: 6, md: 6, lg: 6 }}
@@ -200,42 +192,106 @@ const Profile = () => {
                     </div>
                   </Grid.Col>
                 </Grid>
+                <Grid>
+                  <Grid.Col span={12}>
+                    <Text fw={700} className="profile-text">
+                      Medical History
+                    </Text>
+                    {/* Display fetched images */}
+                    <Text className="profile-text">Uploaded Files</Text>
+                    <div className="d-flex flex-wrap">
+                      {uploadedFiles.map((file, index) => (
+                        <Image
+                          style={{ width: "80px", margin: "5px" }}
+                          key={index}
+                          src={file}
+                          alt={`Image ${index}`}
+                        />
+                      ))}
+                    </div>
+                  </Grid.Col>
+                </Grid>
               </div>
             </Grid.Col>
             <Grid.Col span={{ xs: 12, sm: 12, md: 6, lg: 6 }}>
               <div className="c-card">
-                <Text fw={700} className="profile-text">
-                  Medical History
-                </Text>
-                {/* Display fetched images */}
-                <Text className="profile-text">Uploaded Files</Text>
-                <div className="d-flex flex-wrap">
-                  {uploadedFiles.map((file, index) => (
-                    <Image
-                      style={{ width: "80px", margin: "5px" }}
-                      key={index}
-                      src={file.preview}
-                      alt={`Image ${index}`}
-                    />
-                  ))}
-                </div>
-                {/* File upload component */}
-                <Group className="d-flex w-100 flex-row">
-                  <FileInput
-                    rightSection={icon}
-                    style={{ width: "157px", color: "black" }}
-                    accept="image/*" // Allow only image files
-                    onChange={(files) => handleFileUpload(files)}
-                    maxFiles={5} // Set a maximum number of files allowed
-                    label="Upload Images"
-                    placeholder="Upload your file"
-                    description="You can upload up to 5 images."
-                    format={(file) => file.name} // Display file names
-                  />
-                  <Button style={{ background: "#1b03a3", marginTop: "55px" }}>
-                    Upload
-                  </Button>
-                </Group>
+                <form onSubmit={form.onSubmit((values) => console.log(values))}>
+                  <Grid>
+                    <Grid.Col span={12}>
+                      <div className="d-flex flex-wrap">
+                        <MultiSelect
+                          label="Select Past Medical Conditions"
+                          placeholder="Past Medical Conditions"
+                          // mt="md"
+                          onChange={(value) => {
+                            form.setValues({
+                              ...form.values,
+                              pastMedicalCondition: value,
+                            });
+                          }}
+                          // {...form.getInputProps("pastMedicalCondition")}
+                          // value={form.values.pastMedicalCondition}
+                          // data={[
+                          //   { value: "Hospital 1", label: "Hospital 1" },
+                          //   { value: "Hospital 2", label: "Hospital 2" },
+                          //   { value: "Hospital 3", label: "Hospital 3" },
+                          // ]}
+                          data={[
+                            "Asthma",
+                            "Cancer",
+                            "Diabetes",
+                            "Heart Disease",
+                            "Hypertension",
+                            "Kidney Disease",
+                            "Liver Disease",
+                            "Stroke",
+                            "Thyroid Disease",
+                          ]}
+                          searchable
+                          nothingFoundMessage="Nothing found..."
+                        />
+                      </div>
+                    </Grid.Col>
+                  </Grid>
+                  <Grid>
+                    <Grid.Col span={12} mt={20}>
+                      <Group>
+                        <FileInput
+                          rightSection={icon}
+                          style={{ width: "180px", color: "black" }}
+                          onChange={(files) => handleImageUpload(files)}
+                          label="Upload Related Document"
+                          placeholder="Upload your file"
+                          description="You can upload your documents here."
+                        />
+                        <Button
+                          type="submit"
+                          style={{ background: "#1b03a3", marginTop: "75px" }}
+                        >
+                          Upload
+                        </Button>
+                      </Group>
+                    </Grid.Col>
+                  </Grid>
+                  <Grid>
+                    <Grid.Col span={12} mt={20}>
+                      {/* Preview Image */}
+                      {imagePreview && (
+                        <div>
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            style={{
+                              width: "100%",
+                              height: "auto",
+                              maxWidth: "300px",
+                            }}
+                          />
+                        </div>
+                      )}
+                    </Grid.Col>
+                  </Grid>
+                </form>
               </div>
             </Grid.Col>
           </Grid>

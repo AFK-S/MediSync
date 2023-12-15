@@ -190,8 +190,8 @@ const Appointments = () => {
                 <div className="col-md-6">
                   <Select
                     mt="md"
-                    label="Select Time Slot"
-                    placeholder="Select Time Slot"
+                    label="Select Date"
+                    placeholder="Select Date"
                     disabled={!isDoctorSelected}
                     data={availability.map((slot) => ({
                       value: slot.date,

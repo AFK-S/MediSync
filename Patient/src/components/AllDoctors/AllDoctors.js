@@ -9,7 +9,8 @@ import {
   TextInput,
   Button,
 } from "@mantine/core";
-import { IconBuildingHospital } from "@tabler/icons-react";
+// import { IconDoctor } from "@tabler/icons-react";
+import doctorIcon from "../../assets/doctor.png";
 
 const Table = ({ data, columns }) => {
   return (
@@ -59,22 +60,31 @@ const DoctorCard = ({ doctor }) => {
   return (
     <Grid.Col span={{ xs: 6, sm: 6, lg: 4 }}>
       <Card withBorder padding="lg" radius="md">
-        <Group position="apart">
+        <div className="d-flex w-100 flex-row align-items-between justify-content-between">
           <div className="avatar">
-            <IconBuildingHospital />
+            <img
+              src={doctorIcon}
+              style={{ width: "30px", height: "30px" }}
+              alt="doctor"
+            />
           </div>
-          <Badge color="#1b03a3" p={5}>
-            {doctor.name}
+          <Badge color="#EDEDED" p={12}>
+            <Text
+              fw={600}
+              style={{ color: "black", textTransform: "capitalize" }}
+            >
+              {doctor.name}
+            </Text>
           </Badge>
-        </Group>
-        <Text style={{ color: "black" }} fz="sm" mt="lg">
+        </div>
+        <Text style={{ color: "black" }} fz="md" mt="lg">
           Speciality: {doctor.speciality}
         </Text>
-        <Text style={{ color: "black" }} fz="sm" mt={5}>
+        <Text style={{ color: "black" }} fz="md" mt={5}>
           Experience: {doctor.experience}
         </Text>
         <Text
-          fz="sm"
+          fz="md"
           style={{
             textTransform: "capitalize",
             color: "black",
@@ -84,13 +94,15 @@ const DoctorCard = ({ doctor }) => {
         </Text>
         <button
           style={{
-            width: "80px",
-            // padding: "10px",
-            backgroundColor: "#1b03a3",
+            width: "100px",
+            padding: "5px",
+            backgroundColor: "#0a0059",
             color: "white",
             borderRadius: "10px",
-            marginTop: "5px",
+            marginTop: "15px",
             fontWeight: "500",
+            border: "none",
+            outline: "none",
           }}
         >
           Book

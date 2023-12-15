@@ -69,14 +69,14 @@ const AppointmentCard = ({ value, index }) => {
             }}
           >
             <Accordion.Item
-              style={{ fontSize: "15px" }}
+              style={{ fontSize: "0.9rem" }}
               // key={value.doctorName}
               value="Read More"
               className="card-text"
             >
               <Accordion.Control
                 className="p-0"
-                style={{ color: "blue", fontSize: "10px" }}
+                style={{ color: "blue", fontSize: "0.9rem" }}
               >
                 More Details
               </Accordion.Control>
@@ -186,8 +186,8 @@ const Home = () => {
 
   return (
     <div>
-      <div className="container-fluid ">
-        <div className="row gy-3">
+      <div className="container-fluid c-card">
+        <div className="row  gy-3">
           <h5>UPCOMING APPOINTMENT</h5>
           <div className="upcoming-appointments-container">
             <Grid>
@@ -211,18 +211,9 @@ const Home = () => {
             "HospitalName",
             "",
           ]}
-          // doctorname: "Dr. Karandeep Singh Sandhu",
-          // specialty: "Cardiologist",
-          // date: "18/10/2023",
-          // timeslot: "12:00pm - 03:00pm",
-          // hospitalName: "CardioCare Hospital",
-          // address: "Navghar Road, Mulund East, Mumbai",
-          // contact: "8169645464",
-          // reportLink: "https://example.com/report",
-          // experience: 21,
         />
       </div>
-      <div className="alert-section">
+      <div className="alert-section c-card">
         <h4 className="mb-3">Alerts</h4>
         <div className="alert-container">
           {alerts.map((alert, index) => (
@@ -232,15 +223,6 @@ const Home = () => {
           ))}
         </div>
       </div>
-
-      {/* Waiting Patients */}
-      {/* <div className="container-fluid c-card my-4">
-        <h4 className="mb-2">Patients Waiting</h4>
-        <Table
-          data={patientsWaiting && patientsWaiting}
-          columns={["Name", "Date", "Doctor", "TimeSlot"]}
-        />
-      </div> */}
     </div>
   );
 };
