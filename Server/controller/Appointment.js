@@ -9,6 +9,7 @@ const Register = async (req, res) => {
       hospital_id,
       doctor_id,
       patient_id,
+      type: "online",
       symptoms,
       date: date,
       time_slot,

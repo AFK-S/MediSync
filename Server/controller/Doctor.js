@@ -1,6 +1,7 @@
 import ShortUniqueId from "short-unique-id";
 import DoctorSchema from "../models/DoctorSchema.js";
 import bucket from "../firebase.js";
+import { calculateTotalMinutes } from "../middleware/Function.js";
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
 
@@ -19,6 +20,8 @@ const Register = async (req, res) => {
       gender,
       fees,
       phone_number,
+      start_time,
+      end_time,
     } = req.body;
     const file = req.file;
     if (!file) return res.status(400).send("No file uploaded.");
@@ -34,6 +37,10 @@ const Register = async (req, res) => {
       });
       const username = randomUUID();
       const password = randomUUID();
+      const totalMinutes = calculateTotalMinutes(start_time, end_time);
+      const totalCount = totalMinutes / parseInt(average_time);
+      const online = Math.round(totalCount * 0.7);
+      const walk_in = totalCount - online;
       const doctor = await DoctorSchema.create({
         hospital_id,
         rfid_tag,
@@ -45,6 +52,10 @@ const Register = async (req, res) => {
         age,
         license_number,
         availability: JSON.parse(availability),
+        slot_count: {
+          online,
+          walk_in,
+        },
         average_time,
         gender,
         fees,
