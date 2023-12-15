@@ -7,6 +7,8 @@ import { TimeInput } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { useDispatch } from "react-redux";
+import { setLoading } from "../slice/AppSclice";
 
 const Register = () => {
   const [cookies] = useCookies();
@@ -28,6 +30,7 @@ const Register = () => {
       average_time: "",
     },
   });
+  const dispatch = useDispatch();
 
   const refStart = useRef(null);
   const refEnd = useRef(null);
@@ -109,6 +112,8 @@ const Register = () => {
       values.doctor_name + "." + values.file.type.split("/")[1]
     );
     try {
+      dispatch(setLoading(true));
+
       const { data } = await axios.post(
         `api/doctor/register/${cookies._id}`,
         formData,
@@ -124,6 +129,8 @@ const Register = () => {
       console.log(data);
     } catch (error) {
       console.error("Error submitting data:", error);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
