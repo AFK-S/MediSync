@@ -51,8 +51,9 @@ export const StateProvider = ({ children }) => {
 
   const getProfile = async () => {
     setLoading(true);
+    const id = await AsyncStorage.getItem("_id");
     try {
-      const { data } = await axios.get(`${SERVER_URL}/api/doctor/${doctorId}`);
+      const { data } = await axios.get(`${SERVER_URL}/api/doctor/${id}`);
       setDoctorData(data);
     } catch (error) {
       Alert.alert("Error");
