@@ -256,8 +256,11 @@ const AllDoctors = () => {
                       <h5>{hospitals.name}</h5>
 
                       <Grid mt={15}>
-                        {hospitals.doctors.map((doctor) => (
-                          <DoctorCard doctor={doctor.doctor_details} />
+                        {hospitals.doctors.map((doctor, index) => (
+                          <DoctorCard
+                            doctor={doctor.doctor_details}
+                            key={index}
+                          />
                         ))}
                       </Grid>
                     </div>

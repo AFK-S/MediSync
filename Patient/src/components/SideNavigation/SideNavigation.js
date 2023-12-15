@@ -46,10 +46,10 @@ const SideNavigation = () => {
   return (
     <div className="navigation rounded p-3 d-flex flex-column">
       <div style={{ overflow: "auto" }}>
-        {navs.map((e) => {
+        {navs.map((e, index) => {
           const { name, path, icon } = e;
           return (
-            <NavLink to={path} className="navlink my-2 rounded-s">
+            <NavLink to={path} className="navlink my-2 rounded-s" key={index}>
               <i className={`me-2 ms-2 ${icon}`}></i>
               <p>{name}</p>
             </NavLink>

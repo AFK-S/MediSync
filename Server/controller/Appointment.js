@@ -1,37 +1,28 @@
 import PatientSchema from "../models/PatientSchema.js";
 import AppointmentSchema from "../models/AppointmentSchema.js";
+import { time } from "console";
 
 const Register = async (req, res) => {
   try {
+    console.log(req.body);
     const {
+      hospital,
       hospital_id,
+      specialization,
+      doctor,
       doctor_id,
-      name,
-      age,
-      phone_number,
-      symptoms,
-      medical_history,
+      patient_id,
       date,
       time_slot,
+      symptoms,
     } = req.body;
-    let patient = await PatientSchema.findOne({
-      phone_number,
-    })
-      .select(["_id"])
-      .lean();
-    if (patient === null) {
-      patient = await PatientSchema.create({
-        name,
-        age,
-        phone_number,
-      });
-    }
+
+    console.log(time_slot);
     const appointment = await AppointmentSchema.create({
       hospital_id,
       doctor_id,
-      patient_id: patient._id,
+      patient_id,
       symptoms,
-      medical_history,
       date,
       time_slot,
     });

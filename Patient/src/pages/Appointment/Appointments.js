@@ -3,6 +3,7 @@ import { useForm } from "@mantine/form";
 import { TextInput, Button, Group, Select, NumberInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import axios from "axios";
+import symptomsData from "./symptoms.json";
 
 import {
   PillsInput,
@@ -10,6 +11,7 @@ import {
   Combobox,
   CheckIcon,
   useCombobox,
+  MultiSelect,
 } from "@mantine/core";
 
 import { useCookies } from "react-cookie";
@@ -24,26 +26,29 @@ const Appointments = () => {
 
   const [cookies] = useCookies(["token"]);
 
-  useEffect(async () => {
-    const { data } = await axios.get("/api/hospitals");
-    setHospitals(data);
-    console.log(data);
+  useEffect(() => {
+    const fetchHospitals = async () => {
+      const { data } = await axios.get("/api/hospitals");
+      setHospitals(data);
+      console.log(data);
+    };
+    fetchHospitals();
   }, []);
 
   const handleSpecialization = async (hospital) => {
     const foundHospital = hospitals.find((item) => item.name === hospital);
     const hospitalId = foundHospital._id;
 
-    // Update form values first
     form.setValues({
       ...form.values,
       hospital: hospital,
       hospital_id: hospitalId,
-      specialization: "", // Reset specialization when hospital changes
-      doctor: "", // Reset doctor when hospital changes
+      specialization: "",
+      doctor: "",
     });
 
     const { data } = await axios.get(`/api/specializations/${hospitalId}`);
+
     setFetchedSpecializations(data);
   };
 
@@ -88,32 +93,6 @@ const Appointments = () => {
     console.log(timeSlot);
   };
 
-  const symptoms = [
-    "Fever",
-    "Cough",
-    "Headache",
-    "Body Ache",
-    "Cold",
-    "Sore Throat",
-    "Nausea",
-    "Vomiting",
-    "Diarrhea",
-    "Fatigue",
-    "Shortness of Breath",
-    "Loss of Smell",
-    "Loss of Taste",
-    "Chest Pain",
-    "Abdominal Pain",
-    "Rash",
-    "Red Eyes",
-    "Discoloration of Fingers or Toes",
-    "Headache",
-    "Confusion",
-    "Seizures",
-    "Stroke",
-    "Difficulty Breathing",
-  ];
-
   const form = useForm({
     initialValues: {
       hospital: "",
@@ -123,7 +102,7 @@ const Appointments = () => {
       doctor_id: "",
       patient_id: "",
       date: "",
-      timeslot: "",
+      time_slot: "",
       symptoms: [],
     },
   });
@@ -131,57 +110,16 @@ const Appointments = () => {
   const handleSubmit = async (values) => {
     values.patient_id = cookies._id;
     try {
-      const { data } = axios.post("/appointment/register", values);
-      alert("Appointment Booked");
+      console.log(values);
     } catch (error) {
       alert("Something went wrong");
       console.log(error);
     }
   };
 
-  const combobox = useCombobox({
-    onDropdownClose: () => combobox.resetSelectedOption(),
-    onDropdownOpen: () => combobox.updateSelectedOptionIndex("active"),
-  });
-
-  const [search, setSearch] = useState("");
-  const [value, setValue] = useState([]);
-
-  const handleValueSelect = (val) => {
-    setValue((current) =>
-      current.includes(val)
-        ? current.filter((v) => v !== val)
-        : [...current, val]
-    );
-    form.setValues({
-      ...form.values,
-      symptoms: [...value, val],
-    });
-  };
-
-  const handleValueRemove = (val) =>
-    setValue((current) => current.filter((v) => v !== val));
-
-  const values = value.map((item) => (
-    <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
-      {item}
-    </Pill>
-  ));
-
-  const options = symptoms
-    .filter((item) => item.toLowerCase().includes(search.trim().toLowerCase()))
-    .map((item) => (
-      <Combobox.Option value={item} key={item} active={value.includes(item)}>
-        <Group gap="sm">
-          {value.includes(item) ? <CheckIcon size={12} /> : null}
-          <span>{item}</span>
-        </Group>
-      </Combobox.Option>
-    ));
-
   const isHospitalSelected = form.values.hospital;
-  const isDoctorSelected = form.values.doctor;
   const isSpecializationSelected = form.values.specialization;
+  const isDoctorSelected = form.values.doctor;
   return (
     <div>
       <div className="container-fluid">
@@ -220,6 +158,7 @@ const Appointments = () => {
                       });
                       handleDoctor(value);
                     }}
+                    nothingFoundMessage="No specializations found"
                     disabled={!isHospitalSelected}
                   />
                 </div>
@@ -240,6 +179,7 @@ const Appointments = () => {
                       handleDate(value);
                     }}
                     mt="md"
+                    nothingFoundMessage="No doctors found"
                     disabled={!isSpecializationSelected}
                   />
                 </div>
@@ -257,6 +197,7 @@ const Appointments = () => {
                       form.setValues({ ...form.values, date: value });
                       handleTimeSlots(value);
                     }}
+                    nothingFoundMessage="No time slots available"
                     value={form.values.date}
                   />
                 </div>
@@ -271,61 +212,31 @@ const Appointments = () => {
                       label: slot,
                     }))}
                     onChange={(value) => {
-                      form.setValues({ ...form.values, timeslot: value });
+                      form.setValues({ ...form.values, time_slot: value });
                     }}
-                    value={form.values.timeslot}
+                    nothingFoundMessage="No time slots available"
+                    value={form.values.time_slot}
                   />
                 </div>
                 <div className="col-md-6">
-                  <Combobox
-                    label="Symptoms"
+                  <MultiSelect
+                    label="Enter Symptoms"
+                    placeholder="Pick Symptoms"
                     mt="md"
-                    store={combobox}
-                    onOptionSubmit={handleValueSelect}
-                  >
-                    <Combobox.DropdownTarget>
-                      <PillsInput
-                        disabled={!isDoctorSelected}
-                        onClick={() => combobox.openDropdown()}
-                      >
-                        <Pill.Group>
-                          {values}
-
-                          <Combobox.EventsTarget>
-                            <PillsInput.Field
-                              onFocus={() => combobox.openDropdown()}
-                              onBlur={() => combobox.closeDropdown()}
-                              value={search}
-                              placeholder="Search values"
-                              onChange={(event) => {
-                                combobox.updateSelectedOptionIndex();
-                                setSearch(event.currentTarget.value);
-                              }}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === "Backspace" &&
-                                  search.length === 0
-                                ) {
-                                  event.preventDefault();
-                                  handleValueRemove(value[value.length - 1]);
-                                }
-                              }}
-                            />
-                          </Combobox.EventsTarget>
-                        </Pill.Group>
-                      </PillsInput>
-                    </Combobox.DropdownTarget>
-
-                    <Combobox.Dropdown>
-                      <Combobox.Options>
-                        {options.length > 0 ? (
-                          options
-                        ) : (
-                          <Combobox.Empty>Nothing found...</Combobox.Empty>
-                        )}
-                      </Combobox.Options>
-                    </Combobox.Dropdown>
-                  </Combobox>
+                    onChange={(value) => {
+                      form.setValues({ symptoms: value });
+                    }}
+                    value={form.values.symptoms}
+                    data={Object.entries(symptomsData).map(
+                      ([label, value]) => ({
+                        value: value,
+                        label: label,
+                      })
+                    )}
+                    disabled={!isDoctorSelected}
+                    searchable
+                    nothingFoundMessage="Nothing found..."
+                  />
                 </div>
               </div>
               <Group justify="end" mt="xl">
