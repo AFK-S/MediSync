@@ -3,14 +3,13 @@ import LogSchema from "../models/LogSchema.js";
 
 const CCTVRegister = async (req, res) => {
   try {
-    const { photo_url } = req.params;
-    const status = req.body;
-    const doctor = await DoctorSchema.findOne({ photo_url });
+    const { photo_url, status } = req.body;
+    const doctor = await DoctorSchema.findOne({ photo_url }).select("_id");
     if (!doctor) return res.status(400).send("Doctor not found");
     const log = await LogSchema.create({
       doctor_id: doctor._id,
       type: "CCTV Camera",
-      status: "Found in" + status,
+      status: "Found in " + status,
     });
     res.status(200).send(log._id);
   } catch (err) {

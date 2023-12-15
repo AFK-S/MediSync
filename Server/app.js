@@ -12,6 +12,7 @@ import AppointmentRoute from "./routes/AppointmentRoute.js";
 import LogRoute from "./routes/LogRoute.js";
 import { VerifyConnectedDevices } from "./controller/TpLink.js";
 import { WIFIRegister } from "./controller/Log.js";
+import DashboardRoute from "./routes/DashboardRoute.js";
 
 const app = express();
 dotenv.config();
@@ -47,6 +48,7 @@ app.use("/api", AttendanceRoute);
 app.use("/api", PatientRoute);
 app.use("/api", AppointmentRoute);
 app.use("/api", LogRoute);
+app.use("/api", DashboardRoute);
 
 app.get("/api/logout", async (req, res) => {
   res.clearCookie("_id").status(200).end();

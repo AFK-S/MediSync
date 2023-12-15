@@ -1,11 +1,18 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { Modal, Button } from "@mantine/core";
 import AttendanceCalendar from "../AttendanceCalendar/AttendanceCalendar";
 import { useParams } from "react-router-dom";
-import { StateContext } from "../../context/StateContext";
+import axios from "axios";
 
 const Table = ({ data, columns }) => {
+  const [log, setLog] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      setLog(data);
+    }
+  }, [data]);
   return (
     <div
       className="inner-container"
@@ -22,16 +29,12 @@ const Table = ({ data, columns }) => {
           </tr>
         </thead>
         <tbody>
-          {data &&
-            data.map((item, index) => (
-              <tr key={index}>
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex} style={{ whiteSpace: "nowrap" }}>
-                    {item[col.toLowerCase()]}
-                  </td>
-                ))}
-              </tr>
-            ))}
+          {log.map((item, index) => (
+            <tr key={index}>
+              <td style={{ whiteSpace: "nowrap" }}>{item.status}</td>
+              <td style={{ whiteSpace: "nowrap" }}>{item.createdAt}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
@@ -41,17 +44,20 @@ const Table = ({ data, columns }) => {
 const DoctorProfile = () => {
   const { doctor_id } = useParams();
   const [opened, { open, close }] = useDisclosure(false);
-  const { doctorsList } = useContext(StateContext);
 
   const [doctorDetails, setDoctorDetails] = useState({});
 
-  console.log(doctor_id);
   useEffect(() => {
-    if (doctorsList) {
-      const doctor = doctorsList.find((doc) => doc._id === doctor_id);
-      setDoctorDetails(doctor);
-    }
-  }, [doctorsList]);
+    (async () => {
+      try {
+        const { data } = await axios.get(`/api/dashboard/doctor/${doctor_id}`);
+        console.log(data);
+        setDoctorDetails(data);
+      } catch (error) {
+        console.error("Failed to fetch data: ", error);
+      }
+    })();
+  }, []);
 
   const [patientsDetails, setPatientsDetails] = useState([
     {
@@ -122,17 +128,6 @@ const DoctorProfile = () => {
     },
   ]);
 
-  const [docLog, setDocLog] = useState([
-    {
-      time: "18:32",
-      status: "exit",
-    },
-    {
-      time: "18:32",
-      status: "entry",
-    },
-  ]);
-
   return (
     <>
       {doctorDetails && (
@@ -163,14 +158,17 @@ const DoctorProfile = () => {
           <div className="container-fluid my-4">
             <div className="row gy-4">
               <div className="col-md-8">
-                <AttendanceCalendar />
+                <AttendanceCalendar
+                  availability={doctorDetails.availability}
+                  attendance={doctorDetails.attendance}
+                />
               </div>
               <div className="col-md-4">
                 <div className="c-card">
                   <h4>Logs</h4>
                   <div className="mt-2">
                     <Table
-                      data={docLog && docLog}
+                      data={doctorDetails.log}
                       columns={["Status", "Time"]}
                     />
                   </div>

@@ -8,7 +8,7 @@ import {
 
 const router = express.Router();
 
-router.post("/log/cctv/register/:photo_url", CCTVRegister);
+router.post("/log/cctv/register", CCTVRegister);
 router.delete("/log/delete/:log_id", DeleteLog);
 router.get("/log/:log_id", LogInfo);
 router.get("/photos", AllDoctorsPhotoURL);
