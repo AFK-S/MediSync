@@ -47,6 +47,16 @@ const TodaysCompletedPatient = () => {
   const navigation = useNavigation();
   const { doctorData } = useContext(StateContext);
 
+  // Filter treated appointments
+  const treatedAppointments =
+    doctorData &&
+    doctorData.today_appointment &&
+    doctorData.today_appointment.length > 0
+      ? doctorData.today_appointment.filter(
+          (appointment) => appointment.treated
+        )
+      : [];
+
   const renderItem = ({ item }) => {
     const { patient, date, time_slot } = item;
 
@@ -75,21 +85,19 @@ const TodaysCompletedPatient = () => {
 
   return (
     <View style={{ flex: 1, marginTop: 10, height: 800 }}>
-      {doctorData &&
-      doctorData.today_appointment &&
-      doctorData.today_appointment.length > 0 ? (
+      {treatedAppointments.length > 0 ? (
         <FlatList
-          data={doctorData.today_appointment}
+          data={treatedAppointments}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
-          extraData={doctorData.today_appointment}
+          extraData={treatedAppointments}
         />
       ) : (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Text>No appointments today</Text>
+          <Text>No treated appointments today</Text>
         </View>
       )}
     </View>

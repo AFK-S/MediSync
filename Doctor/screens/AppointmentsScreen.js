@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -18,6 +18,17 @@ const AppointmentsScreen = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const { doctorData } = useContext(StateContext);
   const navigation = useNavigation();
+
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+
+  useEffect(() => {
+    const upcomingAppointments =
+      doctorData &&
+      doctorData.today_appointment.filter(
+        (appointment) => !appointment.treated
+      );
+    setUpcomingAppointments(upcomingAppointments);
+  }, [doctorData]);
 
   const getTitleAndFirstName = (fullName) => {
     if (!fullName) {
@@ -257,7 +268,8 @@ const AppointmentsScreen = () => {
               fontSize: 16,
             }}
           >
-            Upcoming Appointments {`(${patients.length})`}
+            Upcoming Appointments{" "}
+            {`(${upcomingAppointments && upcomingAppointments.length})`}
           </Text>
           <ScrollView
             showsHorizontalScrollIndicator={false}
