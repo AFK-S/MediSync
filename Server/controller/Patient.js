@@ -1,33 +1,5 @@
 import PatientSchema from "../models/PatientSchema.js";
 import AppointmentSchema from "../models/AppointmentSchema.js";
-import DoctorSchema from "../models/DoctorSchema.js";
-
-const AllSpecialization = async (req, res) => {
-  const { hospital_id } = req.params;
-  try {
-    const specialization = await DoctorSchema.find({
-      hospital_id,
-    }).distinct("specialization");
-    res.status(200).json(specialization);
-  } catch (err) {
-    console.error(err);
-    res.status(400).send(err.message);
-  }
-};
-
-const AllSpecializedDoctors = async (req, res) => {
-  const { hospital_id, specialization } = req.params;
-  try {
-    const doctors = await DoctorSchema.find({
-      hospital_id,
-      specialization,
-    }).lean();
-    res.status(200).json(doctors);
-  } catch (err) {
-    console.error(err);
-    res.status(400).send(err.message);
-  }
-};
 
 const VerifyPatient = async (req, res) => {
   try {
@@ -151,6 +123,4 @@ export {
   HospitalPatient,
   DoctorsPatient,
   AllPatients,
-  AllSpecialization,
-  AllSpecializedDoctors,
 };

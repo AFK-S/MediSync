@@ -168,6 +168,35 @@ const AllDoctors = async (req, res) => {
   }
 };
 
+const HospitalSpecialization = async (req, res) => {
+  const { hospital_id } = req.params;
+  try {
+    const specialization = await DoctorSchema.find({
+      hospital_id,
+    })
+      .distinct("specialization")
+      .lean();
+    res.status(200).json(specialization);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+const HospitalSpecializedDoctors = async (req, res) => {
+  const { hospital_id, specialization } = req.params;
+  try {
+    const doctors = await DoctorSchema.find({
+      hospital_id,
+      specialization,
+    }).lean();
+    res.status(200).json(doctors);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   Register,
   UpdateDetails,
@@ -176,4 +205,6 @@ export {
   HospitalDoctorsList,
   AllHospitalDoctorsList,
   AllDoctors,
+  HospitalSpecialization,
+  HospitalSpecializedDoctors,
 };
