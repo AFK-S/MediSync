@@ -14,6 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 
 const PatientDetailsScreen = ({ route }) => {
   const { patient } = route.params;
+  console.log(patient);
   const [selectedImage, setSelectedImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -42,6 +43,21 @@ const PatientDetailsScreen = ({ route }) => {
 
   const closePreview = () => {
     setModalVisible(false);
+  };
+
+  const formatDate = (dateString) => {
+    const dateObject = new Date(dateString);
+    const day = dateObject.getDate().toString().padStart(2, "0");
+    const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
+    const year = dateObject.getFullYear().toString();
+    return `${day}-${month}-${year}`;
+  };
+
+  const capitalizeAndReplaceUnderscore = (str) => {
+    const withoutUnderscore = str.replace(/_/g, " ");
+    return (
+      withoutUnderscore.charAt(0).toUpperCase() + withoutUnderscore.slice(1)
+    );
   };
 
   const prevVisits = [
@@ -163,7 +179,7 @@ const PatientDetailsScreen = ({ route }) => {
               fontWeight: "700",
             }}
           >
-            {patient.name}
+            {patient.name || patient.patient.name}
           </Text>
         </View>
         <View
@@ -175,23 +191,39 @@ const PatientDetailsScreen = ({ route }) => {
             borderRadius: 20,
           }}
         >
-          <Text style={styles.infoText}>Age: {patient.age}</Text>
           <Text style={styles.infoText}>
-            Phone Number: {patient.phone_number}
+            Age: {patient.age || patient.patient.age}
           </Text>
-          {patient.medical_history && (
+          <Text style={styles.infoText}>
+            Phone Number: {patient.phone_number || patient.patient.phone_number}
+          </Text>
+          {patient.medical_history && patient.medical_history.length > 0 ? (
             <Text style={styles.infoText}>
-              Medical History: {patient.medical_history}
+              Medical History: {patient.medical_history.join(", ")}
             </Text>
+          ) : (
+            <Text style={styles.infoText}>Medical History: None</Text>
           )}
-          {patient.symptoms && (
+
+          {patient.symptoms && patient.symptoms.length > 0 ? (
             <Text style={styles.infoText}>
-              Symptoms: {patient.symptoms.join(", ")}
+              Symptoms:{" "}
+              {patient.symptoms.map(capitalizeAndReplaceUnderscore).join(", ")}
             </Text>
+          ) : (
+            <Text style={styles.infoText}>Symptoms: None</Text>
           )}
+
           {patient.date && (
-            <Text style={styles.infoText}>Date: {patient.date}</Text>
+            <Text style={styles.infoText}>
+              Date: {formatDate(patient.date)}
+            </Text>
           )}
+
+          {patient.time_slot && (
+            <Text style={styles.infoText}>Time Slot: {patient.time_slot}</Text>
+          )}
+
           {patient.time && (
             <Text style={styles.infoText}>Time: {patient.time}</Text>
           )}
