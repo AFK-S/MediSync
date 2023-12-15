@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,13 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import StateContext from "../context/StateContext";
 
 const TomorrowsPatient = () => {
+  const { doctorData } = useContext(StateContext);
   const navigation = useNavigation();
+  const nextDay = doctorData && doctorData.availability[1];
+  const [nextPatientData, setNextPatientData] = useState([]);
 
   const patientData = [
     {

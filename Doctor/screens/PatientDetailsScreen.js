@@ -14,7 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 
 const PatientDetailsScreen = ({ route }) => {
   const { patient } = route.params;
-  console.log(patient);
+  // console.log(patient);
   const [selectedImage, setSelectedImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
