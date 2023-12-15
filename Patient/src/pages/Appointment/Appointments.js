@@ -108,9 +108,13 @@ const Appointments = () => {
   });
 
   const handleSubmit = async (values) => {
+    console.log(values);
     values.patient_id = cookies._id;
     try {
       console.log(values);
+      const { data } = await axios.post("/api/appointment/register", values);
+      console.log(data);
+      alert("Appointment booked successfully");
     } catch (error) {
       alert("Something went wrong");
       console.log(error);

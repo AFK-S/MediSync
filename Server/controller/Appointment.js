@@ -6,15 +6,15 @@ const Register = async (req, res) => {
   try {
     console.log(req.body);
     const {
-      hospital,
-      hospital_id,
-      specialization,
+      date,
       doctor,
       doctor_id,
+      hospital,
+      hospital_id,
       patient_id,
-      date,
-      time_slot,
+      specialization,
       symptoms,
+      time_slot,
     } = req.body;
 
     console.log(time_slot);
