@@ -7,6 +7,8 @@ import {
   HospitalPatient,
   DoctorsPatient,
   AllPatients,
+  AllSpecialization,
+  AllSpecializedDoctors,
 } from "../controller/Patient.js";
 import { PatientLogin } from "../controller/Login.js";
 import { SendOTP, VerifyOTP } from "../middleware/OTP.js";
@@ -23,5 +25,10 @@ router.get("/patient/:patient_id", PatientInfo);
 router.get("/patient/hospital/:hospital_id", HospitalPatient);
 router.get("/patient/doctor/:doctor_id", DoctorsPatient);
 router.get("/patients", AllPatients);
+router.get("/specializations/:hospital_id", AllSpecialization);
+router.get(
+  "/appointment/doctor/:hospital_id/:specialization",
+  AllSpecializedDoctors
+);
 
 export default router;
