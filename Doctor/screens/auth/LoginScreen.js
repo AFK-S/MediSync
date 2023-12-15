@@ -6,12 +6,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StateContext from "../../context/StateContext";
 
 const LoginScreen = ({ navigation }) => {
-  const { Login, FirstTimeLogin, isLogin, setIsLogin } =
+  const { Login, FirstTimeLogin, isLogin, setIsLogin, loading, setLoading } =
     useContext(StateContext);
   const [login, setLogin] = useState({
     username: "",
@@ -30,6 +31,8 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLoginPress = async () => {
     try {
+      setLoading(true); // Set loading to true when login starts
+
       const mac_address = await AsyncStorage.getItem("mac_address");
       console.log(mac_address);
 
@@ -42,11 +45,9 @@ const LoginScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false); // Set loading to false when login is complete (success or failure)
     }
-  };
-
-  const handleGoToRegister = () => {
-    navigation.navigate("Register");
   };
 
   return (
@@ -71,10 +72,11 @@ const LoginScreen = ({ navigation }) => {
           secureTextEntry={true}
         />
         <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-          <Text style={styles.btnText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleGoToRegister}>
-          <Text style={styles.registerLink}>Go to Register</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.btnText}>Login</Text>
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
