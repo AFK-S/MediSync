@@ -31,7 +31,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLoginPress = async () => {
     try {
-      setLoading(true); // Set loading to true when login starts
+      setLoading(true);
 
       const mac_address = await AsyncStorage.getItem("mac_address");
       console.log(mac_address);

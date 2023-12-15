@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Patients from "./Patients";
 import PatientDetailsScreen from "./PatientDetailsScreen";
 import AppointmentsScreen from "./AppointmentsScreen";
@@ -32,6 +33,7 @@ const PatientsStack = () => {
 
     fetchData();
   }, []);
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -67,9 +69,6 @@ const AppointmentStack = () => {
 
 const MainScreen = () => {
   const { isLogin, getProfile } = useContext(StateContext);
-  useEffect(() => {
-    if (!isLogin) navigation.navigate("Login");
-  }, []);
 
   useEffect(() => {
     getProfile();
