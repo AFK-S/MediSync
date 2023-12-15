@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Import the default styles for react-calendar
 import "./Attendance.css";
@@ -36,10 +36,17 @@ const Table = ({ data, columns }) => {
   );
 };
 
-const AttendanceCalendar = () => {
+const AttendanceCalendar = ({ availability, attendance }) => {
   // Replace these arrays with the actual data from your backend
-  const attendanceData = ["2023-12-23", "2023-12-13", "2023-10-25"];
-  const upcomingData = ["2023-12-27", "2023-10-28", "2023-12-09"];
+  const [upcomingData, setUpcomingData] = useState([]);
+  const [attendanceData, stAttendanceData] = useState([]);
+
+  useEffect(() => {
+    if (availability && attendance) {
+      setUpcomingData(availability.map((item) => item.date.split("T")[0]));
+      stAttendanceData(attendance.map((item) => item.date.split("T")[0]));
+    }
+  }, [availability, attendance]);
 
   const [patientsWaiting, setPatientsWaiting] = useState([
     {
