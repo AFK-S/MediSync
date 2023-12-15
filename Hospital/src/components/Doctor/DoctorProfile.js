@@ -6,6 +6,13 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const Table = ({ data, columns }) => {
+  const [log, setLog] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      setLog(data);
+    }
+  }, [data]);
   return (
     <div
       className="inner-container"
@@ -22,16 +29,12 @@ const Table = ({ data, columns }) => {
           </tr>
         </thead>
         <tbody>
-          {data &&
-            data.map((item, index) => (
-              <tr key={index}>
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex} style={{ whiteSpace: "nowrap" }}>
-                    {item[col.toLowerCase()]}
-                  </td>
-                ))}
-              </tr>
-            ))}
+          {log.map((item, index) => (
+            <tr key={index}>
+              <td style={{ whiteSpace: "nowrap" }}>{item.status}</td>
+              <td style={{ whiteSpace: "nowrap" }}>{item.createdAt}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
