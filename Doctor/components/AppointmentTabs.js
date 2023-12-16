@@ -16,7 +16,7 @@ const AppointmentTabs = () => {
     const year = dateObject.getFullYear().toString();
     return `${day}-${month}-${year}`;
   }
-  // console.log(doctorData.availability[1].date);
+
   return (
     <Tab.Navigator
       tabBarOptions={{
@@ -43,7 +43,9 @@ const AppointmentTabs = () => {
         //       : "today",
         // }}
         options={{
-          tabBarLabel: "Today",
+          tabBarLabel: `Today (${
+            doctorData && doctorData.today_appointment.length
+          })`,
         }}
       />
 

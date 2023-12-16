@@ -307,6 +307,7 @@ const AppointmentsScreen = () => {
                 paddingVertical: 30,
                 justifyContent: "center",
                 alignItems: "center",
+                borderRadius: 24,
               }}
             >
               <Text style={{ fontSize: 15, fontWeight: "600" }}>
