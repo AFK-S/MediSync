@@ -62,8 +62,12 @@ const Doctor = async (req, res) => {
       },
     ]);
     doctor.today_appointment = today_appointment;
-    doctor.next_date = doctor.availability[1].date;
-    const next_date = new Date(doctor.availability[1].date);
+    doctor.next_date =
+      doctor.availability[0].date.toISOString().split("T")[0] ===
+      new Date().toISOString().split("T")[0]
+        ? doctor.availability[1].date
+        : doctor.availability[0].date;
+    const next_date = new Date(doctor.next_date);
     next_date.setHours(0, 0, 0, 0);
     const next_date_appointment = await AppointmentSchema.aggregate([
       {
