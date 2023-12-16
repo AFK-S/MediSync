@@ -128,6 +128,9 @@ const DoctorProfile = () => {
     },
   ]);
 
+  const revenue =
+    doctorDetails && doctorDetails.treated_patient_count * doctorDetails.fees;
+
   return (
     <>
       {doctorDetails && (
@@ -137,14 +140,24 @@ const DoctorProfile = () => {
             <div className="row gy-3">
               <div className="col-md-4">
                 <div className="c-card">
-                  <h4>Appointments</h4>
-                  <h5>30</h5>
+                  <h4>Today's Appointments</h4>
+                  <h3>
+                    {doctorDetails && doctorDetails.today_appointment_count}
+                  </h3>
                 </div>
               </div>
               <div className="col-md-4">
                 <div className="c-card">
-                  <h4>Revenue</h4>
-                  <h5>Rs. 30,000</h5>
+                  <h4>
+                    Revenue{" "}
+                    <span style={{ fontSize: "18px" }}>
+                      {" "}
+                      ({doctorDetails &&
+                        doctorDetails.treated_patient_count}{" "}
+                      patients treated)
+                    </span>
+                  </h4>
+                  <h5>Rs. {revenue}</h5>
                 </div>
               </div>
               <div className="col-md-4">

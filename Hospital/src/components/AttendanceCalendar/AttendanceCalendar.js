@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Import the default styles for react-calendar
 import "./Attendance.css";
@@ -36,17 +36,15 @@ const Table = ({ data, columns }) => {
   );
 };
 
-const AttendanceCalendar = ({ availability, attendance }) => {
-  // Replace these arrays with the actual data from your backend
-  const [upcomingData, setUpcomingData] = useState([]);
-  const [attendanceData, stAttendanceData] = useState([]);
+const AttendanceCalendar = ({ attendance, availability }) => {
+  const attendanceData =
+    attendance &&
+    attendance.map((item) => (item.date ? item.date.split("T")[0] : ""));
+  const upcomingData =
+    availability &&
+    availability.map((item) => (item.date ? item.date.split("T")[0] : ""));
 
-  useEffect(() => {
-    if (availability && attendance) {
-      setUpcomingData(availability.map((item) => item.date.split("T")[0]));
-      stAttendanceData(attendance.map((item) => item.date.split("T")[0]));
-    }
-  }, [availability, attendance]);
+  console.log(upcomingData);
 
   const [patientsWaiting, setPatientsWaiting] = useState([
     {
@@ -118,11 +116,16 @@ const AttendanceCalendar = ({ availability, attendance }) => {
   ]);
 
   const isDateMarked = (date) => {
-    return attendanceData.includes(date.toISOString().split("T")[0]);
+    return (
+      attendanceData &&
+      attendanceData.includes(date.toISOString().split("T")[0])
+    );
   };
 
   const isDateUpcoming = (date) => {
-    return upcomingData.includes(date.toISOString().split("T")[0]);
+    return (
+      upcomingData && upcomingData.includes(date.toISOString().split("T")[0])
+    );
   };
 
   return (
