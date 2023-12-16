@@ -160,7 +160,19 @@ const AllHospitalDoctorsList = async (req, res) => {
 
 const AllDoctors = async (req, res) => {
   try {
-    const doctors = await DoctorSchema.find().lean();
+    const doctors = await DoctorSchema.aggregate([
+      {
+        $lookup: {
+          from: "hospitals",
+          localField: "hospital_id",
+          foreignField: "_id",
+          as: "hospital",
+        },
+      },
+      {
+        $unwind: "$hospital",
+      },
+    ]);
     res.status(200).json(doctors);
   } catch (err) {
     console.error(err);

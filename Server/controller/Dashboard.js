@@ -8,6 +8,94 @@ import ReportSchema from "../models/ReportSchema.js";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
+const Hospital = async (req, res) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  try {
+    const { hospital_id } = req.params;
+    const hospital = await HospitalSchema.findById(hospital_id).lean();
+    if (!hospital) return res.status(404).send("Hospital not found");
+    const doctor_ids = await DoctorSchema.find({
+      hospital_id: new ObjectId(hospital_id),
+    })
+      .distinct("_id")
+      .lean();
+    const today_doctor_attendance_ids = await AttendanceSchema.find({
+      doctor_id: {
+        $in: doctor_ids,
+      },
+      createdAt: {
+        $gte: today,
+        $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+      },
+    })
+      .sort({ createdAt: -1 })
+      .distinct("doctor_id")
+      .lean();
+    const today_doctor_available = await DoctorSchema.find({
+      hospital_id: new ObjectId(hospital_id),
+      _id: {
+        $in: today_doctor_attendance_ids,
+      },
+    }).lean();
+    hospital.doctor_available = today_doctor_available;
+    hospital.doctor_available_count = today_doctor_available.length;
+    const today_non_treated_patient = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          hospital_id: new ObjectId(hospital_id),
+          date: {
+            $gte: today,
+            $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+          treated: false,
+        },
+      },
+      {
+        $lookup: {
+          from: "doctors",
+          localField: "doctor_id",
+          foreignField: "_id",
+          as: "doctor",
+        },
+      },
+      {
+        $unwind: "$doctor",
+      },
+      {
+        $lookup: {
+          from: "patients",
+          localField: "patient_id",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: "$patient",
+      },
+    ]);
+    hospital.today_non_treated_patient = today_non_treated_patient;
+    hospital.today_non_treated_patient_count = today_non_treated_patient.length;
+    const today_treated_patient = await AppointmentSchema.find({
+      hospital_id: new ObjectId(hospital_id),
+      date: {
+        $gte: today,
+        $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+      },
+      treated: true,
+    }).lean();
+    hospital.today_treated_patient_count = today_treated_patient.length;
+    hospital.today_patient_count =
+      today_treated_patient.length + today_non_treated_patient.length;
+    res.status(200).json(hospital);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 const Doctor = async (req, res) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -220,4 +308,4 @@ const Patient = async (req, res) => {
   }
 };
 
-export { Doctor, Patient };
+export { Hospital, Doctor, Patient };
