@@ -21,6 +21,11 @@ const formatDate = (dateString) => {
   return `${day}-${month}-${year}`;
 };
 
+const capitalizeAndReplaceUnderscore = (str) => {
+  const withoutUnderscore = str.replace(/_/g, " ");
+  return withoutUnderscore.charAt(0).toUpperCase() + withoutUnderscore.slice(1);
+};
+
 const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: "#fff",

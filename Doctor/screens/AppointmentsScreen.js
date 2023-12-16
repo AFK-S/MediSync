@@ -42,49 +42,6 @@ const AppointmentsScreen = () => {
     return `${title} ${firstName}`;
   };
 
-  const patients = [
-    {
-      name: "Karandeep Singh Sandhu",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-    {
-      name: "Aditya Rai",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-    {
-      name: "Karandeep Singh bchbxiljcndc",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-    {
-      name: "Karandeep Singh bchbxiljcndc",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-  ];
-
   const openBottomSheet = (patient) => {
     setSelectedPatient(patient);
     toggleModal();
@@ -92,6 +49,21 @@ const AppointmentsScreen = () => {
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  const formatDate = (date) => {
+    const dateObj = new Date(date);
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth() + 1;
+    const year = dateObj.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const capitalizeAndReplaceUnderscore = (str) => {
+    const withoutUnderscore = str.replace(/_/g, " ");
+    return (
+      withoutUnderscore.charAt(0).toUpperCase() + withoutUnderscore.slice(1)
+    );
   };
 
   const renderBottomSheetContent = () => (
@@ -139,7 +111,7 @@ const AppointmentsScreen = () => {
           }}
         >
           <Text style={{ fontSize: 20, fontWeight: "600" }}>
-            {selectedPatient?.name}
+            {selectedPatient?.patient.name}
           </Text>
         </View>
 
@@ -154,25 +126,33 @@ const AppointmentsScreen = () => {
           }}
         >
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Age: {selectedPatient?.age}
+            Age: {selectedPatient?.patient.age}
           </Text>
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Medical History: {selectedPatient?.medical_history}
+            Medical History:{" "}
+            {selectedPatient?.medical_history?.length
+              ? selectedPatient.medical_history
+              : "None"}
           </Text>
+
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
             Symptoms:{" "}
-            {selectedPatient?.symptoms.map((symptom, index) => (
-              <Text key={index}>
-                {symptom}
-                {index !== selectedPatient.symptoms.length - 1 ? ", " : ""}
-              </Text>
-            ))}
+            {selectedPatient?.symptoms?.length ? (
+              selectedPatient.symptoms.map((symptom, index) => (
+                <Text key={index}>
+                  {capitalizeAndReplaceUnderscore(symptom)}
+                  {index !== selectedPatient.symptoms.length - 1 ? ", " : ""}
+                </Text>
+              ))
+            ) : (
+              <Text>None</Text>
+            )}
           </Text>
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Date: {selectedPatient?.date}
+            Date: {formatDate(selectedPatient?.date)}
           </Text>
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Time: {selectedPatient?.time}
+            Time: {selectedPatient?.time_slot}
           </Text>
         </View>
         <TouchableOpacity
@@ -276,8 +256,8 @@ const AppointmentsScreen = () => {
             horizontal
             contentContainerStyle={{ padding: 10 }}
           >
-            {patients &&
-              patients.map((patient, index) => (
+            {upcomingAppointments &&
+              upcomingAppointments.map((patient, index) => (
                 <TouchableOpacity
                   activeOpacity={0.9}
                   key={index}
@@ -298,12 +278,14 @@ const AppointmentsScreen = () => {
                         numberOfLines={1}
                         ellipsizeMode="tail"
                       >
-                        {patient.name}
+                        {patient.patient.name}
                       </Text>
                       <View style={{ marginTop: 10 }}>
-                        <Text style={styles.silent}>Age : {patient.age}</Text>
+                        <Text style={styles.silent}>
+                          Age : {patient.patient.age}
+                        </Text>
                         <Text style={{ ...styles.silent, marginTop: 5 }}>
-                          {patient.date}, {patient.time}
+                          Time : {patient.time_slot}
                         </Text>
                       </View>
                     </View>
