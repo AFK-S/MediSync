@@ -12,6 +12,7 @@ export const StateProvider = ({ children }) => {
   const [doctorId, setDoctorId] = useState();
   const [doctorData, setDoctorData] = useState();
   const [loading, setLoading] = useState(false);
+  const [patientData, setpatientData] = useState();
 
   useEffect(() => {
     (async () => {
@@ -91,6 +92,25 @@ export const StateProvider = ({ children }) => {
     }
   };
 
+  const getPatientInfo = async (id) => {
+    setpatientData(null);
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${SERVER_URL}/api/dashboard/patient/${id}`
+      );
+      data.past_visit.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      setpatientData(data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching patient data:", error);
+      Alert.alert("Cannot get Patient data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -103,6 +123,8 @@ export const StateProvider = ({ children }) => {
         loading,
         setLoading,
         markAttended,
+        getPatientInfo,
+        patientData,
       }}
     >
       {children}
