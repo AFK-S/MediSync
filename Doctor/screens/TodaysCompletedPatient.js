@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import StateContext from "../context/StateContext";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
 
 const AVATAR_URL =
   "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png";
@@ -46,11 +47,17 @@ const styles = StyleSheet.create({
   labelText: {
     fontWeight: "bold",
   },
+  markNotAttendedButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 8,
+  },
 });
 
 const TodaysCompletedPatient = () => {
   const navigation = useNavigation();
-  const { doctorData } = useContext(StateContext);
+  const { doctorData, markAttended } = useContext(StateContext);
 
   // Filter treated appointments
   const treatedAppointments =
@@ -61,6 +68,17 @@ const TodaysCompletedPatient = () => {
           (appointment) => appointment.treated
         )
       : [];
+
+  const renderMarkNotAttendedButton = (id) => (
+    <TouchableOpacity
+      style={styles.markNotAttendedButton}
+      onPress={() => {
+        markAttended(id);
+      }}
+    >
+      <Ionicons name="arrow-undo" size={20} color="black" />
+    </TouchableOpacity>
+  );
 
   const renderItem = ({ item }) => {
     const { patient, date, time_slot } = item;
@@ -84,6 +102,7 @@ const TodaysCompletedPatient = () => {
           </Text>
           <Text style={styles.labelText}>Time: {time_slot}</Text>
         </View>
+        {renderMarkNotAttendedButton({ id: item._id })}
       </TouchableOpacity>
     );
   };

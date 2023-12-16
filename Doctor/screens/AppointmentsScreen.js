@@ -301,6 +301,8 @@ const AppointmentsScreen = () => {
             <View
               style={{
                 ...styles.patientCard,
+                width: "85%",
+                alignSelf: "center",
                 marginTop: 20,
                 paddingVertical: 30,
                 justifyContent: "center",
