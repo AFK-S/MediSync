@@ -16,7 +16,7 @@ import StateContext from "../context/StateContext";
 const AppointmentsScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const { doctorData } = useContext(StateContext);
+  const { doctorData, markAttended, getProfile } = useContext(StateContext);
   const navigation = useNavigation();
 
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -156,7 +156,10 @@ const AppointmentsScreen = () => {
           </Text>
         </View>
         <TouchableOpacity
-          onPress={toggleModal}
+          onPress={() => {
+            markAttended(selectedPatient._id);
+            toggleModal();
+          }}
           style={{
             backgroundColor: "#18C37D",
             padding: 14,
