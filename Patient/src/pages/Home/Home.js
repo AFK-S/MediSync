@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, Collapse, Group, Text, Accordion } from "@mantine/core";
+import { Grid, Collapse, Group, Text, Accordion, Button } from "@mantine/core";
 import "./Home.css";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
@@ -46,11 +46,15 @@ const Table = ({ data, columns }) => {
 const AppointmentCard = ({ value, index }) => {
   return (
     <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
-      <div key={index} className="c-card h-auto appointment-card ">
+      <div
+        key={index}
+        className="c-card h-auto appointment-card "
+        style={{ borderColor: "#B6BBC4" }}
+      >
         <div className="p-0">
           <p className="card-text mt-2">
             <span className="fw-600">Date: </span>
-            {value.date.split("T")[0].split("-").reverse().join("x-")}
+            {value.date.split("T")[0].split("-").reverse().join("-")}
           </p>
           <p className="card-text mt-1">
             {" "}
@@ -80,7 +84,7 @@ const AppointmentCard = ({ value, index }) => {
             >
               <Accordion.Control
                 className="p-0"
-                style={{ color: "blue", fontSize: "0.9rem" }}
+                style={{ color: "#0a0059", fontSize: "0.9rem" }}
               >
                 More Details
               </Accordion.Control>
@@ -101,7 +105,21 @@ const AppointmentCard = ({ value, index }) => {
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>
-          <button className="mt-md-4 mt-3 cancel-btn card-text">Cancel</button>
+          <Button
+            className="mt-4 cancel-button"
+            variant="light"
+            type="outline"
+            style={{
+              color: "#DF2E38",
+              backgroundColor: "#fff",
+              borderColor: "#DF2E38",
+              fontWeight: 700,
+              fontSize: "0.9rem",
+              transition: "all 0.2s ease-in-out",
+            }}
+          >
+            Cancel
+          </Button>
         </div>
       </div>
     </Grid.Col>
@@ -225,7 +243,9 @@ const Home = () => {
         />
       </div> */}
       <div className="alert-section my-4 c-card">
-        <h4 className="mb-3">Alerts</h4>
+        <h4 className="mb-3">
+          Alerts <i className="fa-solid fa-bell"></i>
+        </h4>
         <div className="alert-container">
           {alerts.map((alert, index) => (
             <div key={index} className="alert-item">

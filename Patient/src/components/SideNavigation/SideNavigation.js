@@ -24,17 +24,17 @@ const SideNavigation = () => {
     {
       name: "Home",
       path: "/home",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-home",
     },
     {
       name: "Search",
       path: "/search",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-search",
     },
     {
       name: "Appointments",
       path: "/appointments",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-hospital-user",
     },
     {
       name: "Profile",
