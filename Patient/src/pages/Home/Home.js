@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { Grid, Collapse, Group, Text, Accordion } from "@mantine/core";
 import "./Home.css";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
+import { useCookies } from "react-cookie";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const Table = ({ data, columns }) => {
   return (
@@ -105,6 +109,11 @@ const AppointmentCard = ({ value, index }) => {
 };
 
 const Home = () => {
+  // const [cookies] = useCookies();
+  const appointmentUpcoming = useSelector(
+    (state) => state.app.appData.upcoming_appointment
+  );
+
   const [doctors, setDoctors] = useState([
     {
       doctorname: "Dr. Karandeep Singh Sandhu",
@@ -191,9 +200,10 @@ const Home = () => {
           <h5>UPCOMING APPOINTMENT</h5>
           <div className="upcoming-appointments-container">
             <Grid>
-              {doctors.map((value, index) => (
-                <AppointmentCard key={index} value={value} index={index} />
-              ))}
+              {appointmentUpcoming &&
+                appointmentUpcoming.map((value, index) => (
+                  <AppointmentCard key={index} value={value} index={index} />
+                ))}
             </Grid>
           </div>
         </div>

@@ -14,10 +14,11 @@ import {
 } from "@mantine/core";
 
 import { useForm } from "@mantine/form";
-import { IconFile } from "@tabler/icons-react";
+import { IconFile, IconH1 } from "@tabler/icons-react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { useDispatch, useSelector } from "react-redux";
 
 const Table = ({ data, columns }) => {
   return (
@@ -58,25 +59,26 @@ const Table = ({ data, columns }) => {
 
 const Profile = () => {
   const [cookies] = useCookies();
+  const patient = useSelector((state) => state.app.appData);
 
-  const [patient, setPatient] = useState(null);
+  // const [patient, setPatient] = useState(null);
 
-  useEffect(() => {
-    const fetchPatientInfo = async () => {
-      try {
-        const response = await axios.get(
-          `/api/dashboard/patient/${cookies._id}`
-        );
-        setPatient(response.data);
+  // useEffect(() => {
+  //   const fetchPatientInfo = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `/api/dashboard/patient/${cookies._id}`
+  //       );
+  //       setPatient(response.data);
 
-        console.log(response.data.past_visit);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  //       console.log(response.data.past_visit);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
 
-    fetchPatientInfo();
-  }, []);
+  //   fetchPatientInfo();
+  // }, []);
 
   const [pdfPreview, setPdfPreview] = useState([]);
 
@@ -160,8 +162,9 @@ const Profile = () => {
                   {/* Display fetched images */}
                   <Text className="profile-text">Uploaded Reports</Text>
                   <div className="d-flex flex-wrap">
-                    {patient &&
+                    {patient.reports &&
                       patient.reports.map((file, index) => (
+                        // <h1>ok</h1>
                         <Image
                           style={{ width: "80px", margin: "5px" }}
                           key={index}
@@ -183,7 +186,6 @@ const Profile = () => {
                       pt={30}
                       label="Select Past Medical Conditions"
                       placeholder="Past Medical Conditions"
-                      // mt="md"
                       onChange={(value) => {
                         form.setValues({
                           ...form.values,
@@ -191,15 +193,47 @@ const Profile = () => {
                         });
                       }}
                       data={[
-                        "Asthma",
-                        "Cancer",
+                        "Fungal infection",
+                        "Allergy",
+                        "GERD",
+                        "Chronic cholestasis",
+                        "Drug Reaction",
+                        "Peptic ulcer disease",
+                        "AIDS",
                         "Diabetes",
-                        "Heart Disease",
+                        "Gastroenteritis",
+                        "Bronchial Asthma",
                         "Hypertension",
-                        "Kidney Disease",
-                        "Liver Disease",
-                        "Stroke",
-                        "Thyroid Disease",
+                        "Migraine",
+                        "Cervical spondylosis",
+                        "Paralysis (brain hemorrhage)",
+                        "Jaundice",
+                        "Malaria",
+                        "Chickenpox",
+                        "Dengue",
+                        "Typhoid",
+                        "Hepatitis A",
+                        "Hepatitis B",
+                        "Hepatitis C",
+                        "Hepatitis D",
+                        "Hepatitis E",
+                        "Alcoholic hepatitis",
+                        "Tuberculosis",
+                        "Common Cold",
+                        "Pneumonia",
+                        "Dimorphic hemmorhoids(piles)",
+                        "Heart attack",
+                        "Varicose veins",
+                        "Hypothyroidism",
+                        "Hyperthyroidism",
+                        "Hypoglycemia",
+                        "Osteoarthritis",
+                        "Arthritis",
+                        "Paroxysmal Positional Vertigo",
+                        "Acne",
+                        "Urinary tract infection",
+                        "Psoriasis",
+                        "Impetigo",
                       ]}
                       searchable
                       nothingFoundMessage="Nothing found..."
@@ -252,7 +286,7 @@ const Profile = () => {
       <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Past Visit to Doctor</h4>
         <Table
-          data={patient && patient.past_visit}
+          data={patient.past_visit && patient.past_visit}
           columns={[
             "DoctorName",
             "Specialty",
