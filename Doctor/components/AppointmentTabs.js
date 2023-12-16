@@ -55,7 +55,9 @@ const AppointmentTabs = () => {
         options={{
           tabBarLabel:
             doctorData && doctorData.next_date
-              ? formatDate(doctorData.next_date)
+              ? `${formatDate(doctorData.next_date)} (${
+                  doctorData && doctorData.next_date_appointment.length
+                })`
               : "None",
         }}
       />
