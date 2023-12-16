@@ -6,6 +6,11 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const Table = ({ data, columns }) => {
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const formattedDate = new Date(date).toLocaleDateString("en-GB", options);
+    return formattedDate;
+  };
   const [log, setLog] = useState([]);
 
   useEffect(() => {
@@ -31,8 +36,11 @@ const Table = ({ data, columns }) => {
         <tbody>
           {log.map((item, index) => (
             <tr key={index}>
+              <td style={{ whiteSpace: "nowrap" }}>{item.type}</td>
               <td style={{ whiteSpace: "nowrap" }}>{item.status}</td>
-              <td style={{ whiteSpace: "nowrap" }}>{item.createdAt}</td>
+              <td style={{ whiteSpace: "nowrap" }}>
+                {formatDate(item.createdAt)}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -174,6 +182,7 @@ const DoctorProfile = () => {
                 <AttendanceCalendar
                   availability={doctorDetails.availability}
                   attendance={doctorDetails.attendance}
+                  today_appointment={doctorDetails.today_appointment}
                 />
               </div>
               <div className="col-md-4">
@@ -182,7 +191,7 @@ const DoctorProfile = () => {
                   <div className="mt-2">
                     <Table
                       data={doctorDetails.log}
-                      columns={["Status", "Time"]}
+                      columns={["Type", "Status", "Time"]}
                     />
                   </div>
                 </div>
