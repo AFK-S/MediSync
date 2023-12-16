@@ -3,6 +3,8 @@ import AppointmentSchema from "../models/AppointmentSchema.js";
 import AttendanceSchema from "../models/AttendanceSchema.js";
 import LogSchema from "../models/LogSchema.js";
 import PatientSchema from "../models/PatientSchema.js";
+import HospitalSchema from "../models/HospitalSchema.js";
+import ReportSchema from "../models/ReportSchema.js";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
@@ -23,6 +25,8 @@ const Doctor = async (req, res) => {
       return itemDate >= today;
     });
     doctor.availability = filter_availability;
+    const hospital = await HospitalSchema.findById(doctor.hospital_id).lean();
+    doctor.hospital = hospital;
     const attendance = await AttendanceSchema.find({
       doctor_id: doctor_id,
     })
@@ -191,6 +195,10 @@ const Patient = async (req, res) => {
       "doctor.availability": 0,
     });
     patient.past_visit = past_visit;
+    const reports = await ReportSchema.find({
+      patient_id: patient_id,
+    }).lean();
+    patient.reports = reports;
     patient.upcoming_appointment_count = upcoming_appointment.length;
     patient.past_visit_count = past_visit.length;
     res.status(200).json(patient);
