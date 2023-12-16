@@ -215,9 +215,9 @@ const PatientDetailsScreen = ({ route }) => {
           <Text style={styles.infoText}>
             Phone Number: {patientData && patientData.phone_number}
           </Text>
-          {patient.medical_history && patient.medical_history.length > 0 ? (
+          {patientData && patientData.disease.length > 0 ? (
             <Text style={styles.infoText}>
-              Medical History: {patient.medical_history.join(", ")}
+              Medical History: {patientData.disease.join(", ")}
             </Text>
           ) : (
             <Text style={styles.infoText}>Medical History: None</Text>
