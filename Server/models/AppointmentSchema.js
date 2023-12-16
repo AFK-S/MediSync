@@ -30,15 +30,17 @@ const AppointmentSchema = new Schema(
       default: 0,
       required: [true, "Please provide a Severity Index"],
     },
+    severity_count: {
+      type: Number,
+      default: 0,
+      required: [true, "Please provide a Severity Count"],
+    },
     treated: {
       type: Boolean,
       default: false,
       required: [true, "Please provide a Treated"],
     },
     symptoms: {
-      type: Array,
-    },
-    medical_history: {
       type: Array,
     },
     date: {

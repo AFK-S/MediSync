@@ -1,18 +1,41 @@
 import AppointmentSchema from "../models/AppointmentSchema.js";
 import DoctorSchema from "../models/DoctorSchema.js";
+import ReportSchema from "../models/ReportSchema.js";
+import PatientSchema from "../models/PatientSchema.js";
 import mongoose from "mongoose";
+import axios from "axios";
 const { ObjectId } = mongoose.Types;
 
 const Register = async (req, res) => {
   try {
     const { hospital_id, doctor_id, patient_id, date, time_slot, symptoms } =
       req.body;
+    const patient = await PatientSchema.findById(patient_id)
+      .select("age")
+      .lean();
+    const reports = await ReportSchema.find({ patient_id })
+      .select("disease")
+      .lean();
+    const disease_list = [];
+    for (const report of reports) {
+      disease_list.push(...report.disease);
+    }
+    const { data } = await axios.post(
+      "http://192.168.0.105:5000/api/patient/severity_index",
+      {
+        age: patient.age,
+        symptoms,
+        past_disease: disease_list,
+      }
+    );
     const appointment = await AppointmentSchema.create({
       hospital_id,
       doctor_id,
       patient_id,
       type: "online",
       symptoms,
+      severity_index: data.severity_index,
+      severity_count: data.severity_count,
       date: date,
       time_slot,
     });
