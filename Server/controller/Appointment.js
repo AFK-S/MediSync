@@ -16,10 +16,7 @@ const Register = async (req, res) => {
     const reports = await ReportSchema.find({ patient_id })
       .select("disease")
       .lean();
-    const disease_list = [];
-    for (const report of reports) {
-      disease_list.push(...report.disease);
-    }
+    const disease_list = reports.flatMap((report) => report.disease);
     const { data } = await axios.post(
       "http://192.168.0.105:5000/api/patient/severity_index",
       {
