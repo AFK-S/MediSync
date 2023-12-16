@@ -47,7 +47,9 @@ const Appointments = () => {
       doctor: "",
     });
 
-    const { data } = await axios.get(`/api/specializations/${hospitalId}`);
+    const { data } = await axios.get(
+      `/api/doctors/specialization/${hospitalId}`
+    );
 
     setFetchedSpecializations(data);
   };
@@ -60,17 +62,13 @@ const Appointments = () => {
     const hospitalId = foundHospital._id;
 
     const { data } = await axios.get(
-      `/api/appointment/doctor/${hospitalId}/${value}`
+      `/api/doctors/specialization/${hospitalId}/${value}`
     );
     setDoctors(data);
   };
 
   const handleDate = async (doctor) => {
-    console.log("====================================");
-    console.log(doctor);
-    console.log("====================================");
     const foundDoctor = doctors.find((item) => item.name === doctor);
-    console.log(foundDoctor);
 
     form.setValues({ doctor_id: foundDoctor._id });
 
@@ -85,12 +83,22 @@ const Appointments = () => {
     const foundDate = foundDoctor.availability.find(
       (item) => item.date === date
     );
-    const start_time = foundDate.start_time;
-    const end_time = foundDate.end_time;
-    const timeSlots = [`${start_time}-${end_time}`];
-    console.log(timeSlots);
-    setTimeSlot(timeSlots);
-    console.log(timeSlot);
+    const slots = await handleAvailableSlot(foundDate.date);
+    console.log(slots);
+    const slotsBooked = slots.slot_booked;
+    const slotsOnlineBooked = slots.slot_count.online;
+    const slotsOfflineBooked = slots.slot_count.online;
+
+    if (slotsBooked <= slotsOnlineBooked) {
+      const start_time = foundDate.start_time;
+      const end_time = foundDate.end_time;
+      const timeSlots = [`${start_time}-${end_time}`];
+      console.log(timeSlots);
+      setTimeSlot(timeSlots);
+      console.log(timeSlot);
+    } else {
+      alert("No slots available");
+    }
   };
 
   const form = useForm({
@@ -106,6 +114,17 @@ const Appointments = () => {
       symptoms: [],
     },
   });
+
+  const handleAvailableSlot = async (date) => {
+    const type = "online";
+    const doctor_id = form.values.doctor_id;
+    // console.log(date);
+    const { data } = await axios.post(
+      `/api/appointment/doctor/slots/${type}/${doctor_id}`,
+      date
+    );
+    return data;
+  };
 
   const handleSubmit = async (values) => {
     console.log(values);
@@ -249,7 +268,7 @@ const Appointments = () => {
                   type="submit"
                   // onClick={handleSubmit}
                   disabled={!isDoctorSelected}
-                  style={{ background: "#1b03a3" }}
+                  style={{ background: "#0a0059" }}
                 >
                   Book
                 </Button>
