@@ -69,32 +69,52 @@ function HospitalList({ setLoading }) {
         {filteredHospitals.map((item, index) => {
           return (
             <Grid.Col md={4} sm={12} key={index}>
-              <Card withBorder padding="lg" radius="md">
-                <Group position="apart">
-                  <div className="avatar">
-                    <IconBuildingHospital />
-                  </div>
-                  <Badge color="dark" p={5}>
-                    {item.name}
-                  </Badge>
-                </Group>
-                <Text fz="sm" mt="lg">
-                  Email: {item.contact_details.email_address}
-                </Text>
-                <Text fz="sm" mt={5}>
-                  Phone: {item.contact_details.phone_number}
-                </Text>
-                <Text fz="sm" style={{ textTransform: "capitalize" }}>
-                  Location: {item.address.street}, {item.address.city},{" "}
-                  {item.address.state},{item.address.country},
-                  {item.address.zipCode}
-                </Text>
-                <Button
-                  variant="filled"
-                  onClick={() => deleteHospital(item._id)}
+              <Card
+                withBorder
+                padding="lg"
+                radius="md"
+                style={{ height: "100%" }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    height: "100%",
+                  }}
                 >
-                  Delete
-                </Button>
+                  <div>
+                    <Group position="apart">
+                      <div className="avatar">
+                        <IconBuildingHospital />
+                      </div>
+                      <Badge color="dark" p={5}>
+                        {item.name}
+                      </Badge>
+                    </Group>
+                    <Text fz="sm" mt="lg">
+                      Email: {item.contact_details.email_address}
+                    </Text>
+                    <Text fz="sm" mt={5}>
+                      Phone: {item.contact_details.phone_number}
+                    </Text>
+                    <Text fz="sm" style={{ textTransform: "capitalize" }}>
+                      Location: {item.address.street}, {item.address.city},{" "}
+                      {item.address.state},{item.address.country},
+                      {item.address.zipCode}
+                    </Text>
+                  </div>
+
+                  <div>
+                    <Button
+                      variant="filled"
+                      onClick={() => deleteHospital(item._id)}
+                      mt={60}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
               </Card>
             </Grid.Col>
           );

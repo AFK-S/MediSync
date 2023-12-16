@@ -5,6 +5,7 @@ import {
   DeleteHospital,
   HospitalInfo,
   AllHospitals,
+  NearByHospitals,
 } from "../controller/Hospital.js";
 import { HospitalLogin } from "../controller/Login.js";
 import { RegistrationMail } from "../middleware/Email.js";
@@ -17,5 +18,6 @@ router.put("/hospital/update/:hospital_id", UpdateHospital);
 router.delete("/hospital/delete/:hospital_id", DeleteHospital);
 router.get("/hospital/:hospital_id", HospitalInfo);
 router.get("/hospitals", AllHospitals);
+router.post("/nearby/hospitals", NearByHospitals);
 
 export default router;

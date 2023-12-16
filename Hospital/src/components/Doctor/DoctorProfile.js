@@ -6,6 +6,11 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const Table = ({ data, columns }) => {
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const formattedDate = new Date(date).toLocaleDateString("en-GB", options);
+    return formattedDate;
+  };
   const [log, setLog] = useState([]);
 
   useEffect(() => {
@@ -31,8 +36,11 @@ const Table = ({ data, columns }) => {
         <tbody>
           {log.map((item, index) => (
             <tr key={index}>
+              <td style={{ whiteSpace: "nowrap" }}>{item.type}</td>
               <td style={{ whiteSpace: "nowrap" }}>{item.status}</td>
-              <td style={{ whiteSpace: "nowrap" }}>{item.createdAt}</td>
+              <td style={{ whiteSpace: "nowrap" }}>
+                {formatDate(item.createdAt)}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -128,6 +136,9 @@ const DoctorProfile = () => {
     },
   ]);
 
+  const revenue =
+    doctorDetails && doctorDetails.treated_patient_count * doctorDetails.fees;
+
   return (
     <>
       {doctorDetails && (
@@ -137,14 +148,24 @@ const DoctorProfile = () => {
             <div className="row gy-3">
               <div className="col-md-4">
                 <div className="c-card">
-                  <h4>Appointments</h4>
-                  <h5>30</h5>
+                  <h4>Today's Appointments</h4>
+                  <h3>
+                    {doctorDetails && doctorDetails.today_appointment_count}
+                  </h3>
                 </div>
               </div>
               <div className="col-md-4">
                 <div className="c-card">
-                  <h4>Revenue</h4>
-                  <h5>Rs. 30,000</h5>
+                  <h4>
+                    Revenue{" "}
+                    <span style={{ fontSize: "18px" }}>
+                      {" "}
+                      ({doctorDetails &&
+                        doctorDetails.treated_patient_count}{" "}
+                      patients treated)
+                    </span>
+                  </h4>
+                  <h5>Rs. {revenue}</h5>
                 </div>
               </div>
               <div className="col-md-4">
@@ -161,6 +182,7 @@ const DoctorProfile = () => {
                 <AttendanceCalendar
                   availability={doctorDetails.availability}
                   attendance={doctorDetails.attendance}
+                  today_appointment={doctorDetails.today_appointment}
                 />
               </div>
               <div className="col-md-4">
@@ -169,7 +191,7 @@ const DoctorProfile = () => {
                   <div className="mt-2">
                     <Table
                       data={doctorDetails.log}
-                      columns={["Status", "Time"]}
+                      columns={["Type", "Status", "Time"]}
                     />
                   </div>
                 </div>

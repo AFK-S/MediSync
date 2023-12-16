@@ -7,12 +7,17 @@ const SideNavigation = () => {
     {
       name: "Hospital List",
       path: "/",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-list",
     },
     {
       name: "Register",
       path: "/register",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-hospital-user",
+    },
+    {
+      name: "Map View",
+      path: "/map",
+      icon: "fa-solid fa-map-location-dot",
     },
   ];
 
