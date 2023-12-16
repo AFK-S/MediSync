@@ -13,12 +13,6 @@ export const StateProvider = ({ children }) => {
   const [doctorData, setDoctorData] = useState();
   const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     await AsyncStorage.clear();
-  //   })();
-  // }, []);
-
   useEffect(() => {
     (async () => {
       const _id = await AsyncStorage.getItem("_id");
@@ -38,7 +32,7 @@ export const StateProvider = ({ children }) => {
       password,
       mac_address,
     });
-    console.log(data);
+    // console.log(data);
     await AsyncStorage.setItem("_id", data);
   };
 
@@ -50,7 +44,7 @@ export const StateProvider = ({ children }) => {
         password,
       }
     );
-    console.log(data);
+    // console.log(data);
     await AsyncStorage.setItem("_id", data._id);
     await AsyncStorage.setItem("mac_address", data.mac_address);
   };
@@ -58,11 +52,12 @@ export const StateProvider = ({ children }) => {
   const getProfile = async () => {
     setLoading(true);
     const id = await AsyncStorage.getItem("_id");
+    console.log("Doctor ID:", id);
     try {
       const { data } = await axios.get(
         `${SERVER_URL}/api/dashboard/doctor/${id}`
       );
-
+      // console.log("Data from server:", data);
       // Sort availability by date
       const sortedAvailability = data.availability.sort((a, b) => {
         const dateA = new Date(a.date);
@@ -70,16 +65,29 @@ export const StateProvider = ({ children }) => {
         return dateA - dateB;
       });
 
-      // console.log(sortedAvailability);
-
       setDoctorData({
         ...data,
         availability: sortedAvailability,
       });
     } catch (error) {
-      Alert.alert("Error");
+      console.error("Error fetching profile data:", error);
+      Alert.alert("Cannot get Data");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const markAttended = async (appointment_id) => {
+    try {
+      const { data } = await axios.put(
+        `${SERVER_URL}/api/appointment/mark_as_done/${appointment_id}`
+      );
+
+      // Assuming you have an API endpoint to fetch updated data
+      getProfile();
+    } catch (error) {
+      console.error("Error marking attended:", error);
+      Alert.alert("Cannot mark Attend");
     }
   };
 
@@ -94,6 +102,7 @@ export const StateProvider = ({ children }) => {
         doctorData,
         loading,
         setLoading,
+        markAttended,
       }}
     >
       {children}

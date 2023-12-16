@@ -16,7 +16,7 @@ import StateContext from "../context/StateContext";
 const AppointmentsScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const { doctorData } = useContext(StateContext);
+  const { doctorData, markAttended, getProfile } = useContext(StateContext);
   const navigation = useNavigation();
 
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -156,7 +156,10 @@ const AppointmentsScreen = () => {
           </Text>
         </View>
         <TouchableOpacity
-          onPress={toggleModal}
+          onPress={() => {
+            markAttended(selectedPatient._id);
+            toggleModal();
+          }}
           style={{
             backgroundColor: "#18C37D",
             padding: 14,
@@ -251,13 +254,14 @@ const AppointmentsScreen = () => {
             Upcoming Appointments{" "}
             {`(${upcomingAppointments && upcomingAppointments.length})`}
           </Text>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            contentContainerStyle={{ padding: 10 }}
-          >
-            {upcomingAppointments &&
-              upcomingAppointments.map((patient, index) => (
+
+          {upcomingAppointments && upcomingAppointments.length > 0 ? (
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              contentContainerStyle={{ padding: 10 }}
+            >
+              {upcomingAppointments.map((patient, index) => (
                 <TouchableOpacity
                   activeOpacity={0.9}
                   key={index}
@@ -292,7 +296,24 @@ const AppointmentsScreen = () => {
                   </View>
                 </TouchableOpacity>
               ))}
-          </ScrollView>
+            </ScrollView>
+          ) : (
+            <View
+              style={{
+                ...styles.patientCard,
+                width: "85%",
+                alignSelf: "center",
+                marginTop: 20,
+                paddingVertical: 30,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontSize: 15, fontWeight: "600" }}>
+                No Appointments Today
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
