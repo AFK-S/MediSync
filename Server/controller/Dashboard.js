@@ -153,7 +153,14 @@ const Doctor = async (req, res) => {
         $unwind: "$patient",
       },
     ]);
-    doctor.today_appointment = today_appointment;
+    const sorted_today_appointment = today_appointment.sort((a, b) => {
+      if (a.severity_index !== b.severity_index) {
+        return b.severity_index - a.severity_index;
+      } else {
+        return b.severity_count - a.severity_count;
+      }
+    });
+    doctor.today_appointment = sorted_today_appointment;
     doctor.next_date =
       doctor.availability[0].date.toISOString().split("T")[0] ===
       new Date().toISOString().split("T")[0]
