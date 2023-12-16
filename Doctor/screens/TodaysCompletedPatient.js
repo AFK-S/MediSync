@@ -73,6 +73,7 @@ const TodaysCompletedPatient = () => {
     <TouchableOpacity
       style={styles.markNotAttendedButton}
       onPress={() => {
+        // console.log(id);
         markAttended(id);
       }}
     >
@@ -102,7 +103,7 @@ const TodaysCompletedPatient = () => {
           </Text>
           <Text style={styles.labelText}>Time: {time_slot}</Text>
         </View>
-        {renderMarkNotAttendedButton({ id: item._id })}
+        {renderMarkNotAttendedButton(item._id)}
       </TouchableOpacity>
     );
   };
