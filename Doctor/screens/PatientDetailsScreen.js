@@ -75,14 +75,6 @@ const PatientDetailsScreen = ({ route }) => {
     return `${day}-${month}-${year}`;
   };
 
-  const reports = [
-    {
-      date: "23/10/2002",
-      title: "XYZ Report",
-      link: "https://firebasestorage.googleapis.com/v0/b/medisync-e2ef1.appspot.com/o/SIH%20PARTICIPATION%20CONSENT.pdf?alt=media&token=cc38f51b-5830-4372-8047-40d4af93ed93",
-    },
-  ];
-
   const prescription = [
     {
       date: "23/10/2002",
@@ -118,10 +110,36 @@ const PatientDetailsScreen = ({ route }) => {
   const renderReportsItem = ({ item }) => (
     <View style={styles.previousVisitItem}>
       <View style={{ marginEnd: 20 }}>
-        <Text style={{ ...styles.infoText, fontSize: 12 }}>{item.date}</Text>
-        <Text style={{ ...styles.infoText, marginEnd: 20 }}>{item.title}</Text>
+        <Text style={{ ...styles.infoText, marginEnd: 20 }}>
+          {formataDate(item.createdAt)}
+        </Text>
+
+        {item.disease.length > 0 ? (
+          <Text
+            style={{
+              ...styles.infoText,
+              marginEnd: 20,
+              fontSize: 14,
+              color: "grey",
+            }}
+          >
+            {item.disease.join(", ")}
+          </Text>
+        ) : (
+          <Text
+            style={{
+              ...styles.infoText,
+              marginEnd: 20,
+              fontSize: 14,
+              color: "grey",
+            }}
+          >
+            No disease
+          </Text>
+        )}
       </View>
-      <TouchableOpacity onPress={() => handleLinkPress(item.link)}>
+
+      <TouchableOpacity onPress={() => handleLinkPress(item.url)}>
         <Text
           style={{
             ...styles.infoText,
@@ -129,7 +147,7 @@ const PatientDetailsScreen = ({ route }) => {
             textDecorationLine: "underline",
           }}
         >
-          View Report
+          View
         </Text>
       </TouchableOpacity>
     </View>
@@ -355,7 +373,7 @@ const PatientDetailsScreen = ({ route }) => {
               showsVerticalScrollIndicator={false}
             >
               <FlatList
-                data={reports}
+                data={patientData && patientData.reports}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderReportsItem}
                 showsVerticalScrollIndicator={false}
