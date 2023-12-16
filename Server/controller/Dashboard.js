@@ -1,4 +1,8 @@
 import DoctorSchema from "../models/DoctorSchema.js";
+import AppointmentSchema from "../models/AppointmentSchema.js";
+import AttendanceSchema from "../models/AttendanceSchema.js";
+import LogSchema from "../models/LogSchema.js";
+import PatientSchema from "../models/PatientSchema.js";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
@@ -9,119 +13,97 @@ const Doctor = async (req, res) => {
   tomorrow.setDate(tomorrow.getDate() + 1);
   try {
     const { doctor_id } = req.params;
-    const response = await DoctorSchema.aggregate([
+    const doctor = await DoctorSchema.findById(doctor_id).lean();
+    if (!doctor) return res.status(404).send("Doctor not found");
+    const sorted_availability = doctor.availability.sort(
+      (dateA, dateB) => Number(dateA.date) - Number(dateB.date)
+    );
+    const filter_availability = sorted_availability.filter((item) => {
+      const itemDate = new Date(item.date);
+      return itemDate >= today;
+    });
+    doctor.availability = filter_availability;
+    const attendance = await AttendanceSchema.find({
+      doctor_id: doctor_id,
+    })
+      .sort({ date: -1 })
+      .lean();
+    doctor.attendance = attendance;
+    const log = await LogSchema.find({
+      doctor_id: doctor_id,
+      createdAt: {
+        $gte: today,
+        $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+      },
+    })
+      .sort({ date: -1 })
+      .lean();
+    doctor.log = log;
+    const today_appointment = await AppointmentSchema.aggregate([
       {
         $match: {
-          _id: new ObjectId(doctor_id),
-        },
-      },
-      {
-        $lookup: {
-          from: "attendances",
-          localField: "_id",
-          foreignField: "doctor_id",
-          as: "attendance",
-        },
-      },
-      {
-        $lookup: {
-          from: "logs",
-          localField: "_id",
-          foreignField: "doctor_id",
-          as: "log",
-        },
-      },
-      {
-        $lookup: {
-          from: "appointments",
-          pipeline: [
-            {
-              $match: {
-                doctor_id: new ObjectId(doctor_id),
-                date: {
-                  $gte: today,
-                  $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-                },
-              },
-            },
-            {
-              $lookup: {
-                from: "patients",
-                localField: "patient_id",
-                foreignField: "_id",
-                as: "patient",
-              },
-            },
-            {
-              $unwind: "$patient",
-            },
-          ],
-          as: "today_appointment",
-        },
-      },
-      {
-        $lookup: {
-          from: "appointments",
-          pipeline: [
-            {
-              $match: {
-                doctor_id: new ObjectId(doctor_id),
-                treated: true,
-              },
-            },
-          ],
-          as: "all_appointment",
-        },
-      },
-      {
-        $lookup: {
-          from: "appointments",
-          pipeline: [
-            {
-              $match: {
-                doctor_id: new ObjectId(doctor_id),
-                treated: false,
-                date: {
-                  $gte: tomorrow,
-                },
-              },
-            },
-            {
-              $lookup: {
-                from: "patients",
-                localField: "patient_id",
-                foreignField: "_id",
-                as: "patient",
-              },
-            },
-            {
-              $unwind: "$patient",
-            },
-          ],
-          as: "upcoming_appointment",
+          doctor_id: new ObjectId(doctor_id),
+          date: {
+            $gte: today,
+            $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
         },
       },
       {
         $lookup: {
           from: "patients",
-          localField: "all_appointment.patient_id",
+          localField: "patient_id",
           foreignField: "_id",
-          as: "treated_patient",
+          as: "patient",
         },
       },
       {
-        $addFields: {
-          treated_patient_count: {
-            $size: "$treated_patient",
-          },
-          today_appointment_count: {
-            $size: "$today_appointment",
+        $unwind: "$patient",
+      },
+    ]);
+    doctor.today_appointment = today_appointment;
+    doctor.next_date = doctor.availability[1].date;
+    const next_date = new Date(doctor.availability[1].date);
+    next_date.setHours(0, 0, 0, 0);
+    const next_date_appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          doctor_id: new ObjectId(doctor_id),
+          date: {
+            $gte: next_date,
+            $lte: new Date(next_date.getTime() + 24 * 60 * 60 * 1000),
           },
         },
       },
+      {
+        $lookup: {
+          from: "patients",
+          localField: "patient_id",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: "$patient",
+      },
     ]);
-    if (response.length == 0) return res.status(404).send("Doctor not found");
-    res.status(200).json(response[0]);
+    doctor.next_date_appointment = next_date_appointment;
+    const treated_patient_ids = await AppointmentSchema.find({
+      doctor_id: doctor_id,
+      treated: true,
+    })
+      .distinct("patient_id")
+      .lean();
+    const treated_patient = await PatientSchema.find({
+      _id: {
+        $in: treated_patient_ids,
+      },
+    }).lean();
+    doctor.treated_patient = treated_patient;
+    doctor.today_appointment_count = today_appointment.length;
+    doctor.next_date_appointment_count = next_date_appointment.length;
+    doctor.treated_patient_count = treated_patient.length;
+    res.status(200).json(doctor);
   } catch (err) {
     console.error(err);
     res.status(400).send(err.message);
