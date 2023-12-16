@@ -199,7 +199,7 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="container-fluid c-card my-4">
+      {/* <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Past Visit to Doctor</h4>
         <Table
           data={doctors && doctors}
@@ -212,8 +212,8 @@ const Home = () => {
             "",
           ]}
         />
-      </div>
-      <div className="alert-section c-card">
+      </div> */}
+      <div className="alert-section my-4 c-card">
         <h4 className="mb-3">Alerts</h4>
         <div className="alert-container">
           {alerts.map((alert, index) => (

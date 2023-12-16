@@ -218,39 +218,31 @@ const Profile = () => {
                 <form onSubmit={form.onSubmit((values) => console.log(values))}>
                   <Grid>
                     <Grid.Col span={12}>
-                      <div className="d-flex flex-wrap">
-                        <MultiSelect
-                          label="Select Past Medical Conditions"
-                          placeholder="Past Medical Conditions"
-                          // mt="md"
-                          onChange={(value) => {
-                            form.setValues({
-                              ...form.values,
-                              pastMedicalCondition: value,
-                            });
-                          }}
-                          // {...form.getInputProps("pastMedicalCondition")}
-                          // value={form.values.pastMedicalCondition}
-                          // data={[
-                          //   { value: "Hospital 1", label: "Hospital 1" },
-                          //   { value: "Hospital 2", label: "Hospital 2" },
-                          //   { value: "Hospital 3", label: "Hospital 3" },
-                          // ]}
-                          data={[
-                            "Asthma",
-                            "Cancer",
-                            "Diabetes",
-                            "Heart Disease",
-                            "Hypertension",
-                            "Kidney Disease",
-                            "Liver Disease",
-                            "Stroke",
-                            "Thyroid Disease",
-                          ]}
-                          searchable
-                          nothingFoundMessage="Nothing found..."
-                        />
-                      </div>
+                      <MultiSelect
+                        pt={30}
+                        label="Select Past Medical Conditions"
+                        placeholder="Past Medical Conditions"
+                        // mt="md"
+                        onChange={(value) => {
+                          form.setValues({
+                            ...form.values,
+                            pastMedicalCondition: value,
+                          });
+                        }}
+                        data={[
+                          "Asthma",
+                          "Cancer",
+                          "Diabetes",
+                          "Heart Disease",
+                          "Hypertension",
+                          "Kidney Disease",
+                          "Liver Disease",
+                          "Stroke",
+                          "Thyroid Disease",
+                        ]}
+                        searchable
+                        nothingFoundMessage="Nothing found..."
+                      />
                     </Grid.Col>
                   </Grid>
                   <Grid>
@@ -258,16 +250,13 @@ const Profile = () => {
                       <Group>
                         <FileInput
                           rightSection={icon}
-                          style={{ width: "180px", color: "black" }}
+                          style={{ width: "100%", color: "black" }}
                           onChange={(files) => handleImageUpload(files)}
                           label="Upload Related Document"
                           placeholder="Upload your file"
                           description="You can upload your documents here."
                         />
-                        <Button
-                          type="submit"
-                          style={{ background: "#1b03a3", marginTop: "75px" }}
-                        >
+                        <Button type="submit" style={{ background: "#1b03a3" }}>
                           Upload
                         </Button>
                       </Group>
@@ -280,7 +269,7 @@ const Profile = () => {
                         <div>
                           <img
                             src={imagePreview}
-                            alt="Preview"
+                            // alt="Preview"
                             style={{
                               width: "100%",
                               height: "auto",
