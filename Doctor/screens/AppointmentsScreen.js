@@ -251,13 +251,14 @@ const AppointmentsScreen = () => {
             Upcoming Appointments{" "}
             {`(${upcomingAppointments && upcomingAppointments.length})`}
           </Text>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            contentContainerStyle={{ padding: 10 }}
-          >
-            {upcomingAppointments &&
-              upcomingAppointments.map((patient, index) => (
+
+          {upcomingAppointments && upcomingAppointments.length > 0 ? (
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              contentContainerStyle={{ padding: 10 }}
+            >
+              {upcomingAppointments.map((patient, index) => (
                 <TouchableOpacity
                   activeOpacity={0.9}
                   key={index}
@@ -292,7 +293,22 @@ const AppointmentsScreen = () => {
                   </View>
                 </TouchableOpacity>
               ))}
-          </ScrollView>
+            </ScrollView>
+          ) : (
+            <View
+              style={{
+                ...styles.patientCard,
+                marginTop: 20,
+                paddingVertical: 20,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontSize: 15, fontWeight: "600" }}>
+                No Appointments Today
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
