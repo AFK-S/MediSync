@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Platform,
   ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -50,39 +51,47 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.innerContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Username or Email"
-          value={login.username}
-          onChangeText={(text) =>
-            setLogin({ ...login, username: text.toLowerCase() })
-          }
-          required
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={login.password}
-          onChangeText={(text) => setLogin({ ...login, password: text })}
-          required
-          secureTextEntry={true}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-          {loading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={styles.btnText}>Login</Text>
-          )}
-        </TouchableOpacity>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.outerContainer}
+    >
+      <View style={styles.innerContainer}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Login</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Username or Email"
+            value={login.username}
+            onChangeText={(text) =>
+              setLogin({ ...login, username: text.toLowerCase() })
+            }
+            required
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={login.password}
+            onChangeText={(text) => setLogin({ ...login, password: text })}
+            required
+            secureTextEntry={true}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.btnText}>Login</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+  },
   innerContainer: {
     flex: 1,
     justifyContent: "center",
@@ -90,7 +99,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: "#fff",
-    padding: 40,
+    padding: Platform.OS === "android" ? 20 : 40,
     marginBottom: 80,
     borderRadius: 30,
   },
