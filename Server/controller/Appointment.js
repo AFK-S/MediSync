@@ -226,9 +226,9 @@ const DoctorAvailableSlots = async (req, res) => {
 const MarkAsDone = async (req, res) => {
   try {
     const { appointment_id } = req.params;
-    await AppointmentSchema.findByIdAndUpdate(appointment_id, {
-      treated: true,
-    });
+    const appointment = await AppointmentSchema.findById(appointment_id);
+    if (!appointment) return res.status(400).send("Appointment not found");
+    appointment.treated = !treated;
     res.status(200).send("Appointment successfully marked");
   } catch (err) {
     console.error(err);

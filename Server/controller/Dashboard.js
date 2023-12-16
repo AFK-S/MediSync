@@ -114,4 +114,90 @@ const Doctor = async (req, res) => {
   }
 };
 
-export { Doctor };
+const Patient = async (req, res) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  try {
+    const { patient_id } = req.params;
+    const patient = await PatientSchema.findById(patient_id).lean();
+    if (!patient) return res.status(404).send("Patient not found");
+    const upcoming_appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          patient_id: new ObjectId(patient_id),
+          date: {
+            $gte: today,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "doctors",
+          localField: "doctor_id",
+          foreignField: "_id",
+          as: "doctor",
+        },
+      },
+      {
+        $unwind: "$doctor",
+      },
+      {
+        $lookup: {
+          from: "hospitals",
+          localField: "hospital_id",
+          foreignField: "_id",
+          as: "hospital",
+        },
+      },
+      {
+        $unwind: "$hospital",
+      },
+    ]).project({
+      "doctor.availability": 0,
+    });
+    patient.upcoming_appointment = upcoming_appointment;
+    const past_visit = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          patient_id: new ObjectId(patient_id),
+          treated: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "doctors",
+          localField: "doctor_id",
+          foreignField: "_id",
+          as: "doctor",
+        },
+      },
+      {
+        $unwind: "$doctor",
+      },
+      {
+        $lookup: {
+          from: "hospitals",
+          localField: "hospital_id",
+          foreignField: "_id",
+          as: "hospital",
+        },
+      },
+      {
+        $unwind: "$hospital",
+      },
+    ]).project({
+      "doctor.availability": 0,
+    });
+    patient.past_visit = past_visit;
+    patient.upcoming_appointment_count = upcoming_appointment.length;
+    patient.past_visit_count = past_visit.length;
+    res.status(200).json(patient);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+export { Doctor, Patient };
