@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Select, NumberInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import axios from "axios";
 import symptomsData from "./symptoms.json";
-
+import { useDispatch, useSelector } from "react-redux";
 import {
   PillsInput,
   Pill,
@@ -30,6 +30,7 @@ const Appointments = () => {
   const [timeSlot, setTimeSlot] = useState([]);
 
   const [cookies] = useCookies(["token"]);
+  const BookFormData = useSelector((state) => state.app.formData);
 
   useEffect(() => {
     const fetchHospitals = async () => {
@@ -37,6 +38,7 @@ const Appointments = () => {
       setHospitals(data);
       console.log(data);
     };
+    console.log(BookFormData);
     fetchHospitals();
   }, []);
 
@@ -116,8 +118,8 @@ const Appointments = () => {
 
   const form = useForm({
     initialValues: {
-      hospital: "",
-      hospital_id: "",
+      hospital: "DMCE Hospital" || "",
+      hospital_id: "jdkhfkjhfjkshjjshjfhkdshjf" || "",
       specialization: "",
       doctor: "",
       doctor_id: "",

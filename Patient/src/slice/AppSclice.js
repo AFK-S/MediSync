@@ -5,6 +5,7 @@ const AppSlice = createSlice({
   initialState: {
     loading: false,
     appData: [],
+    formData: {},
   },
   reducers: {
     setLoading: (state, action) => {
@@ -13,8 +14,11 @@ const AppSlice = createSlice({
     setData: (state, action) => {
       state.appData = action.payload;
     },
+    setFormData: (state, action) => {
+      state.formData = action.payload;
+    },
   },
 });
 
-export const { setLoading, setData } = AppSlice.actions;
+export const { setLoading, setData, setFormData } = AppSlice.actions;
 export default AppSlice.reducer;

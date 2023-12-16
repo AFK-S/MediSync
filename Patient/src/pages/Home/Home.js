@@ -50,22 +50,22 @@ const AppointmentCard = ({ value, index }) => {
         <div className="p-0">
           <p className="card-text mt-2">
             <span className="fw-600">Date: </span>
-            {value.date}
+            {value.date.split("T")[0].split("-").reverse().join("x-")}
           </p>
           <p className="card-text mt-1">
             {" "}
             <span className="fw-600">Doctor: </span>
-            {value.doctorname}
+            {value.doctor.name}
           </p>
           <p className="card-text mt-1">
             {" "}
             <span className="fw-600">Hospital: </span>
-            {value.hospitalname}
+            {value.hospital.name}
           </p>
           <p className="card-text mt-1">
             {" "}
             <span className="fw-600">Time: </span>
-            {value.timeslot}
+            {value.time_slot}
           </p>
           <Accordion
             sx={{
@@ -87,21 +87,21 @@ const AppointmentCard = ({ value, index }) => {
 
               <Accordion.Panel>
                 <span className="fw-600">Contact: </span>
-                {value.contact}
+                {value.hospital.contact_details.phone_number}
               </Accordion.Panel>
               <Accordion.Panel>
-                <span className="fw-600">Experience: </span>
-                {value.experience}
+                <span className="fw-600"> Doctor's Experience: </span>
+                {value.doctor.experience} years
               </Accordion.Panel>
               <Accordion.Panel>
                 <span className="fw-600">Address: </span>
-                {value.address}
+                {value.hospital.address.street}. {value.hospital.address.city},{" "}
+                {value.hospital.address.state}, {value.hospital.address.country}{" "}
+                - {value.hospital.address.zipCode}
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>
-          <button className="mt-md-4 mt-3 reschedule-btn card-text">
-            Reschedule
-          </button>
+          <button className="mt-md-4 mt-3 cancel-btn card-text">Cancel</button>
         </div>
       </div>
     </Grid.Col>
@@ -113,6 +113,7 @@ const Home = () => {
   const appointmentUpcoming = useSelector(
     (state) => state.app.appData.upcoming_appointment
   );
+  console.log(appointmentUpcoming);
 
   const [doctors, setDoctors] = useState([
     {

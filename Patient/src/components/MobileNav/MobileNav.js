@@ -47,7 +47,7 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
   return (
     <div className={`mobileNav ${isMenuOpen ? "active" : ""}`}>
       <div
-        className="close-btn  d-flex align-items-center justify-content-center"
+        className="close-btn nav-close-btn d-flex align-items-center justify-content-center"
         onClick={ToggleMenu}
         style={{
           width: "40px",
@@ -56,7 +56,6 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
           right: "1.8rem",
           top: "1.8rem",
           cursor: "pointer",
-          background: "#1b03a3",
           color: "#fff",
           borderRadius: "10px",
         }}

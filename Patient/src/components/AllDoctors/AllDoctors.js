@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   Grid,
   Card,
@@ -9,54 +9,27 @@ import {
   TextInput,
   Button,
 } from "@mantine/core";
-// import { IconDoctor } from "@tabler/icons-react";
+import { useDispatch } from "react-redux";
+import { setFormData } from "../../slice/AppSclice.js";
 import doctorIcon from "../../assets/doctor.png";
-
-const Table = ({ data, columns }) => {
-  return (
-    <div
-      className="inner-container"
-      style={{ overflowY: "auto", maxHeight: "300px" }}
-    >
-      <table className="table table-hover text-no-wrap table-borderless">
-        <thead>
-          <tr>
-            {columns.map((col, index) => (
-              <th key={index} scope="col" className="text-no-wrap">
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data &&
-            data.map((item, index) => (
-              <tr
-                key={index}
-                style={{
-                  whiteSpace: "nowrap",
-                  backgroundColor: "#fff",
-                  borderRadius: "20px",
-                  padding: "1rem",
-                  border: 0,
-                  marginBottom: "1rem",
-                }}
-              >
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex}>{item[col.toLowerCase()]}</td>
-                ))}
-                <td>
-                  <NavLink to={`profile/${item.id}`}>View More</NavLink>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+import axios from "axios";
 
 const DoctorCard = ({ doctor }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleBooked = () => {
+    dispatch(
+      setFormData({
+        doctor: doctor.name,
+        hospital: doctor.hospital,
+        specialization: doctor.specialization,
+        experience: doctor.experience,
+      })
+    );
+    navigate("/appointments");
+  };
+
   return (
     <Grid.Col span={{ xs: 6, sm: 6, lg: 4 }}>
       <Card withBorder padding="lg" radius="md">
@@ -78,7 +51,7 @@ const DoctorCard = ({ doctor }) => {
           </Badge>
         </div>
         <Text style={{ color: "black" }} fz="md" mt="lg">
-          Speciality: {doctor.speciality}
+          Speciality: {doctor.specialization}
         </Text>
         <Text style={{ color: "black" }} fz="md" mt={5}>
           Experience: {doctor.experience}
@@ -104,6 +77,7 @@ const DoctorCard = ({ doctor }) => {
             border: "none",
             outline: "none",
           }}
+          onClick={handleBooked}
         >
           Book
         </button>
@@ -114,26 +88,20 @@ const DoctorCard = ({ doctor }) => {
 
 const AllDoctors = () => {
   const [searchInput, setSearchInput] = useState("");
-  const [doctors, setDoctors] = useState([
-    {
-      name: "Karandeep Singh",
-      speciality: "ABC",
-      hospital: "Airoli",
-      experience: "20+",
-    },
-    {
-      name: "Karandeep",
-      speciality: "ABC",
-      hospital: "Airoli",
-      experience: "20+",
-    },
-    {
-      name: "Karandeep",
-      speciality: "ABC",
-      hospital: "Airoli",
-      experience: "20+",
-    },
-  ]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const { data } = await axios.get("/api/doctors");
+        setDoctors(data);
+        console.log(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchDoctors();
+  }, []);
+  const [doctors, setDoctors] = useState([]);
 
   const [hospitals, setHospitals] = useState([
     // Updated hospitals data
@@ -284,8 +252,8 @@ const AllDoctors = () => {
             <div>
               <h4>Search Results</h4>
               <Grid>
-                {filteredData.map((doctor) => (
-                  <DoctorCard doctor={doctor} />
+                {doctors.map((doctor, index) => (
+                  <DoctorCard doctor={doctor} key={index} />
                 ))}
               </Grid>
             </div>
