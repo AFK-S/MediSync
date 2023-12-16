@@ -52,10 +52,8 @@ const AppointmentTabs = () => {
         component={TomorrowsPatient}
         options={{
           tabBarLabel:
-            doctorData &&
-            doctorData.availability.length > 1 &&
-            doctorData.availability[1].date
-              ? formatDate(doctorData.availability[1].date)
+            doctorData && doctorData.next_date
+              ? formatDate(doctorData.next_date)
               : "None",
         }}
       />

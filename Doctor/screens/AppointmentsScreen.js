@@ -299,7 +299,7 @@ const AppointmentsScreen = () => {
               style={{
                 ...styles.patientCard,
                 marginTop: 20,
-                paddingVertical: 20,
+                paddingVertical: 30,
                 justifyContent: "center",
                 alignItems: "center",
               }}
