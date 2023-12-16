@@ -12,9 +12,12 @@ import Appointments from "./Appointment/Appointments.js";
 import Profile from "./Profile/Profile.js";
 import Search from "./Search/Search.js";
 import { useCookies } from "react-cookie";
+import { setData } from "../slice/AppSclice.js";
+import { useSelector } from "react-redux";
+
 const MainLayout = () => {
   const navigate = useNavigate();
-  const [cookies] = useCookies(["_id"]);
+  const [cookies] = useCookies();
 
   useEffect(() => {
     console.log(cookies);
@@ -23,6 +26,23 @@ const MainLayout = () => {
       navigate("/login");
     }
   }, [cookies]);
+
+  useEffect(() => {
+    const fetchPatientInfo = async () => {
+      try {
+        const response = await axios.get(
+          `/api/dashboard/patient/${cookies._id}`
+        );
+        dispatch(setData(response.data));
+
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchPatientInfo();
+  }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

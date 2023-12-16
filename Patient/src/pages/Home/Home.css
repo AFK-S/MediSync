@@ -1,9 +1,10 @@
-.reschedule-btn {
+.cancel-btn {
   background-color: var(--main-color);
   color: var(--text-color);
   padding: 5px 10px;
   border-radius: 10px;
   margin-bottom: 0;
+  border: none;
 }
 
 .upcoming-appointments-container {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,22 +11,29 @@ import {
 } from "react-native";
 import { Linking } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import StateContext from "../context/StateContext";
 
 const PatientDetailsScreen = ({ route }) => {
   const { patient } = route.params;
-  // console.log(patient);
   const [selectedImage, setSelectedImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const { getPatientInfo, patientData } = useContext(StateContext);
+
+  const id = (patient.patient && patient.patient._id) || patient._id;
 
   const handleUpload = () => {
     setUploading(true);
     setTimeout(() => {
       setUploading(false);
       setModalVisible(false);
-      // Add any additional logic you need after a successful upload.
     }, 2000);
   };
+  useEffect(() => {
+    console.log(id);
+
+    getPatientInfo(id);
+  }, []);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -60,36 +67,13 @@ const PatientDetailsScreen = ({ route }) => {
     );
   };
 
-  const prevVisits = [
-    {
-      date: "23/10/2023",
-      description:
-        "JNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjn",
-    },
-    {
-      date: "23/10/2023",
-      description:
-        "JNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjn",
-    },
-    {
-      date: "23/10/2023",
-      description:
-        "JNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjn",
-    },
-    {
-      date: "23/10/2023",
-      description:
-        "JNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjnJNjnciskjn",
-    },
-  ];
-
-  const reports = [
-    {
-      date: "23/10/2002",
-      title: "XYZ Report",
-      link: "https://firebasestorage.googleapis.com/v0/b/medisync-e2ef1.appspot.com/o/SIH%20PARTICIPATION%20CONSENT.pdf?alt=media&token=cc38f51b-5830-4372-8047-40d4af93ed93",
-    },
-  ];
+  const formataDate = (dateString) => {
+    const dateObject = new Date(dateString);
+    const day = dateObject.getDate().toString().padStart(2, "0");
+    const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
+    const year = dateObject.getFullYear().toString();
+    return `${day}-${month}-${year}`;
+  };
 
   const prescription = [
     {
@@ -100,8 +84,16 @@ const PatientDetailsScreen = ({ route }) => {
 
   const renderPreviousVisitItem = ({ item }) => (
     <View style={styles.previousVisitItem}>
-      <Text style={{ ...styles.infoText, marginEnd: 20 }}>{item.date}</Text>
-      <Text style={styles.infoText}>{item.description}</Text>
+      <Text style={{ ...styles.infoText, marginEnd: 20 }}>
+        {formataDate(item.date)}
+      </Text>
+      <Text
+        style={{ ...styles.infoText, width: "60%" }}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {item.doctor.name}
+      </Text>
     </View>
   );
 
@@ -118,10 +110,36 @@ const PatientDetailsScreen = ({ route }) => {
   const renderReportsItem = ({ item }) => (
     <View style={styles.previousVisitItem}>
       <View style={{ marginEnd: 20 }}>
-        <Text style={{ ...styles.infoText, fontSize: 12 }}>{item.date}</Text>
-        <Text style={{ ...styles.infoText, marginEnd: 20 }}>{item.title}</Text>
+        <Text style={{ ...styles.infoText, marginEnd: 20 }}>
+          {formataDate(item.createdAt)}
+        </Text>
+
+        {item.disease.length > 0 ? (
+          <Text
+            style={{
+              ...styles.infoText,
+              marginEnd: 20,
+              fontSize: 14,
+              color: "grey",
+            }}
+          >
+            {item.disease.join(", ")}
+          </Text>
+        ) : (
+          <Text
+            style={{
+              ...styles.infoText,
+              marginEnd: 20,
+              fontSize: 14,
+              color: "grey",
+            }}
+          >
+            No disease
+          </Text>
+        )}
       </View>
-      <TouchableOpacity onPress={() => handleLinkPress(item.link)}>
+
+      <TouchableOpacity onPress={() => handleLinkPress(item.url)}>
         <Text
           style={{
             ...styles.infoText,
@@ -129,7 +147,7 @@ const PatientDetailsScreen = ({ route }) => {
             textDecorationLine: "underline",
           }}
         >
-          View Report
+          View
         </Text>
       </TouchableOpacity>
     </View>
@@ -179,7 +197,7 @@ const PatientDetailsScreen = ({ route }) => {
               fontWeight: "700",
             }}
           >
-            {patient.name || patient.patient.name}
+            {patientData && patientData.name}
           </Text>
         </View>
         <View
@@ -192,14 +210,14 @@ const PatientDetailsScreen = ({ route }) => {
           }}
         >
           <Text style={styles.infoText}>
-            Age: {patient.age || patient.patient.age}
+            Age: {patientData && patientData.age} years
           </Text>
           <Text style={styles.infoText}>
-            Phone Number: {patient.phone_number || patient.patient.phone_number}
+            Phone Number: {patientData && patientData.phone_number}
           </Text>
-          {patient.medical_history && patient.medical_history.length > 0 ? (
+          {patientData && patientData.disease.length > 0 ? (
             <Text style={styles.infoText}>
-              Medical History: {patient.medical_history.join(", ")}
+              Medical History: {patientData.disease.join(", ")}
             </Text>
           ) : (
             <Text style={styles.infoText}>Medical History: None</Text>
@@ -241,7 +259,7 @@ const PatientDetailsScreen = ({ route }) => {
           >
             <View style={{ ...styles.previousVisitItem, marginBottom: 10 }}>
               <Text style={styles.titleText}>Date</Text>
-              <Text style={styles.titleText}>Description</Text>
+              <Text style={styles.titleText}>Treated By</Text>
             </View>
 
             <ScrollView
@@ -249,7 +267,7 @@ const PatientDetailsScreen = ({ route }) => {
               showsVerticalScrollIndicator={false}
             >
               <FlatList
-                data={prevVisits}
+                data={patientData && patientData.past_visit}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderPreviousVisitItem}
                 showsVerticalScrollIndicator={false}
@@ -355,7 +373,7 @@ const PatientDetailsScreen = ({ route }) => {
               showsVerticalScrollIndicator={false}
             >
               <FlatList
-                data={reports}
+                data={patientData && patientData.reports}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderReportsItem}
                 showsVerticalScrollIndicator={false}

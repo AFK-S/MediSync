@@ -190,6 +190,18 @@ const HospitalSpecializedDoctors = async (req, res) => {
       hospital_id,
       specialization,
     }).lean();
+    for (let doctor of doctors) {
+      const today = new Date();
+      const sorted_availability = doctor.availability.sort(
+        (dateA, dateB) => Number(dateA.date) - Number(dateB.date)
+      );
+      doctor.availability = sorted_availability;
+      const filter_availability = doctor.availability.filter((item) => {
+        const itemDate = new Date(item.date);
+        return itemDate >= today;
+      });
+      doctor.availability = filter_availability;
+    }
     res.status(200).json(doctors);
   } catch (err) {
     console.error(err);

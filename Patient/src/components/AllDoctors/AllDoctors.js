@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   Grid,
   Card,
@@ -9,54 +9,27 @@ import {
   TextInput,
   Button,
 } from "@mantine/core";
-// import { IconDoctor } from "@tabler/icons-react";
+import { useDispatch } from "react-redux";
+import { setFormData } from "../../slice/AppSclice.js";
 import doctorIcon from "../../assets/doctor.png";
-
-const Table = ({ data, columns }) => {
-  return (
-    <div
-      className="inner-container"
-      style={{ overflowY: "auto", maxHeight: "300px" }}
-    >
-      <table className="table table-hover text-no-wrap table-borderless">
-        <thead>
-          <tr>
-            {columns.map((col, index) => (
-              <th key={index} scope="col" className="text-no-wrap">
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data &&
-            data.map((item, index) => (
-              <tr
-                key={index}
-                style={{
-                  whiteSpace: "nowrap",
-                  backgroundColor: "#fff",
-                  borderRadius: "20px",
-                  padding: "1rem",
-                  border: 0,
-                  marginBottom: "1rem",
-                }}
-              >
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex}>{item[col.toLowerCase()]}</td>
-                ))}
-                <td>
-                  <NavLink to={`profile/${item.id}`}>View More</NavLink>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+import axios from "axios";
 
 const DoctorCard = ({ doctor }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleBooked = () => {
+    dispatch(
+      setFormData({
+        doctor: doctor.name,
+        hospital: doctor.hospital,
+        specialization: doctor.specialization,
+        experience: doctor.experience,
+      })
+    );
+    navigate("/appointments");
+  };
+
   return (
     <Grid.Col span={{ xs: 6, sm: 6, lg: 4 }}>
       <Card withBorder padding="lg" radius="md">
@@ -78,7 +51,7 @@ const DoctorCard = ({ doctor }) => {
           </Badge>
         </div>
         <Text style={{ color: "black" }} fz="md" mt="lg">
-          Speciality: {doctor.speciality}
+          Speciality: {doctor.specialization}
         </Text>
         <Text style={{ color: "black" }} fz="md" mt={5}>
           Experience: {doctor.experience}
@@ -90,7 +63,7 @@ const DoctorCard = ({ doctor }) => {
             color: "black",
           }}
         >
-          Hospital: {doctor.hospital}
+          Hospital: {doctor.hospital.name}
         </Text>
         <button
           style={{
@@ -104,6 +77,7 @@ const DoctorCard = ({ doctor }) => {
             border: "none",
             outline: "none",
           }}
+          onClick={handleBooked}
         >
           Book
         </button>
@@ -114,26 +88,65 @@ const DoctorCard = ({ doctor }) => {
 
 const AllDoctors = () => {
   const [searchInput, setSearchInput] = useState("");
-  const [doctors, setDoctors] = useState([
-    {
-      name: "Karandeep Singh",
-      speciality: "ABC",
-      hospital: "Airoli",
-      experience: "20+",
-    },
-    {
-      name: "Karandeep",
-      speciality: "ABC",
-      hospital: "Airoli",
-      experience: "20+",
-    },
-    {
-      name: "Karandeep",
-      speciality: "ABC",
-      hospital: "Airoli",
-      experience: "20+",
-    },
-  ]);
+  const [location, setLocation] = useState({});
+  const [locationPermissionGranted, setLocationPermissionGranted] =
+    useState(false);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const { data } = await axios.get("/api/doctors");
+        setDoctors(data);
+        console.log(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
+  useEffect(() => {
+    // Function to get the user's location
+    const getLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error.message);
+        }
+      );
+    };
+
+    // Ask for location permission and get the location
+    const askForLocationPermission = () => {
+      navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        if (result.state === "granted") {
+          setLocationPermissionGranted(true);
+
+          getLocation();
+        } else if (result.state === "prompt") {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              console.log("Latitude:", position.coords.latitude);
+              console.log("Longitude:", position.coords.longitude);
+            },
+            (error) => {
+              console.error("Error getting location:", error.message);
+              setLocationPermissionGranted(false);
+            }
+          );
+        }
+      });
+    };
+
+    askForLocationPermission();
+  }, []);
+
+  const [doctors, setDoctors] = useState([]);
 
   const [hospitals, setHospitals] = useState([
     // Updated hospitals data
@@ -234,6 +247,10 @@ const AllDoctors = () => {
     },
   ]);
 
+  const filteredDoctors = doctors.filter((doctor) =>
+    doctor.name.toLowerCase().includes(searchInput.toLowerCase())
+  );
+
   const handleInputChange = (e) => {
     setSearchInput(e.target.value);
   };
@@ -258,38 +275,54 @@ const AllDoctors = () => {
 
       <div className="container-fluid">
         <div className="mt-4">
-          {searchInput.trim() === "" ? (
-            <div className="hospital-list">
-              <h4>Nearby Hospitals</h4>
-              <Grid className="mt-3">
-                {hospitals.map((hospitals, index) => (
-                  <Grid.Col span={12} key={index}>
-                    <div className="c-card">
-                      <h5>{hospitals.name}</h5>
+          {!locationPermissionGranted && searchInput.trim() === "" && (
+            <p>Please Grant Location Permission for Nearby Hospitals</p>
+          )}
 
-                      <Grid mt={15}>
-                        {hospitals.doctors.map((doctor, index) => (
-                          <DoctorCard
-                            doctor={doctor.doctor_details}
-                            key={index}
-                          />
-                        ))}
-                      </Grid>
-                    </div>
-                  </Grid.Col>
-                ))}
-              </Grid>
-            </div>
-          ) : (
+          {locationPermissionGranted &&
+            searchInput.trim() === "" &&
+            hospitals.length > 0 && (
+              <div className="hospital-list">
+                <h4>Nearby Hospitals</h4>
+                <Grid className="mt-3">
+                  {hospitals.map((hospital, index) => (
+                    <Grid.Col span={12} key={index}>
+                      <div className="c-card">
+                        <h5>{hospital.name}</h5>
+
+                        <Grid mt={15}>
+                          {hospital.doctors.map((doctor, index) => (
+                            <DoctorCard
+                              doctor={doctor.doctor_details}
+                              key={index}
+                            />
+                          ))}
+                        </Grid>
+                      </div>
+                    </Grid.Col>
+                  ))}
+                </Grid>
+              </div>
+            )}
+
+          {searchInput.trim() !== "" && (
             <div>
               <h4>Search Results</h4>
-              <Grid>
-                {filteredData.map((doctor) => (
-                  <DoctorCard doctor={doctor} />
-                ))}
-              </Grid>
+              {filteredDoctors.length > 0 ? (
+                <Grid>
+                  {filteredDoctors.map((doctor, index) => (
+                    <DoctorCard doctor={doctor} key={index} />
+                  ))}
+                </Grid>
+              ) : (
+                <p>No matching doctors found</p>
+              )}
             </div>
           )}
+
+          {locationPermissionGranted &&
+            searchInput.trim() === "" &&
+            hospitals.length === 0 && <p>No Nearby Hospitals found</p>}
         </div>
       </div>
     </div>

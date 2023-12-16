@@ -3,6 +3,8 @@ import AppointmentSchema from "../models/AppointmentSchema.js";
 import AttendanceSchema from "../models/AttendanceSchema.js";
 import LogSchema from "../models/LogSchema.js";
 import PatientSchema from "../models/PatientSchema.js";
+import HospitalSchema from "../models/HospitalSchema.js";
+import ReportSchema from "../models/ReportSchema.js";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
@@ -23,6 +25,8 @@ const Doctor = async (req, res) => {
       return itemDate >= today;
     });
     doctor.availability = filter_availability;
+    const hospital = await HospitalSchema.findById(doctor.hospital_id).lean();
+    doctor.hospital = hospital;
     const attendance = await AttendanceSchema.find({
       doctor_id: doctor_id,
     })
@@ -90,7 +94,7 @@ const Doctor = async (req, res) => {
       {
         $unwind: "$patient",
       },
-    ]);
+    ]).sort({ date: 1 });
     doctor.next_date_appointment = next_date_appointment;
     const treated_patient_ids = await AppointmentSchema.find({
       doctor_id: doctor_id,
@@ -102,7 +106,9 @@ const Doctor = async (req, res) => {
       _id: {
         $in: treated_patient_ids,
       },
-    }).lean();
+    })
+      .sort({ updatedAt: -1 })
+      .lean();
     doctor.treated_patient = treated_patient;
     doctor.today_appointment_count = today_appointment.length;
     doctor.next_date_appointment_count = next_date_appointment.length;
@@ -157,7 +163,12 @@ const Patient = async (req, res) => {
     ]).project({
       "doctor.availability": 0,
     });
-    patient.upcoming_appointment = upcoming_appointment;
+    const sorted_upcoming_appointment = upcoming_appointment.sort(
+      (dateA, dateB) => Number(dateA.date) - Number(dateB.date)
+    );
+    const sorted_upcoming_appointment_reverse =
+      sorted_upcoming_appointment.reverse();
+    patient.upcoming_appointment = sorted_upcoming_appointment_reverse;
     const past_visit = await AppointmentSchema.aggregate([
       {
         $match: {
@@ -190,7 +201,16 @@ const Patient = async (req, res) => {
     ]).project({
       "doctor.availability": 0,
     });
-    patient.past_visit = past_visit;
+    const sorted_past_visit = past_visit.sort(
+      (dateA, dateB) => Number(dateA.date) - Number(dateB.date)
+    );
+    const sorted_past_visit_reverse = sorted_past_visit.reverse();
+    patient.past_visit = sorted_past_visit_reverse;
+    const reports = await ReportSchema.find({
+      patient_id: patient_id,
+    }).lean();
+    patient.disease = reports.flatMap((report) => report.disease);
+    patient.reports = reports;
     patient.upcoming_appointment_count = upcoming_appointment.length;
     patient.past_visit_count = past_visit.length;
     res.status(200).json(patient);
