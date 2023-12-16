@@ -1,5 +1,6 @@
 import ShortUniqueId from "short-unique-id";
 import HospitalSchema from "../models/HospitalSchema.js";
+import geolib from "geolib";
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
 
@@ -109,4 +110,48 @@ const AllHospitals = async (req, res) => {
   }
 };
 
-export { Register, UpdateDetails, DeleteHospital, HospitalInfo, AllHospitals };
+const NearByHospitals = async (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;
+    const hospitals = await HospitalSchema.find().lean();
+    const closest_hospital_ids = hospitals
+      .map((hospital) => {
+        const distance = geolib.getDistance(
+          { latitude, longitude },
+          hospital.coordinates
+        );
+        if (distance <= 5 * 1000) return hospital._id;
+      })
+      .sort((a, b) => a.distance - b.distance);
+    const nearby_hospitals = await HospitalSchema.aggregate([
+      {
+        $match: {
+          _id: {
+            $in: closest_hospital_ids,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "doctors",
+          localField: "_id",
+          foreignField: "hospital_id",
+          as: "doctors",
+        },
+      },
+    ]);
+    res.status(200).json(nearby_hospitals);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+export {
+  Register,
+  UpdateDetails,
+  DeleteHospital,
+  HospitalInfo,
+  AllHospitals,
+  NearByHospitals,
+};
