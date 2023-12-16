@@ -223,6 +223,19 @@ const DoctorAvailableSlots = async (req, res) => {
   }
 };
 
+const MarkAsDone = async (req, res) => {
+  try {
+    const { appointment_id } = req.params;
+    await AppointmentSchema.findByIdAndUpdate(appointment_id, {
+      treated: true,
+    });
+    res.status(200).send("Appointment successfully marked");
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   Register,
   UpdateDetails,
@@ -233,4 +246,5 @@ export {
   TodayDoctorAppointment,
   AllDoctorAppointment,
   DoctorAvailableSlots,
+  MarkAsDone,
 };
