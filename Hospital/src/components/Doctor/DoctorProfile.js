@@ -139,6 +139,12 @@ const DoctorProfile = () => {
   const revenue =
     doctorDetails && doctorDetails.treated_patient_count * doctorDetails.fees;
 
+  const formatTime = (date) => {
+    const options = { hour: "2-digit", minute: "2-digit" };
+    const formattedTime = new Date(date).toLocaleTimeString("en-GB", options);
+    return formattedTime;
+  };
+
   return (
     <>
       {doctorDetails && (
@@ -189,10 +195,45 @@ const DoctorProfile = () => {
                 <div className="c-card">
                   <h4>Logs</h4>
                   <div className="mt-2">
-                    <Table
-                      data={doctorDetails.log}
-                      columns={["Type", "Status", "Time"]}
-                    />
+                    {doctorDetails.log && doctorDetails.log.length > 0 ? (
+                      <div
+                        className="inner-container"
+                        style={{ overflowY: "auto", maxHeight: "40vh" }}
+                      >
+                        <table className="table table-hover text-no-wrap">
+                          <thead>
+                            <tr>
+                              <th scope="col" className="text-no-wrap">
+                                Type
+                              </th>
+                              <th scope="col" className="text-no-wrap">
+                                Status
+                              </th>
+                              <th scope="col" className="text-no-wrap">
+                                Time
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {doctorDetails.log.map((item, index) => (
+                              <tr key={index}>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {item.type}
+                                </td>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {item.status}
+                                </td>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {formatTime(item.createdAt)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p>No logs available.</p>
+                    )}
                   </div>
                 </div>
               </div>
