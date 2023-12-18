@@ -14,6 +14,7 @@ import { VerifyConnectedDevices } from "./controller/TpLink.js";
 import { WIFIRegister } from "./controller/Log.js";
 import DashboardRoute from "./routes/DashboardRoute.js";
 import ReportRoute from "./routes/ReportRoute.js";
+import { AllocateAppointmentSlot } from "./controller/Appointment.js";
 
 const app = express();
 dotenv.config();
@@ -62,6 +63,8 @@ app.get("/", (req, res) => {
 
 const interval = 1 * 60 * 1000;
 let result = [];
+
+// AllocateAppointmentSlot("65804330a0d8f9a9b7f8d779");
 
 app.listen(8000, async () => {
   console.log("Server listening on port 8000");
