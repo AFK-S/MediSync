@@ -136,6 +136,19 @@ const NearByHospitals = async (req, res) => {
           from: "doctors",
           localField: "_id",
           foreignField: "hospital_id",
+          pipeline: [
+            {
+              $lookup: {
+                from: "hospitals",
+                localField: "doctors.hospital_id",
+                foreignField: "_id",
+                as: "hospital",
+              },
+            },
+            {
+              $unwind: "$hospital",
+            },
+          ],
           as: "doctors",
         },
       },
