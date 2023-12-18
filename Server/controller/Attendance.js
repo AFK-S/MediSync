@@ -13,9 +13,8 @@ const Register = async (req, res) => {
         $gte: new Date(new Date().setHours(0, 0, 0)),
         $lt: new Date(new Date().setHours(23, 59, 59)),
       },
-      checkOut: { $exists: false },
     });
-    if (response) {
+    if (!response.checkOut) {
       response.checkOut = new Date();
       await response.save();
       await LogSchema.create({
@@ -25,17 +24,21 @@ const Register = async (req, res) => {
       });
       return res.status(200).send(response._id);
     }
-    const attendance = await AttendanceSchema.create({
-      doctor_id: doctor._id,
-      date: new Date(),
-      checkIn: new Date(),
-    });
-    await LogSchema.create({
-      doctor_id: doctor._id,
-      type: "RFID",
-      status: "Check In",
-    });
-    res.status(200).send(attendance._id);
+    if (!response) {
+      const attendance = await AttendanceSchema.create({
+        doctor_id: doctor._id,
+        date: new Date(),
+        checkIn: new Date(),
+      });
+      await LogSchema.create({
+        doctor_id: doctor._id,
+        type: "RFID",
+        status: "Check In",
+      });
+      return res.status(200).send(attendance._id);
+    }
+
+    res.status(200).send("Doctor already checked in and out");
   } catch (err) {
     console.error(err);
     res.status(400).send(err.message);
