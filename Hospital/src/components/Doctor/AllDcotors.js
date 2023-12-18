@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { StateContext } from "../../context/StateContext";
 
@@ -8,19 +8,19 @@ const Table = ({ data, columns }) => {
       className="inner-container"
       style={{ overflowY: "auto", maxHeight: "300px" }}
     >
-      <table className="table table-hover text-no-wrap table-borderless">
-        <thead>
-          <tr>
-            {columns.map((col, index) => (
-              <th key={index} scope="col" className="text-no-wrap">
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data &&
-            data.map((item, index) => (
+      {data.length > 0 ? (
+        <table className="table table-hover text-no-wrap table-borderless">
+          <thead>
+            <tr>
+              {columns.map((col, index) => (
+                <th key={index} scope="col" className="text-no-wrap">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
               <tr
                 key={index}
                 style={{
@@ -41,14 +41,22 @@ const Table = ({ data, columns }) => {
                 </td>
               </tr>
             ))}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      ) : (
+        <p>No Results Found</p>
+      )}
     </div>
   );
 };
 
-const AllDcotors = () => {
+const AllDoctors = () => {
   const { doctorsList } = useContext(StateContext);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredDoctors = doctorsList.filter((doctor) =>
+    doctor.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div>
@@ -63,12 +71,14 @@ const AllDcotors = () => {
             type="text"
             style={{ width: "100%", outline: "none", border: "none" }}
             placeholder="Search Doctor Name or Licence Number"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
       <div className="mt-4">
         <Table
-          data={doctorsList}
+          data={filteredDoctors}
           columns={["Name", "Age", "Specialization", "Experience", ""]}
         />
       </div>
@@ -76,4 +86,4 @@ const AllDcotors = () => {
   );
 };
 
-export default AllDcotors;
+export default AllDoctors;
