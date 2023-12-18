@@ -67,10 +67,10 @@ app.listen(8000, async () => {
   console.log("Server listening on port 8000");
 
   // setInterval(async () => {
-  //   const { mac_address_list, remove_list } = await VerifyConnectedDevices(
-  //     result
-  //   );
-  //   if (remove_list.length > 0) await WIFIRegister(remove_list);
+  //   const { mac_address_list, remove_list, new_list } =
+  //     await VerifyConnectedDevices(result);
+  //   if (remove_list.length > 0) await WIFIRegister(remove_list, "Disconnected");
+  //   if (new_list.length > 0) await WIFIRegister(new_list, "Connected");
   //   result = mac_address_list;
   // }, interval);
 });

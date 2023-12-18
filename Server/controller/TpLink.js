@@ -129,6 +129,7 @@ const VerifyConnectedDevices = async (result) => {
     return {
       mac_address_list,
       remove_list,
+      new_list,
     };
   } catch (err) {
     console.error(err);
