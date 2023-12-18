@@ -74,7 +74,7 @@ const Register = () => {
       setSelected((current) =>
         current.filter((d) => !dayjs(d).isSame(formattedDate, "date"))
       );
-    } else if (selected.length < 7) {
+    } else if (selected.length < 31) {
       setSelected((current) => [...current, formattedDate]);
     }
   };
