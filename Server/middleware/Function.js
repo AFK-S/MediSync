@@ -10,4 +10,12 @@ const calculateTotalMinutes = (startTime, endTime) => {
   return endTimeInMinutes - startTimeInMinutes;
 };
 
-export { calculateTotalMinutes };
+const addMinutes = (time, minute) => {
+  var [hours, mins] = time.split(":").map(Number);
+  var totalMinutes = hours * 60 + mins + minute;
+  hours = Math.floor(totalMinutes / 60) % 24;
+  mins = totalMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+};
+
+export { calculateTotalMinutes, addMinutes };
