@@ -65,15 +65,17 @@ const interval = 1 * 60 * 1000;
 let result = [];
 
 // AllocateAppointmentSlot("65804330a0d8f9a9b7f8d779");
+async function startServer() {
+  try {
+    app.listen(8000, () => {
+      console.log("Server listening on port 8000");
+    });
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+  }
+}
 
-app.listen(8000, async () => {
-  console.log("Server listening on port 8000");
-
-  // setInterval(async () => {
-  //   const { mac_address_list, remove_list, new_list } =
-  //     await VerifyConnectedDevices(result);
-  //   if (remove_list.length > 0) await WIFIRegister(remove_list, "Disconnected");
-  //   if (new_list.length > 0) await WIFIRegister(new_list, "Connected");
-  //   result = mac_address_list;
-  // }, interval);
+// Call the async function to start the server
+startServer().catch((error) => {
+  console.error("Error starting the server:", error);
 });
