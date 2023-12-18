@@ -34,6 +34,7 @@ const MainLayout = () => {
         const { data } = await axios.get(`/api/doctor/hospital/${cookies._id}`);
         setDoctorsList(data);
       } catch (error) {
+        alert("Failed to fetch data");
         console.error("Failed to fetch data: ", error);
       }
       setLoading(false);

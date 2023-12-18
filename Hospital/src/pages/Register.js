@@ -74,7 +74,7 @@ const Register = () => {
       setSelected((current) =>
         current.filter((d) => !dayjs(d).isSame(formattedDate, "date"))
       );
-    } else if (selected.length < 7) {
+    } else if (selected.length < 31) {
       setSelected((current) => [...current, formattedDate]);
     }
   };
@@ -135,21 +135,14 @@ const Register = () => {
   };
 
   const specializationOptions = [
-    { label: "Dermatologist", value: "dermatologist" },
-    { label: "Gastroenterologist", value: "gastroenterologist" },
-    { label: "Hepatologist", value: "hepatologist" },
-    { label: "Osteopathic", value: "osteopathic" },
-    { label: "Endocrinologist", value: "endocrinologist" },
-    { label: "Pulmonologist", value: "pulmonologist" },
-    { label: "Neurologist", value: "neurologist" },
-    { label: "Pediatrician", value: "pediatrician" },
-    { label: "Cardiologist", value: "cardiologist" },
-    { label: "Phlebologist", value: "phlebologist" },
-    { label: "Osteoarthristis", value: "osteoarthristis" },
-    { label: "Rheumatologists", value: "rheumatologists" },
-    { label: "Otolaryngologist", value: "otolaryngologist" },
-    { label: "Gynecologist", value: "gynecologist" },
     { label: "General", value: "general" },
+    { label: "ENT", value: "ent" },
+    { label: "Gynecologist", value: "gynecologist" },
+    { label: "Pediatrician", value: "pediatrician" },
+    { label: "Dental", value: "dental" },
+    { label: "Dermatologist", value: "dermatologist" },
+    { label: "Orthologist", value: "orthologist" },
+    { label: "Ophthalmologist", value: "ophthalmologist" },
   ];
 
   return (

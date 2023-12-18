@@ -18,7 +18,7 @@ const Register = async (req, res) => {
       .lean();
     const disease_list = reports.flatMap((report) => report.disease);
     const { data } = await axios.post(
-      "http://192.168.0.105:5000/api/patient/severity_index",
+      "http://192.168.0.108:5000/api/patient/severity_index",
       {
         age: patient.age,
         symptoms,
