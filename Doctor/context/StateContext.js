@@ -16,6 +16,8 @@ export const StateProvider = ({ children }) => {
 
   useEffect(() => {
     (async () => {
+      // await AsyncStorage.clear();
+      // Alert.alert("Cleared");
       const _id = await AsyncStorage.getItem("_id");
       const mac_address = await AsyncStorage.getItem("mac_address");
 

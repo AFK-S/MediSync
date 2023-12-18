@@ -48,7 +48,7 @@ const Table = ({ data, columns }) => {
 const AllPatients = () => {
   const [doctors, setDoctors] = useState([
     {
-      id: 1,
+      id: "657c32c9560f1eb5906adab0",
       name: "Karandeep",
       speciality: "ABC",
       age: 30,
