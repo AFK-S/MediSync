@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import axios from "axios";
 const { ObjectId } = mongoose.Types;
 
-const Register = async (req, res) => {
+const OnlineRegister = async (req, res) => {
   try {
     const { hospital_id, doctor_id, patient_id, date, time_slot, symptoms } =
       req.body;
@@ -30,6 +30,62 @@ const Register = async (req, res) => {
       doctor_id,
       patient_id,
       type: "online",
+      symptoms,
+      severity_index: data.severity_index,
+      severity_count: data.severity_count,
+      date: date,
+      time_slot,
+    });
+    res.status(200).send(appointment._id);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+const WalkInRegister = async (req, res) => {
+  try {
+    const {
+      hospital_id,
+      doctor_id,
+      phone_number,
+      name,
+      age,
+      gender,
+      date,
+      time_slot,
+      symptoms,
+    } = req.body;
+    let patient = await PatientSchema.findOne({
+      phone_number,
+    })
+      .select("age")
+      .lean();
+    if (!patient) {
+      patient = await PatientSchema.create({
+        phone_number,
+        name,
+        age,
+        gender,
+      });
+    }
+    const reports = await ReportSchema.find({ patient_id: patient._id })
+      .select("disease")
+      .lean();
+    const disease_list = reports.flatMap((report) => report.disease);
+    const { data } = await axios.post(
+      "http://192.168.0.108:5000/api/patient/severity_index",
+      {
+        age: patient.age,
+        symptoms,
+        past_disease: disease_list,
+      }
+    );
+    const appointment = await AppointmentSchema.create({
+      hospital_id,
+      doctor_id,
+      patient_id: patient._id,
+      type: "walk_in",
       symptoms,
       severity_index: data.severity_index,
       severity_count: data.severity_count,
@@ -258,7 +314,8 @@ const MarkAsDone = async (req, res) => {
 };
 
 export {
-  Register,
+  OnlineRegister,
+  WalkInRegister,
   UpdateDetails,
   DeleteAppointment,
   AppointmentInfo,

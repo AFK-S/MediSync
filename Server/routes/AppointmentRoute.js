@@ -1,6 +1,7 @@
 import express from "express";
 import {
-  Register as AppointmentRegister,
+  OnlineRegister as AppointmentOnlineRegister,
+  WalkInRegister as AppointmentWalkInRegister,
   UpdateDetails as UpdateAppointment,
   DeleteAppointment,
   AppointmentInfo,
@@ -14,7 +15,8 @@ import {
 
 const router = express.Router();
 
-router.post("/appointment/register", AppointmentRegister);
+router.post("/appointment/online/register", AppointmentOnlineRegister);
+router.post("/appointment/walk_in/register", AppointmentWalkInRegister);
 router.put("/appointment/update/:appointment_id", UpdateAppointment);
 router.delete("/appointment/delete/:appointment_id", DeleteAppointment);
 router.get("/appointment/:appointment_id", AppointmentInfo);

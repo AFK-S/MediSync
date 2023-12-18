@@ -39,8 +39,8 @@ const Register = async (req, res) => {
       const password = randomUUID();
       const totalMinutes = calculateTotalMinutes(start_time, end_time);
       const totalCount = totalMinutes / parseInt(average_time);
-      const online = Math.round(totalCount * 0.7);
-      const walk_in = totalCount - online;
+      const online = Math.round(totalCount * 0.5);
+      const walk_in = Math.round(totalCount * 0.5);
       const doctor = await DoctorSchema.create({
         hospital_id,
         rfid_tag,
