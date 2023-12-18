@@ -1,6 +1,8 @@
 import ShortUniqueId from "short-unique-id";
 import DoctorSchema from "../models/DoctorSchema.js";
+import HospitalSchema from "../models/HospitalSchema.js";
 import bucket from "../firebase.js";
+import { AllocateAppointmentSlot } from "./Appointment.js";
 import { calculateTotalMinutes } from "../middleware/Function.js";
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
@@ -221,6 +223,18 @@ const HospitalSpecializedDoctors = async (req, res) => {
   }
 };
 
+const AllocateDoctorSlot = async () => {
+  const hospitals = await HospitalSchema.find().lean();
+  for (let hospital of hospitals) {
+    const doctors = await DoctorSchema.find({
+      hospital_id: hospital._id,
+    }).lean();
+    for (let doctor of doctors) {
+      await AllocateAppointmentSlot(doctor._id);
+    }
+  }
+};
+
 export {
   Register,
   UpdateDetails,
@@ -231,4 +245,5 @@ export {
   AllDoctors,
   HospitalSpecialization,
   HospitalSpecializedDoctors,
+  AllocateDoctorSlot,
 };

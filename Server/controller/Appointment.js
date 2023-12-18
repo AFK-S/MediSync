@@ -53,6 +53,8 @@ const WalkInRegister = async (req, res) => {
       name,
       age,
       gender,
+      Drinking_Smoking,
+      lifestyle,
       date,
       time_slot,
       symptoms,
@@ -68,6 +70,8 @@ const WalkInRegister = async (req, res) => {
         name,
         age,
         gender,
+        Drinking_Smoking,
+        lifestyle 
       });
     }
     const reports = await ReportSchema.find({ patient_id: patient._id })
@@ -106,7 +110,7 @@ const UpdateDetails = async (req, res) => {
     const data = req.body;
     const appointment = await AppointmentSchema.findById(appointment_id);
     if (!appointment) {
-      return res.status(400).send("Patient not found");
+      return res.status(400).send("Appointment not found");
     }
     for (const [key, value] of Object.entries(data)) {
       if (appointment[key] && typeof appointment[key] !== "object") {
@@ -287,8 +291,7 @@ const DoctorAvailableSlots = async (req, res) => {
           slot_booked: {
             $size: "$appointment",
           },
-          "slot_count.online": 1,
-          "slot_count.walk_in": 1,
+          slot_count: `$slot_count.${type}`,
         },
       },
     ]);
