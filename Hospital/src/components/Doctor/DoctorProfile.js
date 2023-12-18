@@ -276,7 +276,7 @@ const DoctorProfile = () => {
                       <td style={{ whiteSpace: "nowrap" }}>{item.name}</td>
                       <td style={{ whiteSpace: "nowrap" }}>{item.age}</td>
                       <NavLink
-                        to={`/patients/${item._id}`}
+                        to={`/patients/profile/${item._id}`}
                         style={{
                           padding: 0,
                           height: "100%",
