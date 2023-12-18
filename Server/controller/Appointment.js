@@ -2,6 +2,7 @@ import AppointmentSchema from "../models/AppointmentSchema.js";
 import DoctorSchema from "../models/DoctorSchema.js";
 import ReportSchema from "../models/ReportSchema.js";
 import PatientSchema from "../models/PatientSchema.js";
+import { addMinutes, minusMinutes } from "../middleware/Function.js";
 import mongoose from "mongoose";
 import axios from "axios";
 const { ObjectId } = mongoose.Types;
@@ -313,6 +314,44 @@ const MarkAsDone = async (req, res) => {
   }
 };
 
+const AllocateAppointmentSlot = async (doctor_id) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dayAfterTomorrow = new Date(today);
+  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+  const doctor = await DoctorSchema.findById(doctor_id);
+  let tomorrow_slot = doctor.availability.filter((item) => {
+    const itemDate = new Date(item.date);
+    return (
+      itemDate.getTime() >= tomorrow.getTime() &&
+      itemDate.getTime() < dayAfterTomorrow.getTime()
+    );
+  });
+  tomorrow_slot = tomorrow_slot[0] ? tomorrow_slot[0] : null;
+  if (tomorrow_slot == null) return;
+  const tomorrow_date = new Date(tomorrow_slot.date);
+  tomorrow_date.setHours(0, 0, 0, 0);
+  const tomorrow_appointment = await AppointmentSchema.find({
+    doctor_id: new ObjectId(doctor_id),
+    date: {
+      $gte: tomorrow_date,
+      $lte: new Date(tomorrow_date.getTime() + 24 * 60 * 60 * 1000),
+    },
+    treated: false,
+  });
+  let tomorrow_time = minusMinutes(
+    tomorrow_slot.start_time,
+    doctor.average_time
+  );
+  for (const object of tomorrow_appointment) {
+    object.alloted_time = addMinutes(tomorrow_time, doctor.average_time);
+    tomorrow_time = object.alloted_time;
+  }
+  await Promise.all(tomorrow_appointment.map((item) => item.save()));
+};
+
 export {
   OnlineRegister,
   WalkInRegister,
@@ -325,4 +364,5 @@ export {
   AllDoctorAppointment,
   DoctorAvailableSlots,
   MarkAsDone,
+  AllocateAppointmentSlot,
 };

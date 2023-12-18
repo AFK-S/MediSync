@@ -5,7 +5,6 @@ import LogSchema from "../models/LogSchema.js";
 import PatientSchema from "../models/PatientSchema.js";
 import HospitalSchema from "../models/HospitalSchema.js";
 import ReportSchema from "../models/ReportSchema.js";
-import { addMinutes } from "../middleware/Function.js";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
@@ -43,6 +42,19 @@ const Hospital = async (req, res) => {
     }).lean();
     hospital.doctor_available = today_doctor_available;
     hospital.doctor_available_count = today_doctor_available.length;
+    const treated_patient_ids = await AppointmentSchema.find({
+      hospital_id: new ObjectId(hospital_id),
+      treated: true,
+    })
+      .distinct("patient_id")
+      .lean();
+    const treated_patient = await PatientSchema.find({
+      _id: {
+        $in: treated_patient_ids,
+      },
+    }).lean();
+    hospital.treated_patient = treated_patient;
+    hospital.treated_patient_count = treated_patient.length;
     const today_non_treated_patient = await AppointmentSchema.aggregate([
       {
         $match: {
@@ -113,13 +125,6 @@ const Doctor = async (req, res) => {
       const itemDate = new Date(item.date);
       return itemDate >= today;
     });
-    let today_time = filter_availability.map((item) => {
-      const itemDate = new Date(item.date);
-      console.log(itemDate, today, tomorrow);
-      if (itemDate >= today && itemDate < tomorrow) {
-        return item;
-      }
-    });
     doctor.availability = filter_availability;
     const hospital = await HospitalSchema.findById(doctor.hospital_id).lean();
     doctor.hospital = hospital;
@@ -139,7 +144,7 @@ const Doctor = async (req, res) => {
       .sort({ date: -1 })
       .lean();
     doctor.log = log;
-    const today_appointment = await AppointmentSchema.aggregate([
+    const today_online_appointment = await AppointmentSchema.aggregate([
       {
         $match: {
           doctor_id: new ObjectId(doctor_id),
@@ -147,6 +152,7 @@ const Doctor = async (req, res) => {
             $gte: today,
             $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
           },
+          type: "online",
         },
       },
       {
@@ -161,19 +167,42 @@ const Doctor = async (req, res) => {
         $unwind: "$patient",
       },
     ]);
-    const sorted_today_appointment = today_appointment.sort((a, b) => {
-      if (a.severity_index !== b.severity_index) {
-        return b.severity_index - a.severity_index;
-      } else {
-        return b.severity_count - a.severity_count;
+    const sorted_today_online_appointment = today_online_appointment.sort(
+      (a, b) => {
+        if (a.severity_index !== b.severity_index) {
+          return b.severity_index - a.severity_index;
+        } else {
+          return b.severity_count - a.severity_count;
+        }
       }
-    });
-    console.log(today_time);
-    for (const object of sorted_today_appointment) {
-      object.alloted_time = addMinutes(today_time, doctor.average_time);
-      today_time = object.alloted_time;
-    }
-    doctor.today_appointment = sorted_today_appointment;
+    );
+    const today_walk_in_appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          doctor_id: new ObjectId(doctor_id),
+          date: {
+            $gte: today,
+            $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+          type: "walk_in",
+        },
+      },
+      {
+        $lookup: {
+          from: "patients",
+          localField: "patient_id",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: "$patient",
+      },
+    ]).sort({ createdAt: 1 });
+    doctor.today_appointment = [
+      ...sorted_today_online_appointment,
+      ...today_walk_in_appointment,
+    ];
     doctor.next_date =
       doctor.availability[0].date.toISOString().split("T")[0] ===
       new Date().toISOString().split("T")[0]
@@ -218,7 +247,9 @@ const Doctor = async (req, res) => {
       .sort({ updatedAt: -1 })
       .lean();
     doctor.treated_patient = treated_patient;
-    doctor.today_appointment_count = today_appointment.length;
+    doctor.today_online_appointment_count =
+      sorted_today_online_appointment.length;
+    doctor.today_walk_in_appointment_count = today_walk_in_appointment.length;
     doctor.next_date_appointment_count = next_date_appointment.length;
     doctor.treated_patient_count = treated_patient.length;
     res.status(200).json(doctor);
