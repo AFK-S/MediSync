@@ -14,11 +14,13 @@ import { useCookies } from "react-cookie";
 
 const MainLayout = () => {
   const [cookies] = useCookies();
-  const { isLogin, setDoctorsList, setLoading } = useContext(StateContext);
+  const { isLogin, setDoctorsList, setLoading, getHospital } =
+    useContext(StateContext);
   const Navigate = useNavigate();
 
   useEffect(() => {
     if (!isLogin) Navigate("/login");
+    getHospital(cookies._id);
   }, [isLogin]);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,6 +36,7 @@ const MainLayout = () => {
         const { data } = await axios.get(`/api/doctor/hospital/${cookies._id}`);
         setDoctorsList(data);
       } catch (error) {
+        alert("Failed to fetch data");
         console.error("Failed to fetch data: ", error);
       }
       setLoading(false);

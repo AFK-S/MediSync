@@ -18,7 +18,7 @@ const CCTVRegister = async (req, res) => {
   }
 };
 
-const WIFIRegister = async (mac_addresses) => {
+const WIFIRegister = async (mac_addresses, status) => {
   try {
     for (let i = 0; i < mac_addresses.length; i++) {
       const doctor = await DoctorSchema.findOne({
@@ -28,7 +28,7 @@ const WIFIRegister = async (mac_addresses) => {
       await LogSchema.create({
         doctor_id: doctor._id,
         type: "Wifi Network",
-        status: "Disconnected",
+        status: status,
       });
     }
   } catch (err) {

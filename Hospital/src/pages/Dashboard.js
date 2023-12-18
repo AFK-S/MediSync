@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Divider, Group, Text } from "@mantine/core";
 import Chart from "react-apexcharts";
+import { StateContext } from "../context/StateContext";
 
 const Table = ({ data, columns }) => {
   return (
@@ -36,6 +37,8 @@ const Table = ({ data, columns }) => {
 };
 
 const Dashboard = () => {
+  const { hospitalData } = useContext(StateContext);
+
   const [doctors, setDoctors] = useState([
     {
       name: "Karandeep Singh Sandhu",
@@ -173,12 +176,20 @@ const Dashboard = () => {
   ]);
 
   const bedsChartData = {
-    series: [40, 60],
+    series: [
+      hospitalData.today_non_treated_patient_count !== undefined
+        ? hospitalData.today_non_treated_patient_count
+        : 10,
+      hospitalData.today_treated_patient_count !== undefined
+        ? hospitalData.today_treated_patient_count
+        : 90,
+    ],
+
     options: {
       chart: {
         type: "donut",
       },
-      labels: ["Male", "Female"],
+      labels: ["Non Treated", "Treated"],
       colors: ["#228be6", "#9ebed8"],
       responsive: [
         {
@@ -204,22 +215,28 @@ const Dashboard = () => {
               <div className="row mt-3">
                 <div className="col-6 text-capitalize">
                   <p className="fw-600 ">Appointments Booked</p>
-                  <h1 className="mt-2">90</h1>
+                  <h1 className="mt-2">
+                    {hospitalData &&
+                      hospitalData.today_non_treated_patient_count +
+                        hospitalData.today_treated_patient_count}
+                  </h1>
                 </div>
                 <div className="col-6 text-capitalize">
                   <p className="fw-600 ">Appointments Completed</p>
-                  <h1 className="mt-2">21</h1>
+                  <h1 className="mt-2">
+                    {hospitalData && hospitalData.today_treated_patient_count}
+                  </h1>
                 </div>
               </div>
-              <div className=" text-capitalize d-flex align-items-center mt-3 fw-600">
+              {/* <div className=" text-capitalize d-flex align-items-center mt-3 fw-600">
                 <h5 className=" ">Doctors Available : </h5>
                 <h5 className="ms-3">21</h5>
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="col-md-4 ">
             <div className="c-card">
-              <h4>Beds Available</h4>
+              <h4> Appointment Stats</h4>
               <Chart
                 className="mt-3"
                 options={bedsChartData.options}
@@ -233,7 +250,7 @@ const Dashboard = () => {
             <div className="c-card">
               <h4>Doctors Available today</h4>
               <h1 className="text-center mt-2" style={{ fontSize: "1200%" }}>
-                30
+                {hospitalData && hospitalData.doctor_available_count}
               </h1>
             </div>
           </div>
@@ -243,7 +260,7 @@ const Dashboard = () => {
       {/* Available Doctors */}
       <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Doctors Available</h4>
-        <Table
+        {/* <Table
           data={doctors && doctors}
           columns={[
             "Name",
@@ -253,7 +270,7 @@ const Dashboard = () => {
             "Date",
             "TimeSlot",
           ]}
-        />
+        /> */}
       </div>
 
       {/* Waiting Patients */}

@@ -61,25 +61,6 @@ const Profile = () => {
   const [cookies] = useCookies();
   const patient = useSelector((state) => state.app.appData);
 
-  // const [patient, setPatient] = useState(null);
-
-  // useEffect(() => {
-  //   const fetchPatientInfo = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `/api/dashboard/patient/${cookies._id}`
-  //       );
-  //       setPatient(response.data);
-
-  //       console.log(response.data.past_visit);
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   fetchPatientInfo();
-  // }, []);
-
   const [pdfPreview, setPdfPreview] = useState([]);
 
   const handleImageUpload = (file) => {
@@ -100,6 +81,7 @@ const Profile = () => {
       formData.append("type", "patient");
       const response = await axios.post("/api/report/register", formData);
       console.log(response);
+      alert("Medical History Submitted successfully");
       form.reset();
     } catch (error) {
       console.error(error);

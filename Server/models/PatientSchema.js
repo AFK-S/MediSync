@@ -27,6 +27,11 @@ const PatientSchema = new Schema(
       unique: true,
       required: [true, "Please add a Phone Number"],
     },
+    gender: {
+      type: String,
+      enum: ["male", "female", "others"],
+      required: [true, "Please add the Gender"],
+    },
   },
   { timestamps: true }
 );

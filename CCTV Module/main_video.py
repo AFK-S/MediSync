@@ -6,7 +6,7 @@ import requests
 import os
 
 result = []
-photos_url = "http://192.168.0.107:8000/api/photos"
+photos_url = "http://192.168.0.110:8000/api/photos"
 
 response = requests.get(photos_url)
 if response.status_code == 200:
@@ -16,7 +16,7 @@ else:
     print("Server is down")
 
 
-cap1 = cv2.VideoCapture(0)
+cap1 = cv2.VideoCapture(1)
 sfr1 = SimpleFacerec()
 
 # cap2 = cv2.VideoCapture(1)
@@ -67,13 +67,13 @@ while True:
         if face_distance < threshold_distance:
             doctor_detected = True
 
-    if doctor_detected and (datetime.now() - last_response_time).total_seconds() >= 10:
+    if doctor_detected and (datetime.now() - last_response_time).total_seconds() >= 20:
         current_time = datetime.now().strftime("%H:%M:%S")
         log_message = f"{name} found in Cam1 - Time {current_time}"
         print(log_message)
 
         response = requests.post(
-            "http://192.168.0.107:8000/api/log/cctv/register", data={
+            "http://192.168.0.110:8000/api/log/cctv/register", data={
                 "photo_url": url,
                 "status": "CAM1",
             })
