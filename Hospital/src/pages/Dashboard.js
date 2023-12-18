@@ -179,10 +179,10 @@ const Dashboard = () => {
     series: [
       hospitalData.today_non_treated_patient_count !== undefined
         ? hospitalData.today_non_treated_patient_count
-        : 0,
+        : 10,
       hospitalData.today_treated_patient_count !== undefined
         ? hospitalData.today_treated_patient_count
-        : 0,
+        : 90,
     ],
 
     options: {
