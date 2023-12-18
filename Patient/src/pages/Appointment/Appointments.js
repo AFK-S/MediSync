@@ -142,11 +142,14 @@ const Appointments = () => {
   };
 
   const handleSubmit = async (values) => {
-    console.log(values);
+    // console.log(values);
     values.patient_id = cookies._id;
     try {
-      console.log(values);
-      const { data } = await axios.post("/api/appointment/register", values);
+      // console.log(values);
+      const { data } = await axios.post(
+        "/api/appointment/online/register",
+        values
+      );
       console.log(data);
       alert("Appointment booked successfully");
     } catch (error) {
@@ -168,6 +171,29 @@ const Appointments = () => {
             <div className="container-fluid p-0 mt-3">
               <div className="row">
                 <div className="col-md-6">
+                  <div className=" d-flex justify-content-between align-items-between g-4">
+                    <MultiSelect
+                      style={{ width: "75%" }}
+                      label="Enter Symptoms"
+                      placeholder="Pick Symptoms"
+                      onChange={(value) => {
+                        form.setValues({ symptoms: value });
+                      }}
+                      value={form.values.symptoms}
+                      data={Object.entries(symptomsData).map(
+                        ([label, value]) => ({
+                          value: value,
+                          label: label,
+                        })
+                      )}
+                      // disabled={!isOnlineSlotsAvailable || !isDateSelected}
+                      searchable
+                      nothingFoundMessage="Nothing found..."
+                    />
+                  </div>
+                </div>
+
+                <div className="col-md-6">
                   <Select
                     label="Select Hospital"
                     placeholder="Select Hospital"
@@ -185,6 +211,7 @@ const Appointments = () => {
                   <Select
                     label="Select Specialization"
                     placeholder="Select Specialization"
+                    mt="md"
                     {...form.getInputProps("specialization")}
                     data={fetchedSpecializations.map((specialization) => ({
                       value: specialization,
@@ -259,26 +286,6 @@ const Appointments = () => {
                     value={form.values.time_slot}
                   />
                 </div>
-                <div className="col-md-6">
-                  <MultiSelect
-                    label="Enter Symptoms"
-                    placeholder="Pick Symptoms"
-                    mt="md"
-                    onChange={(value) => {
-                      form.setValues({ symptoms: value });
-                    }}
-                    value={form.values.symptoms}
-                    data={Object.entries(symptomsData).map(
-                      ([label, value]) => ({
-                        value: value,
-                        label: label,
-                      })
-                    )}
-                    disabled={!isOnlineSlotsAvailable || !isDateSelected}
-                    searchable
-                    nothingFoundMessage="Nothing found..."
-                  />
-                </div>
               </div>
               <Group align="center" justify="space-between" mt="xl">
                 <Group>
@@ -289,6 +296,14 @@ const Appointments = () => {
                     Offline Slots Available: {offlineSlotsAvailable}
                   </Text>
                 </Group>
+                <Button
+                  mt={23}
+                  style={{ background: "#0a0059" }}
+                  className="book-btn"
+                >
+                  Recommend
+                </Button>
+
                 <Button
                   className="book-btn"
                   type="submit"
