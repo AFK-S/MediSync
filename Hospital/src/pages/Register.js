@@ -1,14 +1,5 @@
 import React, { useState, useRef } from "react";
-import {
-  Button,
-  TextInput,
-  Select,
-  ActionIcon,
-  rem,
-  Text,
-  FileInput,
-  Group,
-} from "@mantine/core";
+import { Button, TextInput, Select, ActionIcon, rem } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Calendar } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -16,6 +7,8 @@ import { TimeInput } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { useDispatch } from "react-redux";
+import { setLoading } from "../slice/AppSclice";
 
 const Register = () => {
   const [cookies] = useCookies();
@@ -37,18 +30,15 @@ const Register = () => {
       average_time: "",
     },
   });
+  const dispatch = useDispatch();
 
   const refStart = useRef(null);
   const refEnd = useRef(null);
-
   const [imagePreview, setImagePreview] = useState(null);
-  // const [file, setFile] = useState(null);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-
     form.setFieldValue("file", file);
-
     const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
   };
@@ -77,11 +67,9 @@ const Register = () => {
 
   const handleSelect = (date) => {
     const formattedDate = dayjs(date).format("YYYY-MM-DD");
-
     const isSelected = selected.some((s) =>
       dayjs(s).isSame(formattedDate, "date")
     );
-
     if (isSelected) {
       setSelected((current) =>
         current.filter((d) => !dayjs(d).isSame(formattedDate, "date"))
@@ -103,11 +91,8 @@ const Register = () => {
     if (values.availability.length === 0) {
       return alert("Enter Doctor Available Dates and Time");
     }
-
-    console.log(values.availability);
     console.log(values);
     const formData = new FormData();
-
     formData.append("doctor_name", values.doctor_name);
     formData.append("phone_number", values.phone_number);
     formData.append("specialization", values.specialization);
@@ -117,45 +102,36 @@ const Register = () => {
     formData.append("rfid_tag", values.rfid_tag);
     formData.append("gender", values.gender);
     formData.append("fees", values.fees);
-    formData.append("availability", values.availability);
-    // formData.availability
+    formData.append("availability", JSON.stringify(values.availability));
     formData.append("start_time", values.start_time);
     formData.append("end_time", values.end_time);
     formData.append("average_time", values.average_time);
-    formData.append("file", values.file);
+    formData.append(
+      "file",
+      values.file,
+      values.doctor_name + "." + values.file.type.split("/")[1]
+    );
+    try {
+      dispatch(setLoading(true));
 
-    console.log(formData.availability);
-    //     doctor_name: "",
-    // phone_number: "",
-    // phone_number: "",
-    // specialization: "",
-    // age: "",
-    // experience: "",
-    // licence_number: "",
-    // rfid_tag: "",
-    // gender: "",
-    // fees: "",
-    // availability: [],
-    // start_time: "",
-    // end_time: "",
-    // avg_time: "",
-
-    // try {
-    //   const { data } = await axios.post(
-    //     `api/doctor/register/${cookies._id}`,
-    //     formData,
-    //     {
-    //       headers: {
-    //         "Content-Type": "multipart/form-data",
-    //       },
-    //     }
-    //   );
-    //   form.reset();
-    //   setSelected([]);
-    //   console.log("Response from server:", data);
-    // } catch (error) {
-    //   console.error("Error submitting data:", error);
-    // }
+      const { data } = await axios.post(
+        `api/doctor/register/${cookies._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      form.reset();
+      setSelected([]);
+      setImagePreview(null);
+      console.log(data);
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
 
   const specializationOptions = [
@@ -175,12 +151,6 @@ const Register = () => {
     { label: "Gynecologist", value: "gynecologist" },
     { label: "General", value: "general" },
   ];
-
-  const [fileName, setFileName] = useState("");
-
-  // const handleFileChange = (e) => {
-  //   setFile(e.target.files[0]);
-  // };
 
   return (
     <div className="register overflow-hidden">
@@ -205,28 +175,28 @@ const Register = () => {
                   required
                   pattern="[0-9]*"
                   max={9999999999}
+                  min={1000000000}
                   {...form.getInputProps("phone_number")}
                   error={form.errors.phone_number}
                 />
               </div>
               <div className="col-md-6">
-                <Text fw={500}>Specialization</Text>
-
                 <Select
-                  {...form.getInputProps("specialization")}
                   placeholder="Select specialization"
-                  mt={-23}
+                  label="Specialization"
                   data={specializationOptions}
                   value={(option) => option.value}
-                  label={(option) => option.label}
+                  required
+                  {...form.getInputProps("specialization")}
+                  error={form.errors.specialization}
                 />
               </div>
-
               <div className="col-md-6">
                 <TextInput
                   label="Age"
                   type="number"
                   placeholder="Enter your age"
+                  max={150}
                   required
                   {...form.getInputProps("age")}
                   error={form.errors.age}
@@ -237,6 +207,7 @@ const Register = () => {
                   label="Experience"
                   type="number"
                   placeholder="Enter experience"
+                  max={150}
                   required
                   {...form.getInputProps("experience")}
                   error={form.errors.experience}
@@ -295,6 +266,7 @@ const Register = () => {
                         {...form.getInputProps("start_time")}
                         error={form.errors.start_time}
                         style={{ marginTop: "3rem" }}
+                        required
                       />
                     </div>
                   </div>
@@ -307,19 +279,32 @@ const Register = () => {
                         {...form.getInputProps("end_time")}
                         error={form.errors.end_time}
                         style={{ marginTop: "1rem", margin: "0", padding: 0 }}
+                        required
                       />
                     </div>
                   </div>
                 </div>
               </div>
-
               <div className="col-md-6">
                 <Select
                   {...form.getInputProps("gender")}
                   label="Your Gender"
                   placeholder="Pick value"
-                  data={["male", "female", "other"]}
-                  defaultValue={"male"}
+                  data={[
+                    {
+                      value: "male",
+                      label: "Male",
+                    },
+                    {
+                      value: "female",
+                      label: "Female",
+                    },
+                    {
+                      value: "other",
+                      label: "Other",
+                    },
+                  ]}
+                  required
                 />
               </div>
               <div className="col-md-6">
@@ -327,6 +312,7 @@ const Register = () => {
                   label="Average Time for Appointment"
                   type="number"
                   placeholder="Enter Time"
+                  required
                   {...form.getInputProps("average_time")}
                   error={form.errors.average_time}
                 />
@@ -340,12 +326,12 @@ const Register = () => {
                   >
                     Upload Doctor's Image:{" "}
                   </label>
-
                   <input
                     type="file"
                     id="image"
                     accept="image/*"
                     onChange={handleImageUpload}
+                    required
                   />
 
                   {form.errors.image && (

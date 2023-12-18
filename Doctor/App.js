@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, StatusBar } from "react-native";
+import {
+  SafeAreaView,
+  StatusBar,
+  View,
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Auth from "./screens/auth/AuthNavigator.js";
@@ -29,10 +36,11 @@ const AuthNavigator = () => {
 };
 
 const AppNavigator = () => {
-  const { isLogin } = useStateContext();
+  const { isLogin, loading, setLoading } = useStateContext();
   const [asyncStorageExists, setAsyncStorageExists] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const checkAsyncStorage = async () => {
       try {
         const isLoginValue = await AsyncStorage.getItem("isLogin");
@@ -41,32 +49,63 @@ const AppNavigator = () => {
         console.log("isLoginValue:", isLoginValue);
       } catch (error) {
         console.error("Error checking AsyncStorage:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     checkAsyncStorage();
   }, []);
 
+  const LoadingOverlay = () => (
+    <View style={styles.loadingOverlay}>
+      <ActivityIndicator size="large" color="green" />
+    </View>
+  );
+
+  useEffect(() => {
+    console.log(loading);
+  }, []);
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            gestureEnabled: true,
-            animation: "slide_from_left",
-          }}
-        >
-          {isLogin ? (
-            <Stack.Screen name="MainScreen" component={MainScreen} />
-          ) : (
-            <Stack.Screen name="Auth" component={AuthNavigator} />
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaView>
+    <>
+      {loading && <LoadingOverlay />}
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: "white", paddingBottom: 12 }}
+      >
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+              gestureEnabled: true,
+              animation: "slide_from_left",
+            }}
+          >
+            {isLogin ? (
+              <Stack.Screen name="MainScreen" component={MainScreen} />
+            ) : (
+              <Stack.Screen name="Auth" component={AuthNavigator} />
+            )}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaView>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+});
 
 const App = () => {
   return (

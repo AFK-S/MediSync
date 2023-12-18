@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LoadingOverlay, MantineProvider, createTheme } from "@mantine/core";
 import { useSelector } from "react-redux";
 import Login from "./pages/Login";
@@ -39,8 +39,9 @@ function App() {
 
       <BrowserRouter>
         <Routes>
-          <Route path="/*" element={<MainLayout />} />
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/*" element={<MainLayout />} />
         </Routes>
       </BrowserRouter>
     </MantineProvider>

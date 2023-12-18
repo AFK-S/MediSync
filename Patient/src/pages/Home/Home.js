@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { Grid, Collapse, Group, Text, Accordion } from "@mantine/core";
+import { Grid, Collapse, Group, Text, Accordion, Button } from "@mantine/core";
 import "./Home.css";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
+import { useCookies } from "react-cookie";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const Table = ({ data, columns }) => {
   return (
@@ -42,26 +46,30 @@ const Table = ({ data, columns }) => {
 const AppointmentCard = ({ value, index }) => {
   return (
     <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
-      <div key={index} className="c-card h-auto appointment-card ">
+      <div
+        key={index}
+        className="c-card h-auto appointment-card "
+        style={{ borderColor: "#B6BBC4" }}
+      >
         <div className="p-0">
           <p className="card-text mt-2">
             <span className="fw-600">Date: </span>
-            {value.date}
+            {value.date.split("T")[0].split("-").reverse().join("-")}
           </p>
           <p className="card-text mt-1">
             {" "}
             <span className="fw-600">Doctor: </span>
-            {value.doctorname}
+            {value.doctor.name}
           </p>
           <p className="card-text mt-1">
             {" "}
             <span className="fw-600">Hospital: </span>
-            {value.hospitalname}
+            {value.hospital.name}
           </p>
           <p className="card-text mt-1">
             {" "}
             <span className="fw-600">Time: </span>
-            {value.timeslot}
+            {value.time_slot}
           </p>
           <Accordion
             sx={{
@@ -69,35 +77,49 @@ const AppointmentCard = ({ value, index }) => {
             }}
           >
             <Accordion.Item
-              style={{ fontSize: "15px" }}
+              style={{ fontSize: "0.9rem" }}
               // key={value.doctorName}
               value="Read More"
               className="card-text"
             >
               <Accordion.Control
                 className="p-0"
-                style={{ color: "blue", fontSize: "10px" }}
+                style={{ color: "#0a0059", fontSize: "0.9rem" }}
               >
                 More Details
               </Accordion.Control>
 
               <Accordion.Panel>
                 <span className="fw-600">Contact: </span>
-                {value.contact}
+                {value.hospital.contact_details.phone_number}
               </Accordion.Panel>
               <Accordion.Panel>
-                <span className="fw-600">Experience: </span>
-                {value.experience}
+                <span className="fw-600"> Doctor's Experience: </span>
+                {value.doctor.experience} years
               </Accordion.Panel>
               <Accordion.Panel>
                 <span className="fw-600">Address: </span>
-                {value.address}
+                {value.hospital.address.street}. {value.hospital.address.city},{" "}
+                {value.hospital.address.state}, {value.hospital.address.country}{" "}
+                - {value.hospital.address.zipCode}
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>
-          <button className="mt-md-4 mt-3 reschedule-btn card-text">
-            Reschedule
-          </button>
+          <Button
+            className="mt-4 cancel-button"
+            variant="light"
+            type="outline"
+            style={{
+              color: "#DF2E38",
+              backgroundColor: "#fff",
+              borderColor: "#DF2E38",
+              fontWeight: 700,
+              fontSize: "0.9rem",
+              transition: "all 0.2s ease-in-out",
+            }}
+          >
+            Cancel
+          </Button>
         </div>
       </div>
     </Grid.Col>
@@ -105,6 +127,12 @@ const AppointmentCard = ({ value, index }) => {
 };
 
 const Home = () => {
+  // const [cookies] = useCookies();
+  const appointmentUpcoming = useSelector(
+    (state) => state.app.appData.upcoming_appointment
+  );
+  console.log(appointmentUpcoming);
+
   const [doctors, setDoctors] = useState([
     {
       doctorname: "Dr. Karandeep Singh Sandhu",
@@ -186,20 +214,21 @@ const Home = () => {
 
   return (
     <div>
-      <div className="container-fluid ">
-        <div className="row gy-3">
+      <div className="container-fluid c-card">
+        <div className="row  gy-3">
           <h5>UPCOMING APPOINTMENT</h5>
           <div className="upcoming-appointments-container">
             <Grid>
-              {doctors.map((value, index) => (
-                <AppointmentCard key={index} value={value} index={index} />
-              ))}
+              {appointmentUpcoming &&
+                appointmentUpcoming.map((value, index) => (
+                  <AppointmentCard key={index} value={value} index={index} />
+                ))}
             </Grid>
           </div>
         </div>
       </div>
 
-      <div className="container-fluid c-card my-4">
+      {/* <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Past Visit to Doctor</h4>
         <Table
           data={doctors && doctors}
@@ -211,19 +240,12 @@ const Home = () => {
             "HospitalName",
             "",
           ]}
-          // doctorname: "Dr. Karandeep Singh Sandhu",
-          // specialty: "Cardiologist",
-          // date: "18/10/2023",
-          // timeslot: "12:00pm - 03:00pm",
-          // hospitalName: "CardioCare Hospital",
-          // address: "Navghar Road, Mulund East, Mumbai",
-          // contact: "8169645464",
-          // reportLink: "https://example.com/report",
-          // experience: 21,
         />
-      </div>
-      <div className="alert-section">
-        <h4 className="mb-3">Alerts</h4>
+      </div> */}
+      <div className="alert-section my-4 c-card">
+        <h4 className="mb-3">
+          Alerts <i className="fa-solid fa-bell"></i>
+        </h4>
         <div className="alert-container">
           {alerts.map((alert, index) => (
             <div key={index} className="alert-item">
@@ -232,15 +254,6 @@ const Home = () => {
           ))}
         </div>
       </div>
-
-      {/* Waiting Patients */}
-      {/* <div className="container-fluid c-card my-4">
-        <h4 className="mb-2">Patients Waiting</h4>
-        <Table
-          data={patientsWaiting && patientsWaiting}
-          columns={["Name", "Date", "Doctor", "TimeSlot"]}
-        />
-      </div> */}
     </div>
   );
 };

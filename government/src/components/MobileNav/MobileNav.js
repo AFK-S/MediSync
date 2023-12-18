@@ -7,12 +7,17 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
     {
       name: "Hospital List",
       path: "/",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-list",
     },
     {
       name: "Register",
       path: "/register",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-hospital-user",
+    },
+    {
+      name: "Maps",
+      path: "/map",
+      icon: "fa-solid fa-map-location-dot",
     },
   ];
 

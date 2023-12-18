@@ -15,10 +15,32 @@ const AppointmentSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: [true, "Please provide a Patient ID"],
     },
-    symptoms: {
-      type: Array,
+    type: {
+      type: String,
+      trim: true,
+      enum: ["online", "walk_in"],
+      match: [
+        /^[a-zA-Z]+$/,
+        (props) => `${props.value} is not a valid appointment type`,
+      ],
+      required: [true, "Please provide the Appointment Type"],
     },
-    medical_history: {
+    severity_index: {
+      type: Number,
+      default: 0,
+      required: [true, "Please provide a Severity Index"],
+    },
+    severity_count: {
+      type: Number,
+      default: 0,
+      required: [true, "Please provide a Severity Count"],
+    },
+    treated: {
+      type: Boolean,
+      default: false,
+      required: [true, "Please provide a Treated"],
+    },
+    symptoms: {
       type: Array,
     },
     date: {
@@ -32,18 +54,6 @@ const AppointmentSchema = new Schema(
     e_prescription: {
       type: String,
       trim: true,
-      match: [
-        /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
-        (props) => `${props.value} is not a valid report`,
-      ],
-    },
-    report: {
-      type: String,
-      trim: true,
-      match: [
-        /^https?:\/\/.*\.(?:png|jpg|jpeg)$/i,
-        (props) => `${props.value} is not a valid report`,
-      ],
     },
     shift: {
       type: Number,

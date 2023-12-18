@@ -1,38 +1,39 @@
-import PatientSchema from "../models/PatientSchema.js";
 import AppointmentSchema from "../models/AppointmentSchema.js";
+import DoctorSchema from "../models/DoctorSchema.js";
+import ReportSchema from "../models/ReportSchema.js";
+import PatientSchema from "../models/PatientSchema.js";
+import mongoose from "mongoose";
+import axios from "axios";
+const { ObjectId } = mongoose.Types;
 
 const Register = async (req, res) => {
   try {
-    const {
-      hospital_id,
-      doctor_id,
-      name,
-      age,
-      phone_number,
-      symptoms,
-      medical_history,
-      date,
-      time_slot,
-    } = req.body;
-    let patient = await PatientSchema.findOne({
-      phone_number,
-    })
-      .select(["_id"])
+    const { hospital_id, doctor_id, patient_id, date, time_slot, symptoms } =
+      req.body;
+    const patient = await PatientSchema.findById(patient_id)
+      .select("age")
       .lean();
-    if (patient === null) {
-      patient = await PatientSchema.create({
-        name,
-        age,
-        phone_number,
-      });
-    }
+    const reports = await ReportSchema.find({ patient_id })
+      .select("disease")
+      .lean();
+    const disease_list = reports.flatMap((report) => report.disease);
+    const { data } = await axios.post(
+      "http://192.168.0.105:5000/api/patient/severity_index",
+      {
+        age: patient.age,
+        symptoms,
+        past_disease: disease_list,
+      }
+    );
     const appointment = await AppointmentSchema.create({
       hospital_id,
       doctor_id,
-      patient_id: patient._id,
+      patient_id,
+      type: "online",
       symptoms,
-      medical_history,
-      date,
+      severity_index: data.severity_index,
+      severity_count: data.severity_count,
+      date: date,
       time_slot,
     });
     res.status(200).send(appointment._id);
@@ -191,6 +192,71 @@ const AllDoctorAppointment = async (req, res) => {
   }
 };
 
+const DoctorAvailableSlots = async (req, res) => {
+  try {
+    const { doctor_id, type } = req.params;
+    const { date } = req.body;
+    const appointment_date = new Date(date);
+    appointment_date.setHours(0, 0, 0, 0);
+    const response = await DoctorSchema.aggregate([
+      {
+        $match: {
+          _id: new ObjectId(doctor_id),
+        },
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          pipeline: [
+            {
+              $match: {
+                doctor_id: new ObjectId(doctor_id),
+                type,
+                date: {
+                  $gte: appointment_date,
+                  $lte: new Date(
+                    appointment_date.getTime() + 24 * 60 * 60 * 1000
+                  ),
+                },
+              },
+            },
+          ],
+          as: "appointment",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          slot_booked: {
+            $size: "$appointment",
+          },
+          "slot_count.online": 1,
+          "slot_count.walk_in": 1,
+        },
+      },
+    ]);
+    if (response.length === 0) return res.status(400).send("Doctor not found");
+    res.status(200).json(response[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+const MarkAsDone = async (req, res) => {
+  try {
+    const { appointment_id } = req.params;
+    const appointment = await AppointmentSchema.findById(appointment_id);
+    if (!appointment) return res.status(400).send("Appointment not found");
+    appointment.treated = !appointment.treated;
+    await appointment.save();
+    res.status(200).send("Appointment successfully marked");
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   Register,
   UpdateDetails,
@@ -200,4 +266,6 @@ export {
   HospitalAppointment,
   TodayDoctorAppointment,
   AllDoctorAppointment,
+  DoctorAvailableSlots,
+  MarkAsDone,
 };

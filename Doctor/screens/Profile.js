@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,58 +7,72 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { useStateContext } from "../context/StateContext";
+import StateContext from "../context/StateContext";
 import axios from "axios";
 import Timeline from "react-native-timeline-flatlist";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Profile = () => {
-  const { setLogin } = useStateContext();
+const Profile = ({ navigation }) => {
+  const { setIsLogin, doctorData } = useContext(StateContext);
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem("isLogin");
+      await AsyncStorage.removeItem("_id");
+      setIsLogin(false);
+      navigation.navigate("Login");
     } catch (error) {
       console.error("Error removing login status:", error);
     }
-    setLogin(false);
-  };
-  const patient = {
-    name: "Dr. Karandeep Singh Sandhu",
-    age: 19,
-    image:
-      "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-    medical_history: "NA",
-    symptoms: ["Cough", "Fever"],
-    date: "23-10-2023",
-    time: "10:15pm",
   };
 
-  const [timeline, setTimeline] = useState([
-    {
-      time: "12/01/20",
-      title: "Hospital ABC",
-      description: "2:30PM - 02:30PM",
-    },
-    {
-      time: "12/01/20",
-      title: "Hospital ABC",
-      description: "2:30PM - 02:30PM",
-    },
-    {
-      time: "12/01/20",
-      title: "Hospital ABC",
-      description: "2:30PM - 02:30PM",
-    },
-    {
-      time: "12/01/20",
-      title: "Hospital ABC",
-      description: "2:30PM - 02:30PM",
-    },
-    {
-      time: "12/01/20",
-      title: "Hospital ABC",
-      description: "2:30PM - 02:30PM",
-    },
-  ]);
+  function formatDate(inputDate) {
+    const date = new Date(inputDate);
+
+    // Extract day, month, and year components
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Note: Month is zero-based
+    const year = date.getFullYear();
+
+    // Ensure two-digit format for day and month
+    const formattedDay = day < 10 ? `0${day}` : day;
+    const formattedMonth = month < 10 ? `0${month}` : month;
+
+    // Construct the formatted date string
+    const formattedDate = `${year}-${formattedMonth}-${formattedDay}`;
+
+    // Get the day of the week
+    const daysOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const dayOfWeek = daysOfWeek[date.getDay()];
+
+    return {
+      dayOfMonth: day,
+      dayOfWeek: dayOfWeek,
+      formattedDate: formattedDate,
+    };
+  }
+
+  const [timeline, setTimeline] = useState([]);
+
+  useEffect(() => {
+    setTimeline(
+      doctorData &&
+        doctorData.availability.map((e) => {
+          const formatted = formatDate(e.date);
+          return {
+            time: `${formatted.formattedDate}`,
+            description: `${e.start_time} - ${e.end_time}`,
+            title: `${formatted.dayOfWeek}`,
+          };
+        })
+    );
+  }, [doctorData]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -93,7 +107,10 @@ const Profile = () => {
             maxWidth: "100%",
           }}
         >
-          <Image source={{ uri: patient.image }} style={styles.avatar} />
+          <Image
+            source={{ uri: doctorData && doctorData.photo_url }}
+            style={styles.avatar}
+          />
           <Text
             style={{
               fontSize: 30,
@@ -103,7 +120,7 @@ const Profile = () => {
               color: "#fff",
             }}
           >
-            {patient.name}
+            {doctorData && doctorData.name}
           </Text>
         </View>
       </View>
@@ -120,15 +137,24 @@ const Profile = () => {
               borderRadius: 20,
             }}
           >
-            <Text style={styles.infoText}>Age: {patient.age}</Text>
             <Text style={styles.infoText}>
-              Medical History: {patient.medical_history}
+              Age: {doctorData && doctorData.age}
             </Text>
             <Text style={styles.infoText}>
-              Symptoms: {patient.symptoms.join(", ")}
+              Gender: {doctorData && doctorData.gender}
             </Text>
-            <Text style={styles.infoText}>Date: {patient.date}</Text>
-            <Text style={styles.infoText}>Time: {patient.time}</Text>
+            <Text style={styles.infoText}>
+              Specailization: {doctorData && doctorData.specialization}
+            </Text>
+            <Text style={styles.infoText}>
+              Experience: {doctorData && doctorData.experience} years
+            </Text>
+            <Text style={styles.infoText}>
+              Phone Number: {doctorData && doctorData.phone_number}
+            </Text>
+            <Text style={styles.infoText}>
+              License Number: {doctorData && doctorData.license_number}
+            </Text>
           </View>
           <View
             style={{
@@ -141,12 +167,16 @@ const Profile = () => {
               Schedule
             </Text>
             <Timeline
-              style={{ padding: 20 }}
+              style={{ flex: 1, backgroundColor: "#fff", padding: 20 }}
               data={timeline}
               circleSize={20}
               circleColor="#18C37D"
               lineColor="#18C37D"
-              timeContainerStyle={{ minWidth: 52, marginTop: -5 }}
+              timeContainerStyle={{
+                minWidth: 52,
+                marginTop: -5,
+                marginBottom: 40,
+              }}
               timeStyle={{
                 textAlign: "center",
                 backgroundColor: "#18C37D",
@@ -186,6 +216,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     marginTop: 10,
+    textTransform: "capitalize",
   },
   title: {
     color: "#fff",

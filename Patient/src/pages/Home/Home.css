@@ -1,14 +1,41 @@
-.reschedule-btn {
-  background-color: var(--main-color);
+/* .cancel-btn {
+  background-color: #DF2E38;
   color: var(--text-color);
   padding: 5px 10px;
   border-radius: 10px;
   margin-bottom: 0;
+  font-weight: 600;
+  border: none;
+  transition: all 0.2s ease;
+  border: solid 1px #DF2E38;
+  outline: #DF2E38 solid 1px oppacity(0.5);
 }
 
+.cancel-btn:hover {
+  background-color: #DF2E38;
+  outline: #DF2E38 solid 1px oppacity(1);
+  color: var(--text-color);
+  padding: 5px 10px;
+  border-radius: 10px;
+  margin-bottom: 0;
+  font-weight: 600;
+  border: none;
+} */
+.cancel-button:hover {
+  background-color: #DF2E38 !important;
+  color: #fff !important;
+  border: #fff solid 1px; /* Change text color on hover if needed */
+}
+
+
 .upcoming-appointments-container {
-  max-height: 500px;
+  max-height: 530px;
   overflow-y: auto;
+}
+.alert-item {
+  background-color: #ededed;
+  color: #000;
+  font-size: 0.9rem;
 }
 
 .appointment-card {
@@ -18,7 +45,7 @@
 }
 
 .alert-container {
-  max-height: 200px;
+  max-height: 250px;
   overflow-y: auto;
 }
 
@@ -27,7 +54,7 @@
 }
 
 .card-text {
-  font-size: 12px !important;
+  font-size: 0.9rem !important;
 }
 
 .c-card {

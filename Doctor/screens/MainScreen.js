@@ -1,16 +1,39 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Patients from "./Patients";
-import PatientDetailsScreen from "./PatientDetailsScreen"; // Import the new screen
+import PatientDetailsScreen from "./PatientDetailsScreen";
 import AppointmentsScreen from "./AppointmentsScreen";
 import Profile from "./Profile";
+import StateContext from "../context/StateContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const PatientsStack = () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const isLoginString = await AsyncStorage.getItem("isLogin");
+        const _idString = await AsyncStorage.getItem("_id");
+
+        if (isLoginString !== null && _idString !== null) {
+          const isLogin = JSON.parse(isLoginString);
+          const _id = JSON.parse(_idString);
+
+          console.log("isLogin:", isLogin);
+          console.log("_id:", _id);
+        }
+      } catch (error) {
+        console.error("Error retrieving data from AsyncStorage:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -44,7 +67,19 @@ const AppointmentStack = () => {
   );
 };
 
-const MainScreen = () => {
+const MainScreen = ({ navigation }) => {
+  const { isLogin, getProfile } = useContext(StateContext);
+
+  useEffect(() => {
+    if (!isLogin) {
+      // If not logged in, navigate to the "Login" screen
+      navigation.navigate("Login");
+    } else {
+      // If logged in, fetch the profile
+      getProfile();
+    }
+  }, [isLogin, navigation]);
+
   return (
     <Tab.Navigator
       initialRouteName="Appointments"

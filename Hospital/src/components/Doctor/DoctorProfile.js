@@ -1,11 +1,23 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { Modal, Button } from "@mantine/core";
 import AttendanceCalendar from "../AttendanceCalendar/AttendanceCalendar";
 import { useParams } from "react-router-dom";
-import { StateContext } from "../../context/StateContext";
+import axios from "axios";
 
 const Table = ({ data, columns }) => {
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const formattedDate = new Date(date).toLocaleDateString("en-GB", options);
+    return formattedDate;
+  };
+  const [log, setLog] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      setLog(data);
+    }
+  }, [data]);
   return (
     <div
       className="inner-container"
@@ -22,16 +34,15 @@ const Table = ({ data, columns }) => {
           </tr>
         </thead>
         <tbody>
-          {data &&
-            data.map((item, index) => (
-              <tr key={index}>
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex} style={{ whiteSpace: "nowrap" }}>
-                    {item[col.toLowerCase()]}
-                  </td>
-                ))}
-              </tr>
-            ))}
+          {log.map((item, index) => (
+            <tr key={index}>
+              <td style={{ whiteSpace: "nowrap" }}>{item.type}</td>
+              <td style={{ whiteSpace: "nowrap" }}>{item.status}</td>
+              <td style={{ whiteSpace: "nowrap" }}>
+                {formatDate(item.createdAt)}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
@@ -41,17 +52,20 @@ const Table = ({ data, columns }) => {
 const DoctorProfile = () => {
   const { doctor_id } = useParams();
   const [opened, { open, close }] = useDisclosure(false);
-  const { doctorsList } = useContext(StateContext);
 
   const [doctorDetails, setDoctorDetails] = useState({});
 
-  console.log(doctor_id);
   useEffect(() => {
-    if (doctorsList) {
-      const doctor = doctorsList.find((doc) => doc._id === doctor_id);
-      setDoctorDetails(doctor);
-    }
-  }, [doctorsList]);
+    (async () => {
+      try {
+        const { data } = await axios.get(`/api/dashboard/doctor/${doctor_id}`);
+        console.log(data);
+        setDoctorDetails(data);
+      } catch (error) {
+        console.error("Failed to fetch data: ", error);
+      }
+    })();
+  }, []);
 
   const [patientsDetails, setPatientsDetails] = useState([
     {
@@ -122,16 +136,14 @@ const DoctorProfile = () => {
     },
   ]);
 
-  const [docLog, setDocLog] = useState([
-    {
-      time: "18:32",
-      status: "exit",
-    },
-    {
-      time: "18:32",
-      status: "entry",
-    },
-  ]);
+  const revenue =
+    doctorDetails && doctorDetails.treated_patient_count * doctorDetails.fees;
+
+  const formatTime = (date) => {
+    const options = { hour: "2-digit", minute: "2-digit" };
+    const formattedTime = new Date(date).toLocaleTimeString("en-GB", options);
+    return formattedTime;
+  };
 
   return (
     <>
@@ -142,14 +154,24 @@ const DoctorProfile = () => {
             <div className="row gy-3">
               <div className="col-md-4">
                 <div className="c-card">
-                  <h4>Appointments</h4>
-                  <h5>30</h5>
+                  <h4>Today's Appointments</h4>
+                  <h3>
+                    {doctorDetails && doctorDetails.today_appointment_count}
+                  </h3>
                 </div>
               </div>
               <div className="col-md-4">
                 <div className="c-card">
-                  <h4>Revenue</h4>
-                  <h5>Rs. 30,000</h5>
+                  <h4>
+                    Revenue{" "}
+                    <span style={{ fontSize: "18px" }}>
+                      {" "}
+                      ({doctorDetails &&
+                        doctorDetails.treated_patient_count}{" "}
+                      patients treated)
+                    </span>
+                  </h4>
+                  <h5>Rs. {revenue}</h5>
                 </div>
               </div>
               <div className="col-md-4">
@@ -163,16 +185,55 @@ const DoctorProfile = () => {
           <div className="container-fluid my-4">
             <div className="row gy-4">
               <div className="col-md-8">
-                <AttendanceCalendar />
+                <AttendanceCalendar
+                  availability={doctorDetails.availability}
+                  attendance={doctorDetails.attendance}
+                  today_appointment={doctorDetails.today_appointment}
+                />
               </div>
               <div className="col-md-4">
                 <div className="c-card">
                   <h4>Logs</h4>
                   <div className="mt-2">
-                    <Table
-                      data={docLog && docLog}
-                      columns={["Status", "Time"]}
-                    />
+                    {doctorDetails.log && doctorDetails.log.length > 0 ? (
+                      <div
+                        className="inner-container"
+                        style={{ overflowY: "auto", maxHeight: "40vh" }}
+                      >
+                        <table className="table table-hover text-no-wrap">
+                          <thead>
+                            <tr>
+                              <th scope="col" className="text-no-wrap">
+                                Type
+                              </th>
+                              <th scope="col" className="text-no-wrap">
+                                Status
+                              </th>
+                              <th scope="col" className="text-no-wrap">
+                                Time
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {doctorDetails.log.map((item, index) => (
+                              <tr key={index}>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {item.type}
+                                </td>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {item.status}
+                                </td>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {formatTime(item.createdAt)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p>No logs available.</p>
+                    )}
                   </div>
                 </div>
               </div>

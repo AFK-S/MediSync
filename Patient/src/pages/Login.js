@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "@mantine/form";
+import {auth} from "../firebase.js"
+
+import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
+
 import {
   TextInput,
   PasswordInput,
@@ -13,75 +17,91 @@ import {
 import { PinInput } from "@mantine/core";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Loader } from "@mantine/core";
 import { useCookies } from "react-cookie";
 
+import { useDispatch, useSelector } from "react-redux";
+
 export default function Login() {
-  const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otpConfirm, setOtpConfirm] = useState(false);
-  const Navigate = useNavigate();
+  const [otp, setOtp] = useState("");
+  const [user, setUser] = useState(null);
+
+  const navigate = useNavigate();
+  const [cookies] = useCookies();
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.user);
+
+  useEffect(() => {
+    console.log("login");
+    console.log(cookies._id);
+    if (cookies._id) {
+      console.log("cookies hai: ", cookies._id);
+      navigate("/home");
+    }
+  }, [cookies]);
+
   const form = useForm({
     initialValues: {
-      mobile: "",
-      otp: "",
       name: "",
       age: "",
+      phone_number: "",
     },
-    validate: {
-      // mobile: (val) => (/^\d{10}$/.test(val) ? null : "Invalid mobile number"),
-      // otp: (val) => (val.trim().length === 6 ? null : "Invalid OTP"),
-      // name: (val) => (val.trim() === "" ? "Name is required" : null),
-      // age: (val) =>
-      //   isNaN(val) || val <= 0 ? "Age should be a positive number" : null,
-    },
+    validate: {},
   });
 
-  const [cookies, setCookie] = useCookies(["token", "userId"]);
-
-  const handleMobileSubmit = (values) => {
-    // setLoading(true);
+  const handleSendOTP = async () => {
     try {
-      form.reset();
+      const PhoneNumber = "+91" + form.values.phone_number;
+      const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        PhoneNumber,
+        recaptcha
+      );
+
+      console.log(confirmation);
+      setUser(confirmation);
       alert("OTP sent successfully!");
+
       setOtpSent(true);
-    } catch (err) {
-      console.log(err);
-      alert(`Something went wrong: ${err.response && err.response.data.msg}`);
-    } finally {
-      // setLoading(false);
+      console.log(form.values);
+    } catch (error) {
+      console.error("Error sending OTP:", error);
     }
   };
 
-  const handleOtpSubmit = (values) => {
-    setLoading(true);
+  const handleVerifyOTP = async () => {
     try {
-      // Implement logic to verify OTP
-      // For example, you can make an API call to verify OTP
+      await user.confirm(otp);
+      const response = await axios.get(
+        `/api/patient/verify/${form.values.phone_number}`
+      );
 
-      // Simulating successful OTP verification
-      alert("OTP verified successfully!");
-      setOtpConfirm(true);
-    } catch (err) {
-      console.log(err);
-      alert(`Invalid OTP. Please try again.`);
-    } finally {
-      setLoading(false);
+      if (response.status == 200) {
+        navigate("/home");
+      } else {
+        setOtpConfirm(true);
+        alert("OTP verified!");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
     }
   };
 
-  const handleSignUpSubmit = (values) => {
-    setLoading(true);
+  const handleSignUpSubmit = async (values) => {
+    console.log(form.values);
     try {
+      const { data } = await axios.post("api/patient/login/", form.values);
+      console.log(data);
+
       alert(`Welcome ${values.name}! You are now registered.`);
-      setTimeout(() => {
-        Navigate("/home");
-      }, 1000);
+      navigate("/home");
+      console.log(form);
     } catch (err) {
       console.log(err);
       alert(`Something went wrong: ${err.response && err.response.data.msg}`);
     } finally {
-      setLoading(false);
       form.reset();
     }
   };
@@ -98,16 +118,10 @@ export default function Login() {
           maxWidth: 450,
         }}
       >
-        <Text
-          size="lg"
-          // weight={700}
-          style={{ color: "black", fontWeight: "bolder" }}
-        >
+        <Text size="lg" style={{ color: "black", fontWeight: "bolder" }}>
           Welcome to MediSync
         </Text>
-
         <Divider my="lg"></Divider>
-
         {otpConfirm ? (
           <form onSubmit={form.onSubmit((value) => handleSignUpSubmit(value))}>
             <Stack>
@@ -138,49 +152,50 @@ export default function Login() {
             </Stack>
 
             <Group position="apart" mt="xl">
-              <Button type="submit" radius="lg" disabled={loading}>
-                {loading ? <Loader color="white" variant="dots" /> : "Sign Up"}
+              <Button type="submit" radius="lg">
+                Sign Up
               </Button>
             </Group>
           </form>
         ) : otpSent ? (
-          <form onSubmit={form.onSubmit((value) => handleOtpSubmit(value))}>
+          <form onSubmit={form.onSubmit(handleVerifyOTP)}>
             <Stack>
               <Text style={{ color: "black" }}>
                 Enter OTP received on you Phone
               </Text>
-              <PinInput
-                value={form.values.otp}
-                onChange={(otp) => form.setFieldValue("otp", otp)}
-                aria-label="One time code"
+              <TextInput
+                onChange={(event) => setOtp(event.target.value)}
+                label={"Enter OTP"}
                 type={/^[0-9]*$/}
-                inputType="tel"
-                inputMode="numeric"
+                radius="md"
+                required
+                value={otp}
+                placeholder="Enter Your OTP"
               />
             </Stack>
 
             <Group position="apart" mt="xl">
-              <Button type="submit" radius="lg" disabled={loading}>
-                {loading ? <Loader color="white" variant="dots" /> : "Submit"}
+              <Button type="submit" radius="lg">
+                Submit
               </Button>
               <NavLink to="/login">Edit Mobile Number</NavLink>
             </Group>
           </form>
         ) : (
-          <form onSubmit={form.onSubmit(handleMobileSubmit)}>
+          <form onSubmit={form.onSubmit(handleSendOTP)}>
             <Stack>
               <TextInput
                 required
                 type="tel"
                 label="Mobile Number"
                 placeholder="Enter your mobile number"
-                value={form.values.mobile}
-                onChange={(event) =>
-                  form.setFieldValue("mobile", event.currentTarget.value)
-                }
-                error={form.errors.mobile && form.errors.mobile}
                 radius="md"
+                value={form.values.phone_number}
+                onChange={(event) =>
+                  form.setFieldValue("phone_number", event.currentTarget.value)
+                }
               />
+              <div id="recaptcha"></div>
             </Stack>
 
             <Group position="apart" mt="xl">

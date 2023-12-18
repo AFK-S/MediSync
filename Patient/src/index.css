@@ -1,12 +1,12 @@
 @import url(https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
 
-/* iframe#webpack-dev-server-client-overlay {
-    display: none !important
-} */
+iframe#webpack-dev-server-client-overlay {
+  display: none !important;
+}
 
 :root {
   --bg-color: #f5f6fa;
-  --main-color: #1b03a3;
+  --main-color: #0a0059;
   --text-color: #fff;
 }
 

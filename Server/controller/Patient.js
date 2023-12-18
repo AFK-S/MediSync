@@ -1,6 +1,27 @@
 import PatientSchema from "../models/PatientSchema.js";
 import AppointmentSchema from "../models/AppointmentSchema.js";
 
+const VerifyPatient = async (req, res) => {
+  try {
+    const { phone_number } = req.params;
+    const response = await PatientSchema.findOne({
+      phone_number,
+    })
+      .select(["_id"])
+      .lean();
+    if (!response) return res.status(201).send(false);
+    res
+      .cookie("_id", response._id, {
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      })
+      .status(200)
+      .send(response._id);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 const UpdateDetails = async (req, res) => {
   try {
     const { patient_id } = req.params;
@@ -95,6 +116,7 @@ const AllPatients = async (req, res) => {
 };
 
 export {
+  VerifyPatient,
   UpdateDetails,
   DeletePatient,
   PatientInfo,

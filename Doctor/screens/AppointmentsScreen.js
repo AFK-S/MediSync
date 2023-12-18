@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,54 +11,36 @@ import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
 import AppointmentTabs from "../components/AppointmentTabs";
 import { useNavigation } from "@react-navigation/native";
+import StateContext from "../context/StateContext";
 
 const AppointmentsScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const { doctorData, markAttended, getProfile } = useContext(StateContext);
   const navigation = useNavigation();
 
-  const patients = [
-    {
-      name: "Karandeep Singh Sandhu",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-    {
-      name: "Aditya Rai",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-    {
-      name: "Karandeep Singh bchbxiljcndc",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-    {
-      name: "Karandeep Singh bchbxiljcndc",
-      age: 19,
-      image:
-        "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png",
-      medical_history: "NA",
-      symptoms: ["Cough", "Fever"],
-      date: "23-10-2023",
-      time: "10:15pm",
-    },
-  ];
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+
+  useEffect(() => {
+    const upcomingAppointments =
+      doctorData &&
+      doctorData.today_appointment.filter(
+        (appointment) => !appointment.treated
+      );
+    setUpcomingAppointments(upcomingAppointments);
+  }, [doctorData]);
+
+  const getTitleAndFirstName = (fullName) => {
+    if (!fullName) {
+      return ""; // Handle the case where fullName is undefined or null
+    }
+
+    const title = fullName.split(" ")[0].trim(); // Assuming that the title ends with a dot
+    const firstName = fullName.split(" ")[1];
+
+    // Return the formatted string
+    return `${title} ${firstName}`;
+  };
 
   const openBottomSheet = (patient) => {
     setSelectedPatient(patient);
@@ -67,6 +49,21 @@ const AppointmentsScreen = () => {
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  const formatDate = (date) => {
+    const dateObj = new Date(date);
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth() + 1;
+    const year = dateObj.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const capitalizeAndReplaceUnderscore = (str) => {
+    const withoutUnderscore = str.replace(/_/g, " ");
+    return (
+      withoutUnderscore.charAt(0).toUpperCase() + withoutUnderscore.slice(1)
+    );
   };
 
   const renderBottomSheetContent = () => (
@@ -114,7 +111,7 @@ const AppointmentsScreen = () => {
           }}
         >
           <Text style={{ fontSize: 20, fontWeight: "600" }}>
-            {selectedPatient?.name}
+            {selectedPatient?.patient.name}
           </Text>
         </View>
 
@@ -129,29 +126,40 @@ const AppointmentsScreen = () => {
           }}
         >
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Age: {selectedPatient?.age}
+            Age: {selectedPatient?.patient.age}
           </Text>
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Medical History: {selectedPatient?.medical_history}
+            Medical History:{" "}
+            {selectedPatient?.medical_history?.length
+              ? selectedPatient.medical_history
+              : "None"}
           </Text>
+
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
             Symptoms:{" "}
-            {selectedPatient?.symptoms.map((symptom, index) => (
-              <Text key={index}>
-                {symptom}
-                {index !== selectedPatient.symptoms.length - 1 ? ", " : ""}
-              </Text>
-            ))}
+            {selectedPatient?.symptoms?.length ? (
+              selectedPatient.symptoms.map((symptom, index) => (
+                <Text key={index}>
+                  {capitalizeAndReplaceUnderscore(symptom)}
+                  {index !== selectedPatient.symptoms.length - 1 ? ", " : ""}
+                </Text>
+              ))
+            ) : (
+              <Text>None</Text>
+            )}
           </Text>
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Date: {selectedPatient?.date}
+            Date: {formatDate(selectedPatient?.date)}
           </Text>
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Time: {selectedPatient?.time}
+            Time: {selectedPatient?.time_slot}
           </Text>
         </View>
         <TouchableOpacity
-          onPress={toggleModal}
+          onPress={() => {
+            markAttended(selectedPatient._id);
+            toggleModal();
+          }}
           style={{
             backgroundColor: "#18C37D",
             padding: 14,
@@ -230,7 +238,7 @@ const AppointmentsScreen = () => {
             }}
           >
             <Text style={{ ...styles.title, fontSize: 30 }}>
-              Hi, Dr. Karandeep
+              Hi, {doctorData && getTitleAndFirstName(doctorData.name)}
             </Text>
           </View>
         </View>
@@ -243,15 +251,17 @@ const AppointmentsScreen = () => {
               fontSize: 16,
             }}
           >
-            Upcoming Appointments {`(${patients.length})`}
+            Upcoming Appointments{" "}
+            {`(${upcomingAppointments && upcomingAppointments.length})`}
           </Text>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            contentContainerStyle={{ padding: 10 }}
-          >
-            {patients &&
-              patients.map((patient, index) => (
+
+          {upcomingAppointments && upcomingAppointments.length > 0 ? (
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              contentContainerStyle={{ padding: 10 }}
+            >
+              {upcomingAppointments.map((patient, index) => (
                 <TouchableOpacity
                   activeOpacity={0.9}
                   key={index}
@@ -272,19 +282,39 @@ const AppointmentsScreen = () => {
                         numberOfLines={1}
                         ellipsizeMode="tail"
                       >
-                        {patient.name}
+                        {patient.patient.name}
                       </Text>
                       <View style={{ marginTop: 10 }}>
-                        <Text style={styles.silent}>Age : {patient.age}</Text>
+                        <Text style={styles.silent}>
+                          Age : {patient.patient.age}
+                        </Text>
                         <Text style={{ ...styles.silent, marginTop: 5 }}>
-                          {patient.date}, {patient.time}
+                          Time : {patient.time_slot}
                         </Text>
                       </View>
                     </View>
                   </View>
                 </TouchableOpacity>
               ))}
-          </ScrollView>
+            </ScrollView>
+          ) : (
+            <View
+              style={{
+                ...styles.patientCard,
+                width: "85%",
+                alignSelf: "center",
+                marginTop: 20,
+                paddingVertical: 30,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 24,
+              }}
+            >
+              <Text style={{ fontSize: 15, fontWeight: "600" }}>
+                No Appointments Today
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 

@@ -25,13 +25,36 @@ const HospitalLogin = async (req, res) => {
     res.status(400).send(err.message);
   }
 };
-
-const DoctorLogin = async (req, res) => {
+const FirstTimeDoctorLogin = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const response = await DoctorSchema.findOne({
       username,
       password,
+    })
+      .select(["_id", "mac_address"])
+      .lean();
+    if (response === null) {
+      return res.status(400).send("Invalid Credential");
+    }
+    if (!response.mac_address.includes("AFKS")) {
+      return res.status(400).send("Already Registered");
+    }
+    req._id = response._id;
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+const DoctorLogin = async (req, res) => {
+  try {
+    const { username, password, mac_address } = req.body;
+    const response = await DoctorSchema.findOne({
+      username,
+      password,
+      mac_address,
     })
       .select(["_id"])
       .lean();
@@ -72,4 +95,4 @@ const PatientLogin = async (req, res) => {
   }
 };
 
-export { HospitalLogin, DoctorLogin, PatientLogin };
+export { HospitalLogin, FirstTimeDoctorLogin, DoctorLogin, PatientLogin };

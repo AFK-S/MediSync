@@ -16,13 +16,14 @@ const DoctorSchema = new Schema(
     name: {
       type: String,
       trim: true,
-      match: [/^[a-zA-Z ]+$/, (props) => `${props.value} is not a valid name`],
     },
     mac_address: {
       type: String,
+      trim: true,
       unique: true,
+      required: [true, "Please provide the MAC Address"],
     },
-    photo: {
+    photo_url: {
       type: String,
       trim: true,
       default: "https://www.pexels.com/photo/man-in-brown-polo-shirt-614810/",
@@ -92,6 +93,24 @@ const DoctorSchema = new Schema(
         },
       },
     ],
+    slot_count: {
+      online: {
+        type: Number,
+        match: [
+          /^[0-9]+$/,
+          (props) => `${props.value} is not a valid slot count`,
+        ],
+        required: [true, "Please provide the Online Slot Count"],
+      },
+      walk_in: {
+        type: Number,
+        match: [
+          /^[0-9]+$/,
+          (props) => `${props.value} is not a valid slot count`,
+        ],
+        required: [true, "Please provide the Walk In Slot Count"],
+      },
+    },
     average_time: {
       type: Number,
       match: [

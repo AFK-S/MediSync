@@ -2,37 +2,40 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutAdmin } from "../../slice/AdminSlice.js";
+import { logoutUser } from "../../slice/UserSlice.js";
 import { useCookies } from "react-cookie";
 import "./MobileNav.css";
+import axios from "axios";
 
 const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [cookies, removeCookie] = useCookies(["token", "userId"]);
 
-  const handleLogout = () => {
-    removeCookie("token");
-    removeCookie("userId");
-    dispatch(logoutAdmin());
-    window.location.href = "/login";
+  const handleLogout = async () => {
+    try {
+      await axios.get("/api/logout");
+      navigate("/login");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const navs = [
     {
       name: "Home",
       path: "/home",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-home",
     },
     {
       name: "Search",
       path: "/search",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-search",
     },
     {
       name: "Appointments",
       path: "/appointments",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-hospital-user",
     },
     {
       name: "Profile",
@@ -44,7 +47,7 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
   return (
     <div className={`mobileNav ${isMenuOpen ? "active" : ""}`}>
       <div
-        className="close-btn  d-flex align-items-center justify-content-center"
+        className="close-btn nav-close-btn d-flex align-items-center justify-content-center"
         onClick={ToggleMenu}
         style={{
           width: "40px",
@@ -53,7 +56,6 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
           right: "1.8rem",
           top: "1.8rem",
           cursor: "pointer",
-          background: "#1b03a3",
           color: "#fff",
           borderRadius: "10px",
         }}

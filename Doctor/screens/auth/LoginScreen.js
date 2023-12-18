@@ -1,93 +1,108 @@
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
-  Button,
   TextInput,
   StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
-  Image,
+  Platform,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useStateContext } from "../../context/StateContext";
+import StateContext from "../../context/StateContext";
 
 const LoginScreen = ({ navigation }) => {
-  const { setLogin } = useStateContext();
+  const { Login, FirstTimeLogin, isLogin, setIsLogin, loading, setLoading } =
+    useContext(StateContext);
+  const [login, setLogin] = useState({
+    username: "",
+    password: "",
+  });
 
-  const handleLogin = async () => {
-    // Set isLogin to true in the context
-    setLogin(true);
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      if (isLogin) {
+        navigation.navigate("MainScreen");
+      }
+    };
 
-    // Set isLogin to true in AsyncStorage
+    checkLoginStatus();
+  }, [isLogin, navigation]);
+
+  const handleLoginPress = async () => {
     try {
-      // Use boolean value instead of a string
-      await AsyncStorage.setItem("isLogin", JSON.stringify(true));
+      setLoading(true);
+
+      const mac_address = await AsyncStorage.getItem("mac_address");
+      console.log(mac_address);
+      if (mac_address == null) {
+        await FirstTimeLogin(login.username, login.password);
+      } else {
+        await Login(login.username, login.password, mac_address);
+      }
+      setIsLogin(true);
+      navigation.navigate("MainScreen");
     } catch (error) {
-      console.error("Error storing login status:", error);
+      console.log(error);
+    } finally {
+      setLoading(false); // Set loading to false when login is complete (success or failure)
     }
-
-    // Navigate to MainScreen
-    navigation.navigate("MainScreen");
-  };
-
-  const handleGoToRegister = () => {
-    navigation.navigate("Register");
   };
 
   return (
-    <>
-      {/* <Image
-        source={require("../../assets/logo.png")}
-        style={{ width: 150, height: 150, borderRadius: 100 }}
-      /> */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.innerContainer}
-      >
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.outerContainer}
+    >
+      <View style={styles.innerContainer}>
         <View style={styles.container}>
           <Text style={styles.title}>Login</Text>
           <TextInput
             style={styles.input}
             placeholder="Username or Email"
-            // Add onChangeText prop to handle input changes
+            value={login.username}
+            onChangeText={(text) =>
+              setLogin({ ...login, username: text.toLowerCase() })
+            }
+            required
           />
           <TextInput
             style={styles.input}
             placeholder="Password"
+            value={login.password}
+            onChangeText={(text) => setLogin({ ...login, password: text })}
+            required
             secureTextEntry={true}
-            // Add onChangeText prop to handle input changes
           />
-          <TouchableOpacity
-            style={styles.button}
-            title="Login"
-            onPress={handleLogin}
-          >
-            <Text style={styles.btnText}>Login</Text>
+          <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.btnText}>Login</Text>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity
-            title="Go to Register"
-            onPress={handleGoToRegister}
-          />
         </View>
-      </KeyboardAvoidingView>
-    </>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+  },
   innerContainer: {
     flex: 1,
-    justifyContent: "center", // Center vertically
+    justifyContent: "center",
     alignItems: "center",
   },
   container: {
     backgroundColor: "#fff",
-    padding: 40,
+    padding: Platform.OS === "android" ? 20 : 40,
     marginBottom: 80,
     borderRadius: 30,
   },
-
   title: {
     fontSize: 24,
     marginBottom: 16,
@@ -116,6 +131,11 @@ const styles = StyleSheet.create({
   btnText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  registerLink: {
+    color: "#18C37D",
+    marginTop: 10,
+    textAlign: "center",
   },
 });
 
