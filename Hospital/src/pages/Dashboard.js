@@ -177,9 +177,14 @@ const Dashboard = () => {
 
   const bedsChartData = {
     series: [
-      hospitalData && hospitalData.today_non_treated_patient_count,
-      hospitalData.today_treated_patient_count,
+      hospitalData.today_non_treated_patient_count !== undefined
+        ? hospitalData.today_non_treated_patient_count
+        : 0,
+      hospitalData.today_treated_patient_count !== undefined
+        ? hospitalData.today_treated_patient_count
+        : 0,
     ],
+
     options: {
       chart: {
         type: "donut",
