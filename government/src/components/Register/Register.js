@@ -35,7 +35,7 @@ function Register({ setLoading }) {
         contact_details: values.contact_details,
       });
       console.log(data);
-
+      alert("Hospital registered successfully!");
       form.reset();
     } catch (err) {
       console.error(err);

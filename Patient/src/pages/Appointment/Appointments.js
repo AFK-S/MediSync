@@ -118,8 +118,8 @@ const Appointments = () => {
 
   const form = useForm({
     initialValues: {
-      hospital: "DMCE Hospital" || "",
-      hospital_id: "jdkhfkjhfjkshjjshjfhkdshjf" || "",
+      hospital: "",
+      hospital_id: "",
       specialization: "",
       doctor: "",
       doctor_id: "",

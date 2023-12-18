@@ -14,15 +14,16 @@ import { setFormData } from "../../slice/AppSclice.js";
 import doctorIcon from "../../assets/doctor.png";
 import axios from "axios";
 
-const DoctorCard = ({ doctor }) => {
+const DoctorCard = ({ doctor, hospital }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  // console.log(doctor);
 
   const handleBooked = () => {
     dispatch(
       setFormData({
         doctor: doctor.name,
-        hospital: doctor.hospital,
+        hospital: hospital,
         specialization: doctor.specialization,
         experience: doctor.experience,
       })
@@ -63,7 +64,7 @@ const DoctorCard = ({ doctor }) => {
             color: "black",
           }}
         >
-          Hospital: {doctor.hospital.name}
+          Hospital: {hospital}
         </Text>
         <button
           style={{
@@ -92,16 +93,16 @@ const AllDoctors = () => {
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false);
 
+  const fetchDoctors = async () => {
+    try {
+      const { data } = await axios.get("/api/doctors");
+      setDoctors(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const { data } = await axios.get("/api/doctors");
-        setDoctors(data);
-        console.log(data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
     fetchDoctors();
   }, []);
 
@@ -146,106 +147,25 @@ const AllDoctors = () => {
     askForLocationPermission();
   }, []);
 
+  useEffect(() => {
+    const getNearbyHospitals = async () => {
+      try {
+        const { data } = await axios.post("/api/nearby/hospitals", location);
+        setHospitals(data);
+        // console.log(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    if (locationPermissionGranted) {
+      getNearbyHospitals();
+    }
+  }, [location]);
+
   const [doctors, setDoctors] = useState([]);
 
-  const [hospitals, setHospitals] = useState([
-    // Updated hospitals data
-    {
-      name: "City Hospital 1",
-      doctors: [
-        {
-          doctor_details: {
-            name: "Karandeep Singh",
-            speciality: "orthology",
-            experience: "20 years",
-            hospital: "City Hospital 1",
-          },
-        },
-        {
-          doctor_details: {
-            name: "Another Doctor",
-            speciality: "Another Speciality",
-            experience: "10 years",
-            hospital: "City Hospital 1",
-          },
-        },
-        {
-          doctor_details: {
-            name: "Another Doctor",
-            speciality: "Another Speciality",
-            experience: "10 years",
-            hospital: "City Hospital 1",
-          },
-        },
-      ],
-    },
-    {
-      name: "City Hospital 1",
-      doctors: [
-        {
-          doctor_details: {
-            name: "Karandeep Singh",
-            speciality: "orthology",
-            experience: "20 years",
-            hospital: "City Hospital 1",
-          },
-        },
-        {
-          doctor_details: {
-            name: "Another Doctor",
-            speciality: "Another Speciality",
-            experience: "10 years",
-            hospital: "City Hospital 1",
-          },
-        },
-        {
-          doctor_details: {
-            name: "Another Doctor",
-            speciality: "Another Speciality",
-            experience: "10 years",
-            hospital: "City Hospital 1",
-          },
-        },
-      ],
-    },
-    {
-      name: "City Hospital 1",
-      doctors: [
-        {
-          doctor_details: {
-            name: "Karandeep Singh Sandhu",
-            speciality: "orthology",
-            experience: "20 years",
-            hospital: "City Hospital 1",
-          },
-        },
-        {
-          doctor_details: {
-            name: "Another Doctor",
-            speciality: "Another Speciality",
-            experience: "10 years",
-            hospital: "City Hospital 1",
-          },
-        },
-        {
-          doctor_details: {
-            name: "Another Doctor",
-            speciality: "Another Speciality",
-            experience: "10 years",
-            hospital: "City Hospital 1",
-          },
-        },
-        {
-          doctor_details: {
-            name: "Another Doctor",
-            speciality: "Another Speciality",
-            experience: "10 years",
-            hospital: "City Hospital 1",
-          },
-        },
-      ],
-    },
-  ]);
+  const [hospitals, setHospitals] = useState([]);
 
   const filteredDoctors = doctors.filter((doctor) =>
     doctor.name.toLowerCase().includes(searchInput.toLowerCase())
@@ -256,6 +176,8 @@ const AllDoctors = () => {
   };
 
   const filteredData = searchInput.trim() === "" ? hospitals : doctors;
+
+  // console.log(hospitals);
 
   return (
     <div>
@@ -293,7 +215,8 @@ const AllDoctors = () => {
                         <Grid mt={15}>
                           {hospital.doctors.map((doctor, index) => (
                             <DoctorCard
-                              doctor={doctor.doctor_details}
+                              hospital={hospital.name}
+                              doctor={doctor}
                               key={index}
                             />
                           ))}
@@ -311,7 +234,11 @@ const AllDoctors = () => {
               {filteredDoctors.length > 0 ? (
                 <Grid>
                   {filteredDoctors.map((doctor, index) => (
-                    <DoctorCard doctor={doctor} key={index} />
+                    <DoctorCard
+                      hospital={doctor.hospital.name}
+                      doctor={doctor}
+                      key={index}
+                    />
                   ))}
                 </Grid>
               ) : (
