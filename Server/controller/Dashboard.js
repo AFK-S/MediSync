@@ -5,6 +5,7 @@ import LogSchema from "../models/LogSchema.js";
 import PatientSchema from "../models/PatientSchema.js";
 import HospitalSchema from "../models/HospitalSchema.js";
 import ReportSchema from "../models/ReportSchema.js";
+import { addMinutes } from "../middleware/Function.js";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
@@ -112,6 +113,13 @@ const Doctor = async (req, res) => {
       const itemDate = new Date(item.date);
       return itemDate >= today;
     });
+    let today_time = filter_availability.map((item) => {
+      const itemDate = new Date(item.date);
+      console.log(itemDate, today, tomorrow);
+      if (itemDate >= today && itemDate < tomorrow) {
+        return item;
+      }
+    });
     doctor.availability = filter_availability;
     const hospital = await HospitalSchema.findById(doctor.hospital_id).lean();
     doctor.hospital = hospital;
@@ -160,6 +168,11 @@ const Doctor = async (req, res) => {
         return b.severity_count - a.severity_count;
       }
     });
+    console.log(today_time);
+    for (const object of sorted_today_appointment) {
+      object.alloted_time = addMinutes(today_time, doctor.average_time);
+      today_time = object.alloted_time;
+    }
     doctor.today_appointment = sorted_today_appointment;
     doctor.next_date =
       doctor.availability[0].date.toISOString().split("T")[0] ===
