@@ -2,10 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { Modal, Button } from "@mantine/core";
 import AttendanceCalendar from "../AttendanceCalendar/AttendanceCalendar";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import axios from "axios";
 
 const Table = ({ data, columns }) => {
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const formattedDate = new Date(date).toLocaleDateString("en-GB", options);
+    return formattedDate;
+  };
   const [log, setLog] = useState([]);
 
   useEffect(() => {
@@ -31,8 +36,11 @@ const Table = ({ data, columns }) => {
         <tbody>
           {log.map((item, index) => (
             <tr key={index}>
+              <td style={{ whiteSpace: "nowrap" }}>{item.type}</td>
               <td style={{ whiteSpace: "nowrap" }}>{item.status}</td>
-              <td style={{ whiteSpace: "nowrap" }}>{item.createdAt}</td>
+              <td style={{ whiteSpace: "nowrap" }}>
+                {formatDate(item.createdAt)}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -131,6 +139,12 @@ const DoctorProfile = () => {
   const revenue =
     doctorDetails && doctorDetails.treated_patient_count * doctorDetails.fees;
 
+  const formatTime = (date) => {
+    const options = { hour: "2-digit", minute: "2-digit" };
+    const formattedTime = new Date(date).toLocaleTimeString("en-GB", options);
+    return formattedTime;
+  };
+
   return (
     <>
       {doctorDetails && (
@@ -149,21 +163,24 @@ const DoctorProfile = () => {
               <div className="col-md-4">
                 <div className="c-card">
                   <h4>
-                    Revenue{" "}
+                    Today's Revenue{" "}
                     <span style={{ fontSize: "18px" }}>
                       {" "}
-                      ({doctorDetails &&
+                      <br />(
+                      {doctorDetails &&
                         doctorDetails.treated_patient_count}{" "}
                       patients treated)
                     </span>
                   </h4>
-                  <h5>Rs. {revenue}</h5>
+                  <h5 className="mt-3">Rs. {revenue}</h5>
                 </div>
               </div>
               <div className="col-md-4">
                 <div className="c-card">
                   <h4>Patient History</h4>
-                  <Button onClick={open}>Open modal</Button>
+                  <Button onClick={open} mt={12}>
+                    Open modal
+                  </Button>
                 </div>
               </div>
             </div>
@@ -174,16 +191,52 @@ const DoctorProfile = () => {
                 <AttendanceCalendar
                   availability={doctorDetails.availability}
                   attendance={doctorDetails.attendance}
+                  today_appointment={doctorDetails.today_appointment}
                 />
               </div>
               <div className="col-md-4">
                 <div className="c-card">
                   <h4>Logs</h4>
                   <div className="mt-2">
-                    <Table
-                      data={doctorDetails.log}
-                      columns={["Status", "Time"]}
-                    />
+                    {doctorDetails.log && doctorDetails.log.length > 0 ? (
+                      <div
+                        className="inner-container"
+                        style={{ overflowY: "auto", maxHeight: "40vh" }}
+                      >
+                        <table className="table table-hover text-no-wrap">
+                          <thead>
+                            <tr>
+                              <th scope="col" className="text-no-wrap">
+                                Type
+                              </th>
+                              <th scope="col" className="text-no-wrap">
+                                Status
+                              </th>
+                              <th scope="col" className="text-no-wrap">
+                                Time
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {doctorDetails.log.reverse().map((item, index) => (
+                              <tr key={index}>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {item.type}
+                                </td>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {item.status}
+                                </td>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {formatTime(item.createdAt)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p>No logs available.</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -192,10 +245,57 @@ const DoctorProfile = () => {
         </div>
       )}
       <Modal opened={opened} onClose={close} title="Patient Details">
-        <Table
+        {/* <Table
           data={patientsDetails && patientsDetails}
           columns={["Name", "Date", "Doctor", "TimeSlot"]}
-        />
+        /> */}
+        {doctorDetails.treated_patient &&
+        doctorDetails.treated_patient.length > 0 ? (
+          <div
+            className="inner-container"
+            style={{ overflowY: "auto", maxHeight: "40vh" }}
+          >
+            <table className="table table-hover text-no-wrap">
+              <thead>
+                <tr>
+                  <th scope="col" className="text-no-wrap">
+                    Name
+                  </th>
+                  <th scope="col" className="text-no-wrap">
+                    Age
+                  </th>
+                  <th scope="col" className="text-no-wrap">
+                    View
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {doctorDetails &&
+                  doctorDetails.treated_patient.map((item, index) => (
+                    <tr key={index}>
+                      <td style={{ whiteSpace: "nowrap" }}>{item.name}</td>
+                      <td style={{ whiteSpace: "nowrap" }}>{item.age}</td>
+                      <NavLink
+                        to={`/patients/profile/${item._id}`}
+                        style={{
+                          padding: 0,
+                          height: "100%",
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          marginTop: "10px",
+                        }}
+                      >
+                        <td style={{ whiteSpace: "nowrap" }}>View</td>
+                      </NavLink>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p>No Patient available.</p>
+        )}
       </Modal>
     </>
   );

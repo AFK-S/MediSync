@@ -2,11 +2,12 @@ import AppointmentSchema from "../models/AppointmentSchema.js";
 import DoctorSchema from "../models/DoctorSchema.js";
 import ReportSchema from "../models/ReportSchema.js";
 import PatientSchema from "../models/PatientSchema.js";
+import { addMinutes, minusMinutes } from "../middleware/Function.js";
 import mongoose from "mongoose";
 import axios from "axios";
 const { ObjectId } = mongoose.Types;
 
-const Register = async (req, res) => {
+const OnlineRegister = async (req, res) => {
   try {
     const { hospital_id, doctor_id, patient_id, date, time_slot, symptoms } =
       req.body;
@@ -18,7 +19,7 @@ const Register = async (req, res) => {
       .lean();
     const disease_list = reports.flatMap((report) => report.disease);
     const { data } = await axios.post(
-      "http://192.168.0.105:5000/api/patient/severity_index",
+      "http://192.168.0.108:5000/api/patient/severity_index",
       {
         age: patient.age,
         symptoms,
@@ -30,6 +31,62 @@ const Register = async (req, res) => {
       doctor_id,
       patient_id,
       type: "online",
+      symptoms,
+      severity_index: data.severity_index,
+      severity_count: data.severity_count,
+      date: date,
+      time_slot,
+    });
+    res.status(200).send(appointment._id);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+const WalkInRegister = async (req, res) => {
+  try {
+    const {
+      hospital_id,
+      doctor_id,
+      phone_number,
+      name,
+      age,
+      gender,
+      date,
+      time_slot,
+      symptoms,
+    } = req.body;
+    let patient = await PatientSchema.findOne({
+      phone_number,
+    })
+      .select("age")
+      .lean();
+    if (!patient) {
+      patient = await PatientSchema.create({
+        phone_number,
+        name,
+        age,
+        gender,
+      });
+    }
+    const reports = await ReportSchema.find({ patient_id: patient._id })
+      .select("disease")
+      .lean();
+    const disease_list = reports.flatMap((report) => report.disease);
+    const { data } = await axios.post(
+      "http://192.168.0.108:5000/api/patient/severity_index",
+      {
+        age: patient.age,
+        symptoms,
+        past_disease: disease_list,
+      }
+    );
+    const appointment = await AppointmentSchema.create({
+      hospital_id,
+      doctor_id,
+      patient_id: patient._id,
+      type: "walk_in",
       symptoms,
       severity_index: data.severity_index,
       severity_count: data.severity_count,
@@ -257,8 +314,47 @@ const MarkAsDone = async (req, res) => {
   }
 };
 
+const AllocateAppointmentSlot = async (doctor_id) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dayAfterTomorrow = new Date(today);
+  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+  const doctor = await DoctorSchema.findById(doctor_id);
+  let tomorrow_slot = doctor.availability.filter((item) => {
+    const itemDate = new Date(item.date);
+    return (
+      itemDate.getTime() >= tomorrow.getTime() &&
+      itemDate.getTime() < dayAfterTomorrow.getTime()
+    );
+  });
+  tomorrow_slot = tomorrow_slot[0] ? tomorrow_slot[0] : null;
+  if (tomorrow_slot == null) return;
+  const tomorrow_date = new Date(tomorrow_slot.date);
+  tomorrow_date.setHours(0, 0, 0, 0);
+  const tomorrow_appointment = await AppointmentSchema.find({
+    doctor_id: new ObjectId(doctor_id),
+    date: {
+      $gte: tomorrow_date,
+      $lte: new Date(tomorrow_date.getTime() + 24 * 60 * 60 * 1000),
+    },
+    treated: false,
+  });
+  let tomorrow_time = minusMinutes(
+    tomorrow_slot.start_time,
+    doctor.average_time
+  );
+  for (const object of tomorrow_appointment) {
+    object.alloted_time = addMinutes(tomorrow_time, doctor.average_time);
+    tomorrow_time = object.alloted_time;
+  }
+  await Promise.all(tomorrow_appointment.map((item) => item.save()));
+};
+
 export {
-  Register,
+  OnlineRegister,
+  WalkInRegister,
   UpdateDetails,
   DeleteAppointment,
   AppointmentInfo,
@@ -268,4 +364,5 @@ export {
   AllDoctorAppointment,
   DoctorAvailableSlots,
   MarkAsDone,
+  AllocateAppointmentSlot,
 };

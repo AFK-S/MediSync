@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "@mantine/form";
-import {auth} from "../firebase.js"
+import { auth } from "../firebase.js";
 
 import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
 
@@ -13,6 +13,7 @@ import {
   Button,
   Divider,
   Stack,
+  Select,
 } from "@mantine/core";
 import { PinInput } from "@mantine/core";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -46,6 +47,7 @@ export default function Login() {
       name: "",
       age: "",
       phone_number: "",
+      gender: "",
     },
     validate: {},
   });
@@ -53,15 +55,15 @@ export default function Login() {
   const handleSendOTP = async () => {
     try {
       const PhoneNumber = "+91" + form.values.phone_number;
-      const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        PhoneNumber,
-        recaptcha
-      );
+      // const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
+      // const confirmation = await signInWithPhoneNumber(
+      //   auth,
+      //   PhoneNumber,
+      //   recaptcha
+      // );
 
-      console.log(confirmation);
-      setUser(confirmation);
+      // console.log(confirmation);
+      // setUser(confirmation);
       alert("OTP sent successfully!");
 
       setOtpSent(true);
@@ -73,7 +75,7 @@ export default function Login() {
 
   const handleVerifyOTP = async () => {
     try {
-      await user.confirm(otp);
+      // await user.confirm(otp);
       const response = await axios.get(
         `/api/patient/verify/${form.values.phone_number}`
       );
@@ -148,6 +150,20 @@ export default function Login() {
                 }
                 error={form.errors.age && form.errors.age}
                 radius="md"
+              />
+              <Select
+                required
+                placeholder="Select Gender"
+                label="Select Gender"
+                data={[
+                  { value: "male", label: "Male" },
+                  { value: "female", label: "Female" },
+                  { value: "others", label: "others" },
+                ]}
+                onChange={(event) => {
+                  form.setValues({ gender: event });
+                }}
+                value={form.values.gender}
               />
             </Stack>
 

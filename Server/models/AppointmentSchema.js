@@ -51,6 +51,9 @@ const AppointmentSchema = new Schema(
       type: String,
       required: [true, "Please provide a Time Slot"],
     },
+    alloted_time: {
+      type: String,
+    },
     e_prescription: {
       type: String,
       trim: true,
