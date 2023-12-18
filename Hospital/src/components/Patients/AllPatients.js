@@ -1,51 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
-
-const Table = ({ data, columns }) => {
-  return (
-    <div
-      className="inner-container"
-      style={{ overflowY: "auto", maxHeight: "300px" }}
-    >
-      <table className="table table-hover text-no-wrap table-borderless">
-        <thead>
-          <tr>
-            {columns.map((col, index) => (
-              <th key={index} scope="col" className="text-no-wrap">
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data &&
-            data.map((item, index) => (
-              <tr
-                key={index}
-                style={{
-                  whiteSpace: "nowrap",
-                  backgroundColor: "#fff",
-                  borderRadius: "20px",
-                  padding: "1rem",
-                  border: 0,
-                  marginBottom: "1rem",
-                }}
-              >
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex}>{item[col.toLowerCase()]}</td>
-                ))}
-                <td>
-                  <NavLink to={`profile/${item.id}`}>View More</NavLink>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+import { StateContext } from "../../context/StateContext";
 
 const AllPatients = () => {
+  const { hopitalData } = useContext(StateContext);
+  console.log(hopitalData);
+
   const [doctors, setDoctors] = useState([
     {
       id: "657c32c9560f1eb5906adab0",
@@ -85,10 +45,48 @@ const AllPatients = () => {
 
       <div className="container-fluid">
         <div className="mt-4">
-          <Table
-            data={doctors && doctors}
-            columns={["Name", "Age", "Speciality", "Experience", ""]}
-          />
+          <div
+            className="inner-container"
+            style={{ overflowY: "auto", maxHeight: "300px" }}
+          >
+            <table className="table table-hover text-no-wrap table-borderless">
+              <thead>
+                <tr>
+                  <th scope="col" className="text-no-wrap">
+                    Name
+                  </th>
+                  <th scope="col" className="text-no-wrap">
+                    Age
+                  </th>
+                  <th scope="col" className="text-no-wrap">
+                    View
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {hopitalData.treated_patient &&
+                  hopitalData.treated_patient.map((item, index) => (
+                    <tr
+                      key={index}
+                      style={{
+                        whiteSpace: "nowrap",
+                        backgroundColor: "#fff",
+                        borderRadius: "20px",
+                        padding: "1rem",
+                        border: 0,
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <td>{item.name}</td>
+                      <td>{item.age}</td>
+                      <td>
+                        <NavLink to={`profile/${item._id}`}>View More</NavLink>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
