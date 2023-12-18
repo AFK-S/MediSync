@@ -9,7 +9,7 @@ const StateProvider = ({ children }) => {
   const [isLogin, setIsLogin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [doctorsList, setDoctorsList] = useState([]);
-  const [hopitalData, setHopitalData] = useState([]);
+  const [hospitalData, setHopitalData] = useState([]);
 
   useEffect(() => {
     setIsLogin(cookies._id ? true : false);
@@ -29,7 +29,7 @@ const StateProvider = ({ children }) => {
     <StateContext.Provider
       value={{
         getHospital,
-        hopitalData,
+        hospitalData,
         loading,
         setLoading,
         isLogin,

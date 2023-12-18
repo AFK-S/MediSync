@@ -3,8 +3,8 @@ import { NavLink } from "react-router-dom";
 import { StateContext } from "../../context/StateContext";
 
 const AllPatients = () => {
-  const { hopitalData } = useContext(StateContext);
-  console.log(hopitalData);
+  const { hospitalData } = useContext(StateContext);
+  console.log(hospitalData);
 
   const [doctors, setDoctors] = useState([
     {
@@ -64,8 +64,8 @@ const AllPatients = () => {
                 </tr>
               </thead>
               <tbody>
-                {hopitalData.treated_patient &&
-                  hopitalData.treated_patient.map((item, index) => (
+                {hospitalData.treated_patient &&
+                  hospitalData.treated_patient.map((item, index) => (
                     <tr
                       key={index}
                       style={{

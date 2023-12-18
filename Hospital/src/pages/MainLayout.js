@@ -14,7 +14,7 @@ import { useCookies } from "react-cookie";
 
 const MainLayout = () => {
   const [cookies] = useCookies();
-  const { isLogin, setDoctorsList, setLoading, getHospital, hospital } =
+  const { isLogin, setDoctorsList, setLoading, getHospital } =
     useContext(StateContext);
   const Navigate = useNavigate();
 
