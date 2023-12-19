@@ -12,16 +12,24 @@ class SimpleFacerec:
         self.frame_resizing = 0.25
 
     def load_encoding_image_url(self, image_url):
-        img = self.load_image_from_cloudinary(image_url)
-        rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        """Load face encoding from an image URL."""
+        try:
+            img = self.load_image_from_cloudinary(image_url)
+            rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        filename = image_url.split("/")[-1].split("?")[0]
+            filename = image_url.split("/")[-1].split("?")[0]
 
-        img_encoding = face_recognition.face_encodings(rgb_img)[0]
+            # Assuming only the first face encoding is needed
+            face_encodings = face_recognition.face_encodings(rgb_img)
+            if not face_encodings:
+                raise ValueError("No face found in the provided image.")
+            img_encoding = face_encodings[0]
 
-        self.known_face_encodings.append(img_encoding)
-        self.known_face_names.append(filename)
-        self.known_face_urls.append(image_url)
+            self.known_face_encodings.append(img_encoding)
+            self.known_face_names.append(filename)
+            self.known_face_urls.append(image_url)
+        except Exception as e:
+            print(f"Error loading image from URL {image_url}: {e}")
 
     def load_image_from_cloudinary(self, image_url):
         img_data = requests.get(image_url).content

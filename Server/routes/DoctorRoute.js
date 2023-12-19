@@ -4,6 +4,7 @@ import {
   UpdateDetails as UpdateDoctor,
   DeleteDoctor,
   DoctorInfo,
+  VerifyDoctor,
   HospitalDoctorsList,
   AllHospitalDoctorsList,
   AllDoctors,
@@ -29,6 +30,7 @@ router.post(
 router.put("/doctor/update/:doctor_id", UpdateDoctor);
 router.delete("/doctor/delete/:doctor_id", DeleteDoctor);
 router.get("/doctor/:doctor_id", DoctorInfo);
+router.get("/doctor/verify/:mac_address", VerifyDoctor);
 router.get("/doctor/hospital/:hospital_id", HospitalDoctorsList);
 router.get("/doctors/hospital", AllHospitalDoctorsList);
 router.get("/doctors", AllDoctors);

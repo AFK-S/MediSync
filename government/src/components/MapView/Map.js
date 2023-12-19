@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "ol/ol.css";
 import Map from "ol/Map";
-import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
 import OSM from "ol/source/OSM";
 import Feature from "ol/Feature";
@@ -17,11 +16,11 @@ const MapComponent = () => {
   const [map, setMap] = useState(null);
   const [hospitalVectorLayer, setHospitalVectorLayer] = useState(null);
   const [hospitals, setHospitals] = useState([]);
+  const [isShown, setIsShown] = useState(false);
 
   const getCords = async () => {
     try {
       const { data } = await axios.get("/api/hospitals");
-      console.log();
 
       const hospitalCoords = data.map((hospital) => ({
         latitude: hospital.coordinates.latitude,
@@ -43,10 +42,6 @@ const MapComponent = () => {
             source: new OSM(),
           }),
         ],
-        view: new View({
-          center: fromLonLat([76.64, 12.3]),
-          zoom: 12,
-        }),
       });
 
       setMap(newMap);
@@ -81,8 +76,18 @@ const MapComponent = () => {
 
       hospitalVectorLayer.getSource().clear();
       hospitalVectorLayer.getSource().addFeatures(hospitalFeatures);
+
+      const avgLat =
+        hospitals.reduce((acc, curr) => acc + curr.latitude, 0) /
+        hospitals.length;
+      const avgLon =
+        hospitals.reduce((acc, curr) => acc + curr.longitude, 0) /
+        hospitals.length;
+
+      map.getView().setCenter(fromLonLat([avgLon, avgLat]));
+      map.getView().setZoom(12);
     }
-  }, [hospitalVectorLayer, hospitals]);
+  }, [hospitals, hospitalVectorLayer, map]);
 
   return (
     <div className="map-container" style={{ width: "1200px", height: "500px" }}>
