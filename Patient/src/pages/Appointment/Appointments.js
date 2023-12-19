@@ -95,7 +95,7 @@ const Appointments = () => {
     console.log(slots);
     const slotsBooked = slots.slot_booked;
     const slotsOnlineAvailable = slots.slot_count;
-    const slotsOfflineAvailable = slots.slot_count.walk_in || 0;
+    const slotsOfflineAvailable = slots.slot_count.walk_in;
     console.log(slotsBooked, slotsOnlineAvailable, slotsOfflineAvailable);
 
     if (slotsBooked <= slotsOnlineAvailable) {
@@ -138,12 +138,14 @@ const Appointments = () => {
       `/api/appointment/doctor/slots/${type}/${doctor_id}`,
       { date: date }
     );
+
+    console.log(data);
     return data;
   };
 
   const handleSubmit = async (values) => {
-    // console.log(values);
     values.patient_id = cookies._id;
+    console.log(values);
     try {
       // console.log(values);
       const { data } = await axios.post(
@@ -214,11 +216,11 @@ const Appointments = () => {
                     value={form.values.hospital}
                   />
                 </div>
-                <div className="col-md-6 mt-3 mt-md-0">
+                <div className="col-md-6 mt-md-3 mt-md-0">
                   <Select
                     label="Select Specialization"
                     placeholder="Select Specialization"
-                    mt="md"
+                    // mt="md"
                     {...form.getInputProps("specialization")}
                     data={fetchedSpecializations.map((specialization) => ({
                       value: specialization,

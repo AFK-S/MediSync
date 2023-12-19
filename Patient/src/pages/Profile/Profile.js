@@ -127,26 +127,39 @@ const Profile = () => {
                     </Text>
 
                     <Text className="profile-text" fz="xl" fw={500}>
-                      Age : {patient && patient.age}
+                      <span style={{ fontWeight: "600" }}>Age : </span>
+                      {patient && patient.age}
                     </Text>
 
-                    <Text className="profile-text" fz="lg" c="dimmed">
-                      Phone : {patient && patient.phone_number}
+                    <Text className="profile-text" fz="xl" fw={500}>
+                      <span style={{ fontWeight: "600" }}>Phone : </span>
+                      {patient && patient.phone_number}
                     </Text>
-                    <Text className="profile-text" fz="lg" c="dimmed">
-                      Past Medical Conditions :{" "}
-                      {patient?.disease?.map((item, index) => (
-                        <span key={item}>
-                          {item}
-                          {index !== patient.disease.length - 1 && ", "}
-                        </span>
-                      ))}
+                    <Text className="profile-text" fz="xl" fw={500}>
+                      <span style={{ fontWeight: "600" }}>
+                        Past Medical Conditions:{" "}
+                      </span>
+                      {patient?.disease && patient.disease.length > 0
+                        ? patient.disease.map((item, index) => (
+                            <span key={item}>
+                              {item}
+                              {index !== patient.disease.length - 1 && ", "}
+                            </span>
+                          ))
+                        : "NA"}
                     </Text>
-                    <Text className="profile-text" fz="lg" c="dimmed">
-                      Drinking Habits : {patient && patient.phone_number}
+
+                    <Text className="profile-text" fz="xl" fw={500}>
+                      <span style={{ fontWeight: "600" }}>
+                        Drinking/Smoking habits :{" "}
+                      </span>
+                      Yes
+                      {/* {patient && patient.phone_number} */}
                     </Text>
-                    <Text className="profile-text" fz="lg" c="dimmed">
-                      Lifestyle : {patient && patient.phone_number}
+                    <Text className="profile-text" fz="xl" fw={500}>
+                      <span style={{ fontWeight: "600" }}>Lifestyle : </span>
+                      Urban
+                      {/* {patient && patient.phone_number} */}
                     </Text>
                   </div>
                 </Grid.Col>
