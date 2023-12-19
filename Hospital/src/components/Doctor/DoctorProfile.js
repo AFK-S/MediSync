@@ -155,8 +155,12 @@ const DoctorProfile = () => {
               <div className="col-md-4">
                 <div className="c-card">
                   <h4>Today's Appointments</h4>
-                  {doctorDetails && doctorDetails.today_appointment_count ? (
-                    <h3>{doctorDetails.today_appointment_count}</h3>
+                  {doctorDetails &&
+                  doctorDetails.today_online_appointment_count ? (
+                    <h3>
+                      {doctorDetails.today_online_appointment_count +
+                        doctorDetails.today_walk_in_appointment_count}
+                    </h3>
                   ) : (
                     <p className="mt-3">No Appointments Today</p>
                   )}

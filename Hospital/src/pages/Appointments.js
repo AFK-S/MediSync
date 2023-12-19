@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
 import { TextInput, Button, Group, Select, NumberInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
-const doctors = ["Dr. XYZ", "Dr. ABC", "Dr. PQR"];
+// const doctors = ["Dr. XYZ", "Dr. ABC", "Dr. PQR"];
 const timeSlots = ["10:00am - 10:30am", "11:00am - 11:30am", "2:00pm - 2:30pm"];
 
 const Table = ({ data, columns }) => {
@@ -40,6 +42,11 @@ const Table = ({ data, columns }) => {
 };
 
 const Appointments = () => {
+  const [doctors, setDoctors] = useState([]);
+  const [availability, setAvailability] = useState([]);
+  const [cookie] = useCookies();
+  const [timeSlot, setTimeSlot] = useState([]);
+
   const [patientsWaiting, setPatientsWaiting] = useState([
     {
       name: "Karan",
@@ -83,16 +90,72 @@ const Appointments = () => {
       name: "",
       age: "",
       phone_number: "",
+      gender: "",
+      lifestyle: "",
+      habits: "",
       doctor: "",
-      timeslot: "",
+      doctor_id: "",
       date: "",
+      time_slot: "",
+      hospital_id: cookie._id,
+      symptoms: [],
     },
   });
+
+  const handleDate = async (value) => {
+    const foundDoctor = doctors.find((item) => item.name === value);
+
+    form.setValues({ doctor: value });
+    form.setValues({ doctor_id: foundDoctor._id });
+
+    const date = foundDoctor.availability;
+
+    console.log(date);
+    setAvailability(date);
+  };
+
+  const handleTimeSlot = (date) => {
+    const foundDoctor = doctors.find(
+      (item) => item.name === form.values.doctor
+    );
+    const foundDate = foundDoctor.availability.find(
+      (item) => item.date === date
+    );
+
+    const start_time = foundDate.start_time;
+    const end_time = foundDate.end_time;
+    const timeSlots = [`${start_time}-${end_time}`];
+    console.log(timeSlots);
+
+    setTimeSlot(timeSlots);
+  };
+
+  const fetchDoctors = async () => {
+    try {
+      const { data } = await axios.get(`/api/doctor/hospital/${cookie._id}`);
+      setDoctors(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
 
   const handleSubmit = () => {
     // Handle form submission logic here
     const formData = form.values;
-    // Add logic to handle the form data (e.g., API call, state update)
+    try {
+      const { data } = axios.post(
+        "/api/appointment/walk_in/register",
+        formData
+      );
+
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
     console.log(formData);
   };
 
@@ -128,25 +191,87 @@ const Appointments = () => {
               <div className="col-md-6">
                 <Select
                   mt="md"
+                  label="Select Gender"
+                  placeholder="Select Gender"
+                  data={[
+                    { label: "Male", value: "male" },
+                    { label: "Female", value: "female" },
+                  ]}
+                  onChange={(value) =>
+                    form.setValues({ ...form.values, gender: value })
+                  }
+                  value={form.values.gender}
+                />{" "}
+              </div>
+
+              <div className="col-md-6">
+                <Select
+                  mt="md"
+                  required
+                  placeholder="Select one of the following"
+                  label="Do You Drink/Smoke?"
+                  data={[
+                    { value: "yes", label: "Yes" },
+                    { value: "no", label: "No" },
+                  ]}
+                  onChange={(event) => {
+                    form.setValues({ habits: event });
+                  }}
+                  value={form.values.habits}
+                />
+              </div>
+              <div className="col-md-6">
+                <Select
+                  mt="md"
+                  label="Select Lifestyle"
+                  placeholder="Select Lifestyle"
+                  data={[
+                    { value: "rural", label: "Rural" },
+                    { value: "urban", label: "Urban" },
+                    { value: "active", label: "Active" },
+                    { value: "urban-rural", label: "Urban-rural" },
+                  ]}
+                  onChange={(value) =>
+                    form.setValues({ ...form.values, lifestyle: value })
+                  }
+                  value={form.values.lifestyle}
+                />
+              </div>
+              <div className="col-md-6">
+                <Select
+                  mt="md"
                   label="Select Doctor"
                   placeholder="Select Doctor"
                   data={doctors.map((doctor) => ({
-                    value: doctor,
-                    label: doctor,
+                    value: doctor.name,
+                    label: doctor.name,
                   }))}
-                  onChange={(value) =>
-                    form.setValues({ ...form.values, doctor: value })
-                  }
+                  onChange={(value) => handleDate(value)}
                   value={form.values.doctor}
                 />
               </div>
 
               <div className="col-md-6">
-                <DateInput
+                <Select
                   mt="md"
                   label="Select Date"
                   placeholder="Select Date"
-                  {...form.getInputProps("date")}
+                  data={availability
+                    .filter(
+                      (slot) =>
+                        new Date(slot.date) >= new Date().setHours(0, 0, 0, 0)
+                    )
+                    .map((slot) => ({
+                      value: slot.date,
+                      label: new Date(slot.date).toLocaleDateString("en-GB"),
+                    }))
+                    .sort((a, b) => new Date(a.value) - new Date(b.value))}
+                  onChange={(value) => {
+                    form.setValues({ ...form.values, date: value });
+                    handleTimeSlot(value);
+                  }}
+                  nothingFoundMessage="No time slots available"
+                  value={form.values.date}
                 />
               </div>
               <div className="col-md-6">
@@ -154,11 +279,11 @@ const Appointments = () => {
                   mt="md"
                   label="Select Time Slot"
                   placeholder="Select Time Slot"
-                  data={timeSlots.map((slot) => ({ value: slot, label: slot }))}
+                  data={timeSlot.map((slot) => ({ value: slot, label: slot }))}
                   onChange={(value) =>
-                    form.setValues({ ...form.values, timeslot: value })
+                    form.setValues({ ...form.values, time_slot: value })
                   }
-                  value={form.values.timeslot}
+                  value={form.values.time_slot}
                 />
               </div>
             </div>
