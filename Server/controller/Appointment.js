@@ -53,6 +53,8 @@ const WalkInRegister = async (req, res) => {
       name,
       age,
       gender,
+      habits,
+      lifestyle,
       date,
       time_slot,
       symptoms,
@@ -66,6 +68,8 @@ const WalkInRegister = async (req, res) => {
         name,
         age,
         gender,
+        habits,
+        lifestyle,
       });
     }
     const reports = await ReportSchema.find({ patient_id: patient._id })
@@ -82,6 +86,24 @@ const WalkInRegister = async (req, res) => {
         habits: patient.habits,
       }
     );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const today_online_appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          doctor_id: new ObjectId(doctor_id),
+          date: {
+            $gte: today,
+            $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+          type: "online",
+        },
+      },
+    ]).sort({ severity_index: -1, severity_count: -1 });
+    const last_appointment_allocated_time = today_online_appointment[-1]
+      ? today_online_appointment[-1].alloted_time
+      : "00:00";
+    const doctor = await DoctorSchema.findById(doctor_id).lean();
     const appointment = await AppointmentSchema.create({
       hospital_id,
       doctor_id,
@@ -92,6 +114,10 @@ const WalkInRegister = async (req, res) => {
       severity_count: data.severity_count,
       date: date,
       time_slot,
+      alloted_time: addMinutes(
+        last_appointment_allocated_time,
+        doctor.average_time
+      ),
     });
     res.status(200).send(appointment._id);
   } catch (err) {
@@ -390,6 +416,41 @@ const AllocateTodayAppointmentSlot = async (doctor_id) => {
   await Promise.all(tomorrow_appointment.map((item) => item.save()));
 };
 
+const TodayWalkInAppointment = async (req, res) => {
+  try {
+    const { hospital_id } = req.params;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const today_walk_in_appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          hospital_id: new ObjectId(hospital_id),
+          date: {
+            $gte: today,
+            $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+          type: "walk_in",
+        },
+      },
+      {
+        $lookup: {
+          from: "patients",
+          localField: "patient_id",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: "$patient",
+      },
+    ]).lean();
+    res.status(200).send(today_walk_in_appointment);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   OnlineRegister,
   WalkInRegister,
@@ -404,4 +465,5 @@ export {
   MarkAsDone,
   AllocateAppointmentSlot,
   AllocateTodayAppointmentSlot,
+  TodayWalkInAppointment,
 };
