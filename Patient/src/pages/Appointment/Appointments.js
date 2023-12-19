@@ -94,8 +94,8 @@ const Appointments = () => {
     const slots = await handleAvailableSlot(foundDate.date);
     console.log(slots);
     const slotsBooked = slots.slot_booked;
-    const slotsOnlineAvailable = slots.slot_count.online;
-    const slotsOfflineAvailable = slots.slot_count.walk_in;
+    const slotsOnlineAvailable = slots.slot_count;
+    const slotsOfflineAvailable = slots.slot_count.walk_in || 0;
     console.log(slotsBooked, slotsOnlineAvailable, slotsOfflineAvailable);
 
     if (slotsBooked <= slotsOnlineAvailable) {
@@ -190,6 +190,13 @@ const Appointments = () => {
                       searchable
                       nothingFoundMessage="Nothing found..."
                     />
+                    <Button
+                      mt={23}
+                      style={{ background: "#0a0059" }}
+                      className="book-btn"
+                    >
+                      Recommend
+                    </Button>
                   </div>
                 </div>
 
@@ -296,13 +303,6 @@ const Appointments = () => {
                     Offline Slots Available: {offlineSlotsAvailable}
                   </Text>
                 </Group>
-                <Button
-                  mt={23}
-                  style={{ background: "#0a0059" }}
-                  className="book-btn"
-                >
-                  Recommend
-                </Button>
 
                 <Button
                   className="book-btn"
