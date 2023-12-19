@@ -328,9 +328,11 @@ const DoctorAvailableSlots = async (req, res) => {
 const MarkAsDone = async (req, res) => {
   try {
     const { appointment_id } = req.params;
+    const { diagnosis_result } = req.body;
     const appointment = await AppointmentSchema.findById(appointment_id);
     if (!appointment) return res.status(400).send("Appointment not found");
     appointment.treated = !appointment.treated;
+    if (diagnosis_result) appointment.diagnosis_result = diagnosis_result;
     await appointment.save();
     res.status(200).send("Appointment successfully marked");
   } catch (err) {
