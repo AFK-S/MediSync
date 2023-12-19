@@ -103,7 +103,7 @@ const Appointments = () => {
       const end_time = foundDate.end_time;
       const timeSlots = [`${start_time}-${end_time}`];
       console.log(timeSlots);
-      setIsDateSelected(true); // Set the state when a date is selected
+      setIsDateSelected(true);
 
       setTimeSlot(timeSlots);
     } else {
