@@ -70,7 +70,7 @@ const DoctorLogin = async (req, res) => {
 
 const PatientLogin = async (req, res) => {
   try {
-    const { name, age, phone_number, gender } = req.body;
+    const { name, age, phone_number, gender, habits, lifestyle } = req.body;
     let response = await PatientSchema.findOne({
       phone_number,
     })
@@ -82,6 +82,8 @@ const PatientLogin = async (req, res) => {
         age,
         phone_number,
         gender,
+        habits,
+        lifestyle,
       });
     }
     res

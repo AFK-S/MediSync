@@ -53,7 +53,7 @@ const WalkInRegister = async (req, res) => {
       name,
       age,
       gender,
-      Drinking_Smoking,
+      habits,
       lifestyle,
       date,
       time_slot,
@@ -70,8 +70,8 @@ const WalkInRegister = async (req, res) => {
         name,
         age,
         gender,
-        Drinking_Smoking,
-        lifestyle 
+        habits,
+        lifestyle,
       });
     }
     const reports = await ReportSchema.find({ patient_id: patient._id })
@@ -343,6 +343,9 @@ const AllocateAppointmentSlot = async (doctor_id) => {
       $lte: new Date(tomorrow_date.getTime() + 24 * 60 * 60 * 1000),
     },
     treated: false,
+  }).sort({
+    severity_index: -1,
+    severity_count: -1,
   });
   let tomorrow_time = minusMinutes(
     tomorrow_slot.start_time,

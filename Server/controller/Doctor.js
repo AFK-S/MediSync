@@ -124,6 +124,18 @@ const DoctorInfo = async (req, res) => {
     res.status(400).send(err.message);
   }
 };
+const VerifyDoctor = async (req, res) => {
+  try {
+    const { mac_address } = req.params;
+    const doctor = await DoctorSchema.findOne({
+      mac_address: mac_address,
+    }).lean();
+    res.status(200).send(doctor ? true : false);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
 
 const HospitalDoctorsList = async (req, res) => {
   try {
@@ -240,6 +252,7 @@ export {
   UpdateDetails,
   DeleteDoctor,
   DoctorInfo,
+  VerifyDoctor,
   HospitalDoctorsList,
   AllHospitalDoctorsList,
   AllDoctors,
