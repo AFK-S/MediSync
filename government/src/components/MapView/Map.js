@@ -16,21 +16,24 @@ const MapComponent = () => {
   const [map, setMap] = useState(null);
   const [hospitalVectorLayer, setHospitalVectorLayer] = useState(null);
   const [hospitals, setHospitals] = useState([]);
-  const [isShown, setIsShown] = useState(false);
 
   const getCords = async () => {
     try {
       const { data } = await axios.get("/api/hospitals");
-
       const hospitalCoords = data.map((hospital) => ({
         latitude: hospital.coordinates.latitude,
         longitude: hospital.coordinates.longitude,
       }));
-
       setHospitals(hospitalCoords);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const createHospitalCircle = (coordinates) => {
+    return new Feature({
+      geometry: new Point(coordinates),
+    });
   };
 
   useEffect(() => {
@@ -43,7 +46,6 @@ const MapComponent = () => {
           }),
         ],
       });
-
       setMap(newMap);
 
       const hospitalVectorLayer = new VectorLayer({
@@ -56,26 +58,22 @@ const MapComponent = () => {
           }),
         }),
       });
-
       newMap.addLayer(hospitalVectorLayer);
-
       setHospitalVectorLayer(hospitalVectorLayer);
     }
+
     getCords();
   }, [map]);
 
   useEffect(() => {
     if (hospitalVectorLayer && hospitals.length > 0) {
-      const hospitalFeatures = hospitals.map((hospital) => {
+      const hospitalCircleFeatures = hospitals.map((hospital) => {
         const coords = fromLonLat([hospital.longitude, hospital.latitude]);
-        return new Feature({
-          geometry: new Point(coords),
-          name: hospital.name,
-        });
+        return createHospitalCircle(coords);
       });
 
       hospitalVectorLayer.getSource().clear();
-      hospitalVectorLayer.getSource().addFeatures(hospitalFeatures);
+      hospitalVectorLayer.getSource().addFeatures(hospitalCircleFeatures);
 
       const avgLat =
         hospitals.reduce((acc, curr) => acc + curr.latitude, 0) /

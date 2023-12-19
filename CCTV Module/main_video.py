@@ -16,7 +16,7 @@ else:
     print("Server is down")
 
 
-cap1 = cv2.VideoCapture(0)
+cap1 = cv2.VideoCapture(1)
 sfr1 = SimpleFacerec()
 
 # cap2 = cv2.VideoCapture(1)

@@ -109,7 +109,7 @@ function HospitalList({ setLoading }) {
                     <Button
                       variant="filled"
                       onClick={() => deleteHospital(item._id)}
-                      mt={60}
+                      mt={30}
                     >
                       Delete
                     </Button>
