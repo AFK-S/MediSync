@@ -14,7 +14,7 @@ import {
   MultiSelect,
   Text,
 } from "@mantine/core";
-
+import ETA from "./ETA";
 import { useCookies } from "react-cookie";
 
 const Appointments = () => {
@@ -318,6 +318,9 @@ const Appointments = () => {
               </Group>
             </div>
           </form>
+        </div>
+        <div className="c-card mt-5">
+          <ETA />
         </div>
       </div>
     </div>

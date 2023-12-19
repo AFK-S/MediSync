@@ -71,11 +71,20 @@ function Statistics() {
               <h3 className="text-center">Number of Live Hospitals</h3>
             </div>
           </div>
-          {/* <div className="col-md-4">
-            <div className="c-card">
-              <h3 className="text-center">Total XYZ</h3>
+        </div>
+        <div className="row mt-4">
+          <div className="col-md-12">
+            <div className="c-card ">
+              <h3 className="text-center">Number of Patients Treated</h3>
+              <Chart
+                className="mt-3"
+                options={bedsChartData.options}
+                series={bedsChartData.series}
+                type="bar"
+                height="380"
+              />
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>
