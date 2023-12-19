@@ -163,7 +163,7 @@ const Appointments = () => {
     <div>
       <div className="container-fluid">
         <div className="c-card">
-          <h4>Book an Appointment</h4>
+          <h4>Walk In Appointments</h4>
           <div className="container-fluid p-0 mt-3">
             <div className="row">
               <div className="col-md-6">
@@ -295,7 +295,7 @@ const Appointments = () => {
       </div>
       <div className="mt-4 c-card">
         <div className="d-flex flex-column flex-md-row align-items-start align-content-md-center justify-content-between w-100">
-          <h4 className="mb-2 ">Patients List</h4>
+          <h4 className="mb-2 ">Walk In Patient List</h4>
           <div
             className="d-flex align-items-center w-100 my-3 my-md-0"
             style={{ maxWidth: "300px" }}
