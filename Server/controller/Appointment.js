@@ -11,19 +11,19 @@ const OnlineRegister = async (req, res) => {
   try {
     const { hospital_id, doctor_id, patient_id, date, time_slot, symptoms } =
       req.body;
-    const patient = await PatientSchema.findById(patient_id)
-      .select("age")
-      .lean();
+    const patient = await PatientSchema.findById(patient_id).lean();
     const reports = await ReportSchema.find({ patient_id })
       .select("disease")
       .lean();
     const disease_list = reports.flatMap((report) => report.disease);
     const { data } = await axios.post(
-      "http://192.168.0.108:5000/api/patient/severity_index",
+      "http://192.168.0.114:5000/api/patient/severity_index",
       {
         age: patient.age,
         symptoms,
         past_disease: disease_list,
+        lifestyle: patient.lifestyle,
+        habits: patient.habits,
       }
     );
     const appointment = await AppointmentSchema.create({
@@ -53,25 +53,19 @@ const WalkInRegister = async (req, res) => {
       name,
       age,
       gender,
-      habits,
-      lifestyle,
       date,
       time_slot,
       symptoms,
     } = req.body;
     let patient = await PatientSchema.findOne({
       phone_number,
-    })
-      .select("age")
-      .lean();
+    }).lean();
     if (!patient) {
       patient = await PatientSchema.create({
         phone_number,
         name,
         age,
         gender,
-        habits,
-        lifestyle,
       });
     }
     const reports = await ReportSchema.find({ patient_id: patient._id })
@@ -79,11 +73,13 @@ const WalkInRegister = async (req, res) => {
       .lean();
     const disease_list = reports.flatMap((report) => report.disease);
     const { data } = await axios.post(
-      "http://192.168.0.108:5000/api/patient/severity_index",
+      "http://192.168.0.114:5000/api/patient/severity_index",
       {
         age: patient.age,
         symptoms,
         past_disease: disease_list,
+        lifestyle: patient.lifestyle,
+        habits: patient.habits,
       }
     );
     const appointment = await AppointmentSchema.create({
@@ -358,6 +354,42 @@ const AllocateAppointmentSlot = async (doctor_id) => {
   await Promise.all(tomorrow_appointment.map((item) => item.save()));
 };
 
+const AllocateTodayAppointmentSlot = async (doctor_id) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const doctor = await DoctorSchema.findById(doctor_id);
+  let today_slot = doctor.availability.filter((item) => {
+    const itemDate = new Date(item.date);
+    return (
+      itemDate.getTime() >= today.getTime() &&
+      itemDate.getTime() < tomorrow.getTime()
+    );
+  });
+  today_slot = today_slot[0] ? today_slot[0] : null;
+  if (today_slot == null) return;
+  const today_date = new Date(today_slot.date);
+  today_date.setHours(0, 0, 0, 0);
+  const tomorrow_appointment = await AppointmentSchema.find({
+    doctor_id: new ObjectId(doctor_id),
+    date: {
+      $gte: today_date,
+      $lte: new Date(today_date.getTime() + 24 * 60 * 60 * 1000),
+    },
+    treated: false,
+  }).sort({
+    severity_index: -1,
+    severity_count: -1,
+  });
+  let today_time = minusMinutes(today_slot.start_time, doctor.average_time);
+  for (const object of tomorrow_appointment) {
+    object.alloted_time = addMinutes(today_time, doctor.average_time);
+    today_time = object.alloted_time;
+  }
+  await Promise.all(tomorrow_appointment.map((item) => item.save()));
+};
+
 export {
   OnlineRegister,
   WalkInRegister,
@@ -371,4 +403,5 @@ export {
   DoctorAvailableSlots,
   MarkAsDone,
   AllocateAppointmentSlot,
+  AllocateTodayAppointmentSlot,
 };
