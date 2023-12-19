@@ -267,7 +267,13 @@ const AppointmentsScreen = () => {
                   key={index}
                   onPress={() => openBottomSheet(patient)}
                 >
-                  <View style={styles.patientCard}>
+                  <View
+                    style={{
+                      ...styles.patientCard,
+                      borderColor: "#000",
+                      borderWidth: patient?.type === "online" ? 0 : 2,
+                    }}
+                  >
                     <View>
                       <Image
                         source={{
