@@ -44,7 +44,7 @@ const PatientProfile = () => {
   const getPatient = async () => {
     try {
       const { data } = await axios.get(`/api/dashboard/patient/${id}`);
-      console.log(data);
+
       setPatientData(data);
     } catch (error) {
       alert(error.message);

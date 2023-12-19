@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Divider, Group, Text } from "@mantine/core";
+import { Divider, Group, Text, Avatar } from "@mantine/core";
 import Chart from "react-apexcharts";
 import { StateContext } from "../context/StateContext";
 
@@ -260,26 +260,102 @@ const Dashboard = () => {
       {/* Available Doctors */}
       <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Doctors Available</h4>
-        {/* <Table
-          data={doctors && doctors}
-          columns={[
-            "Name",
-            "Age",
-            "Experience",
-            "Specialty",
-            "Date",
-            "TimeSlot",
-          ]}
-        /> */}
+        <div
+          className="inner-container"
+          style={{ overflowY: "auto", maxHeight: "40vh" }}
+        >
+          <table className="table table-hover text-no-wrap">
+            <thead>
+              <tr>
+                <th scope="col" className="text-no-wrap">
+                  Avatar
+                </th>
+                <th scope="col" className="text-no-wrap">
+                  Name
+                </th>
+                <th scope="col" className="text-no-wrap">
+                  specialization
+                </th>
+                <th scope="col" className="text-no-wrap">
+                  Age
+                </th>
+                <th scope="col" className="text-no-wrap">
+                  Experience
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {hospitalData.doctor_available?.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    <Avatar src={item.photo_url} alt="it's me" />
+                  </td>
+                  <td style={{ whiteSpace: "nowrap" }}>{item.name}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    {item.specialization}
+                  </td>
+                  <td style={{ whiteSpace: "nowrap" }}>{item.age} years</td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    {item.experience} years
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Waiting Patients */}
       <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Patients Waiting</h4>
-        <Table
+        {/* <Table
           data={patientsWaiting && patientsWaiting}
           columns={["Name", "Date", "Doctor", "TimeSlot"]}
-        />
+        /> */}
+        <div
+          className="inner-container"
+          style={{ overflowY: "auto", maxHeight: "40vh" }}
+        >
+          <table className="table table-hover text-no-wrap">
+            <thead>
+              <tr>
+                <th scope="col" className="text-no-wrap">
+                  Name
+                </th>
+                <th scope="col" className="text-no-wrap">
+                  Doctor
+                </th>
+                <th scope="col" className="text-no-wrap">
+                  Symptoms
+                </th>
+                <th scope="col" className="text-no-wrap">
+                  Time
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {hospitalData?.today_non_treated_patient?.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ whiteSpace: "nowrap" }}>{item.patient.name}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>{item.doctor.name}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      {item.symptoms.map((symptom, index) => (
+                        <span key={index}>
+                          {symptom
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (char) => char.toUpperCase())}
+                          {index < item.symptoms.length - 1 && ", "}
+                        </span>
+                      ))}
+                    </td>
+                  </td>
+                  <td style={{ whiteSpace: "nowrap" }}>{item.time_slot}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -19,10 +19,6 @@ const AppointmentSchema = new Schema(
       type: String,
       trim: true,
       enum: ["online", "walk_in"],
-      match: [
-        /^[a-zA-Z]+$/,
-        (props) => `${props.value} is not a valid appointment type`,
-      ],
       required: [true, "Please provide the Appointment Type"],
     },
     severity_index: {

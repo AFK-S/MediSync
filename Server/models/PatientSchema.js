@@ -32,6 +32,15 @@ const PatientSchema = new Schema(
       enum: ["male", "female", "others"],
       required: [true, "Please add the Gender"],
     },
+    Drinking_Smoking: {
+      type: Boolean,
+      default: false,
+    },
+    lifestyle: {
+      type: String,
+      enum: ["rural", "urban", "active", "urban-rural"],
+      required: [true, "Please add the Lifestyle"],
+    },
   },
   { timestamps: true }
 );
