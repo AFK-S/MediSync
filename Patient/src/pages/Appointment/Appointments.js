@@ -301,9 +301,9 @@ const Appointments = () => {
                   <Text style={{ color: "black" }}>
                     Online Slots Available: {onlineSlotsAvailable}
                   </Text>
-                  <Text style={{ color: "black" }}>
+                  {/* <Text style={{ color: "black" }}>
                     Offline Slots Available: {offlineSlotsAvailable}
-                  </Text>
+                  </Text> */}
                 </Group>
 
                 <Button
