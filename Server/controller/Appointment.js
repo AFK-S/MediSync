@@ -5,19 +5,27 @@ import PatientSchema from "../models/PatientSchema.js";
 import { addMinutes, minusMinutes } from "../middleware/Function.js";
 import mongoose from "mongoose";
 import axios from "axios";
+import { FLASK_URL } from "../config.js";
 const { ObjectId } = mongoose.Types;
 
 const OnlineRegister = async (req, res) => {
   try {
-    const { hospital_id, doctor_id, patient_id, date, time_slot, symptoms } =
-      req.body;
+    const {
+      hospital_id,
+      doctor_id,
+      patient_id,
+      date,
+      time_slot,
+      symptoms,
+      coordinates,
+    } = req.body;
     const patient = await PatientSchema.findById(patient_id).lean();
     const reports = await ReportSchema.find({ patient_id })
       .select("disease")
       .lean();
     const disease_list = reports.flatMap((report) => report.disease);
     const { data } = await axios.post(
-      "http://192.168.0.114:5000/api/patient/severity_index",
+      `${FLASK_URL}/api/patient/severity_index`,
       {
         age: patient.age,
         symptoms,
@@ -36,6 +44,7 @@ const OnlineRegister = async (req, res) => {
       severity_count: data.severity_count,
       date: date,
       time_slot,
+      coordinates,
     });
     res.status(200).send(appointment._id);
   } catch (err) {
@@ -53,6 +62,9 @@ const WalkInRegister = async (req, res) => {
       name,
       age,
       gender,
+      habits,
+      lifestyle,
+      coordinates,
       date,
       time_slot,
       symptoms,
@@ -66,6 +78,8 @@ const WalkInRegister = async (req, res) => {
         name,
         age,
         gender,
+        habits,
+        lifestyle,
       });
     }
     const reports = await ReportSchema.find({ patient_id: patient._id })
@@ -73,7 +87,7 @@ const WalkInRegister = async (req, res) => {
       .lean();
     const disease_list = reports.flatMap((report) => report.disease);
     const { data } = await axios.post(
-      "http://192.168.0.114:5000/api/patient/severity_index",
+      `${FLASK_URL}/api/patient/severity_index`,
       {
         age: patient.age,
         symptoms,
@@ -82,6 +96,40 @@ const WalkInRegister = async (req, res) => {
         habits: patient.habits,
       }
     );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const today_online_appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          doctor_id: new ObjectId(doctor_id),
+          date: {
+            $gte: today,
+            $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+          type: "online",
+        },
+      },
+    ]).sort({ severity_index: -1, severity_count: -1 });
+    const today_walk_in_appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          doctor_id: new ObjectId(doctor_id),
+          date: {
+            $gte: today,
+            $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+          type: "walk_in",
+        },
+      },
+    ]).sort({ date: 1 });
+    const today_appointment = [
+      ...today_online_appointment,
+      ...today_walk_in_appointment,
+    ];
+    const last_appointment_allocated_time = today_appointment[-1]
+      ? today_appointment[-1].alloted_time
+      : "00:00";
+    const doctor = await DoctorSchema.findById(doctor_id).lean();
     const appointment = await AppointmentSchema.create({
       hospital_id,
       doctor_id,
@@ -92,6 +140,11 @@ const WalkInRegister = async (req, res) => {
       severity_count: data.severity_count,
       date: date,
       time_slot,
+      coordinates,
+      alloted_time: addMinutes(
+        last_appointment_allocated_time,
+        doctor.average_time
+      ),
     });
     res.status(200).send(appointment._id);
   } catch (err) {
@@ -302,11 +355,13 @@ const DoctorAvailableSlots = async (req, res) => {
 const MarkAsDone = async (req, res) => {
   try {
     const { appointment_id } = req.params;
+    const { diagnosis_result } = req.body;
     const appointment = await AppointmentSchema.findById(appointment_id);
     if (!appointment) return res.status(400).send("Appointment not found");
     appointment.treated = !appointment.treated;
+    if (diagnosis_result) appointment.diagnosis_result = diagnosis_result;
     await appointment.save();
-    res.status(200).send("Appointment successfully marked");
+    res.status(200).send("Patient treated successfully marked");
   } catch (err) {
     console.error(err);
     res.status(400).send(err.message);
@@ -390,6 +445,52 @@ const AllocateTodayAppointmentSlot = async (doctor_id) => {
   await Promise.all(tomorrow_appointment.map((item) => item.save()));
 };
 
+const TodayWalkInAppointment = async (req, res) => {
+  try {
+    const { hospital_id } = req.params;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const today_walk_in_appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          hospital_id: new ObjectId(hospital_id),
+          date: {
+            $gte: today,
+            $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+          type: "walk_in",
+        },
+      },
+      {
+        $lookup: {
+          from: "patients",
+          localField: "patient_id",
+          foreignField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $unwind: "$patient",
+      },
+      {
+        $lookup: {
+          from: "doctors",
+          localField: "doctor_id",
+          foreignField: "_id",
+          as: "doctor",
+        },
+      },
+      {
+        $unwind: "$doctor",
+      },
+    ]);
+    res.status(200).send(today_walk_in_appointment);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   OnlineRegister,
   WalkInRegister,
@@ -404,4 +505,5 @@ export {
   MarkAsDone,
   AllocateAppointmentSlot,
   AllocateTodayAppointmentSlot,
+  TodayWalkInAppointment,
 };

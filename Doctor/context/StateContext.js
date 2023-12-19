@@ -103,13 +103,16 @@ export const StateProvider = ({ children }) => {
     }
   };
 
-  const markAttended = async (appointment_id) => {
+  const markAttended = async (appointment_id, disease) => {
+    const reqData = {
+      diagnosis_result: disease,
+    };
     try {
       const { data } = await axios.put(
-        `${SERVER_URL}/api/appointment/mark_as_done/${appointment_id}`
+        `${SERVER_URL}/api/appointment/mark_as_done/${appointment_id}`,
+        reqData
       );
-
-      // Assuming you have an API endpoint to fetch updated data
+      console.log(data);
       getProfile();
     } catch (error) {
       console.error("Error marking attended:", error);

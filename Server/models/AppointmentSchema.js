@@ -59,6 +59,24 @@ const AppointmentSchema = new Schema(
       default: 0,
       required: [true, "Please provide a Shift"],
     },
+    rating: {
+      type: Number,
+      default: 0,
+      enum: [-1, 0, 1],
+      required: [true, "Please provide a Rating"],
+    },
+    diagnosis_result: {
+      type: String,
+      trim: true,
+    },
+    coordinates: {
+      latitude: {
+        type: Number,
+      },
+      longitude: {
+        type: Number,
+      },
+    },
   },
   { timestamps: true }
 );

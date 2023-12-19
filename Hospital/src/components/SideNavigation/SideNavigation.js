@@ -26,7 +26,7 @@ const SideNavigation = () => {
       icon: "fa-solid fa-user-doctor",
     },
     {
-      name: "Appointments",
+      name: "Walk In Appointments",
       path: "/appointments",
       icon: "fa-solid fa-calendar-check",
     },
