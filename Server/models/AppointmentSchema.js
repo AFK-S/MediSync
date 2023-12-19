@@ -69,6 +69,14 @@ const AppointmentSchema = new Schema(
       type: String,
       trim: true,
     },
+    coordinates: {
+      latitude: {
+        type: Number,
+      },
+      longitude: {
+        type: Number,
+      },
+    },
   },
   { timestamps: true }
 );

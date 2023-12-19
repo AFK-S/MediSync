@@ -10,6 +10,7 @@ import {
   AllDoctors,
   HospitalSpecialization,
   HospitalSpecializedDoctors,
+  SuggestDoctor,
 } from "../controller/Doctor.js";
 import { FirstTimeDoctorLogin, DoctorLogin } from "../controller/Login.js";
 import { CheckMacAddress } from "../controller/TpLink.js";
@@ -39,5 +40,6 @@ router.get(
   "/doctors/specialization/:hospital_id/:specialization",
   HospitalSpecializedDoctors
 );
+router.post("/suggest/doctors", SuggestDoctor);
 
 export default router;
