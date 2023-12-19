@@ -73,7 +73,7 @@ const TomorrowsPatient = () => {
         <Text style={{ ...styles.labelText, marginTop: 10 }}>
           Date: {formatDate(item.date)}
         </Text>
-        <Text style={styles.labelText}>Time: {item.time_slot}</Text>
+        <Text style={styles.labelText}>Time: {item?.alloted_time}</Text>
       </View>
     </TouchableOpacity>
   );

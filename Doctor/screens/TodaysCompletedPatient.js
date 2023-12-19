@@ -101,7 +101,7 @@ const TodaysCompletedPatient = () => {
           <Text style={{ ...styles.labelText, marginTop: 10 }}>
             Date: {formatDate(date)}
           </Text>
-          <Text style={styles.labelText}>Time: {time_slot}</Text>
+          <Text style={styles.labelText}>Time: {item?.alloted_time}</Text>
         </View>
         {renderMarkNotAttendedButton(item._id)}
       </TouchableOpacity>

@@ -18,6 +18,25 @@ export const StateProvider = ({ children }) => {
     (async () => {
       // await AsyncStorage.clear();
       // Alert.alert("Cleared");
+      try {
+        const mac_address = await AsyncStorage.getItem("mac_address");
+        console.log(mac_address);
+        const { data } = await axios.get(
+          `${SERVER_URL}/api/doctor/verify/${mac_address}`
+        );
+        console.log(data);
+        if (!data) {
+          await AsyncStorage.clear();
+          console.log("Cleared");
+          // Alert.alert("Cleared");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
       const _id = await AsyncStorage.getItem("_id");
       const mac_address = await AsyncStorage.getItem("mac_address");
 
@@ -30,13 +49,17 @@ export const StateProvider = ({ children }) => {
   }, []);
 
   const Login = async (username, password, mac_address) => {
-    const { data } = await axios.post(`${SERVER_URL}/api/doctor/login`, {
-      username,
-      password,
-      mac_address,
-    });
-    // console.log(data);
-    await AsyncStorage.setItem("_id", data);
+    try {
+      const { data } = await axios.post(`${SERVER_URL}/api/doctor/login`, {
+        username,
+        password,
+        mac_address,
+      });
+      console.log(data);
+      await AsyncStorage.setItem("_id", data);
+    } catch (error) {
+      console.log(error.response.data);
+    }
   };
 
   const FirstTimeLogin = async (username, password) => {
@@ -47,7 +70,7 @@ export const StateProvider = ({ children }) => {
         password,
       }
     );
-    // console.log(data);
+    console.log(data);
     await AsyncStorage.setItem("_id", data._id);
     await AsyncStorage.setItem("mac_address", data.mac_address);
   };
