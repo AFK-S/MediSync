@@ -152,7 +152,7 @@ const AppointmentsScreen = () => {
             Date: {formatDate(selectedPatient?.date)}
           </Text>
           <Text style={{ fontSize: 16, fontWeight: "600", marginVertical: 5 }}>
-            Time: {selectedPatient?.time_slot}
+            Time: {selectedPatient?.alloted_time}
           </Text>
         </View>
         <TouchableOpacity
@@ -289,7 +289,7 @@ const AppointmentsScreen = () => {
                           Age : {patient.patient.age}
                         </Text>
                         <Text style={{ ...styles.silent, marginTop: 5 }}>
-                          Time : {patient.time_slot}
+                          Time : {patient.alloted_time}
                         </Text>
                       </View>
                     </View>
