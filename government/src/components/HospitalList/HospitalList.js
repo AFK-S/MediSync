@@ -86,19 +86,35 @@ function HospitalList({ setLoading }) {
                   <div>
                     <Group position="apart">
                       <div className="avatar">
-                        <IconBuildingHospital />
+                        <IconBuildingHospital
+                          style={{ width: "30px", height: "30px" }}
+                        />
                       </div>
-                      <Badge color="dark" p={5}>
-                        {item.name}
+                      <Badge color="#000" p={15}>
+                        <Text
+                          fw={600}
+                          fz={16}
+                          style={{
+                            color: "white",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {item.name}
+                        </Text>
                       </Badge>
                     </Group>
-                    <Text fz="sm" mt="lg">
+                    <Text color="black" fz="md" mt="lg">
                       Email: {item.contact_details.email_address}
                     </Text>
-                    <Text fz="sm" mt={5}>
+                    <Text color="black" fz="md" mt={2}>
                       Phone: {item.contact_details.phone_number}
                     </Text>
-                    <Text fz="sm" style={{ textTransform: "capitalize" }}>
+                    <Text
+                      color="black"
+                      fz="md"
+                      mt={2}
+                      style={{ textTransform: "capitalize" }}
+                    >
                       Location: {item.address.street}, {item.address.city},{" "}
                       {item.address.state},{item.address.country},
                       {item.address.zipCode}
@@ -108,8 +124,9 @@ function HospitalList({ setLoading }) {
                   <div>
                     <Button
                       variant="filled"
+                      style={{ backgroundColor: "#000" }}
                       onClick={() => deleteHospital(item._id)}
-                      mt={30}
+                      mt={15}
                     >
                       Delete
                     </Button>
