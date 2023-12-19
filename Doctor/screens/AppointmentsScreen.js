@@ -6,19 +6,21 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
 import AppointmentTabs from "../components/AppointmentTabs";
 import { useNavigation } from "@react-navigation/native";
 import StateContext from "../context/StateContext";
+import RNPickerSelect from "react-native-picker-select";
 
 const AppointmentsScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const { doctorData, markAttended, getProfile } = useContext(StateContext);
   const navigation = useNavigation();
-
+  const [disease, setDisease] = useState();
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ const AppointmentsScreen = () => {
 
   const getTitleAndFirstName = (fullName) => {
     if (!fullName) {
-      return ""; // Handle the case where fullName is undefined or null
+      return "";
     }
 
     const title = fullName.split(" ")[0].trim(); // Assuming that the title ends with a dot
@@ -155,16 +157,62 @@ const AppointmentsScreen = () => {
             Time: {selectedPatient?.alloted_time}
           </Text>
         </View>
+
+        <TouchableOpacity
+          style={{
+            marginTop: 40,
+            backgroundColor: "#ededed",
+            padding: 14,
+            borderRadius: 10,
+          }}
+          activeOpacity={1}
+        >
+          <RNPickerSelect
+            style={{
+              inputIOS: {
+                color: "#000",
+                fontSize: 16,
+                fontWeight: "600",
+              },
+              inputAndroid: {
+                color: "#000",
+                fontSize: 16,
+                fontWeight: "600",
+              },
+              placeholder: {
+                color: "#000",
+              },
+              itemText: {
+                color: "#000",
+              },
+            }}
+            onValueChange={(value) => setDisease(value)}
+            items={[
+              { label: "Influenza (Flu)", value: "flu" },
+              { label: "Common Cold", value: "Common Cold" },
+              { label: "COVID-19", value: "COVID-19" },
+              { label: "Measles", value: "Measles" },
+              { label: "Chickenpox", value: "Chickenpox" },
+            ]}
+            useNativeAndroidPickerStyle={false}
+            hideIcon
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            markAttended(selectedPatient._id);
+            if (!disease) {
+              Alert.alert("Please select a disease");
+              return;
+            }
+            markAttended(selectedPatient._id, disease);
+            setDisease(null);
             toggleModal();
           }}
           style={{
             backgroundColor: "#18C37D",
             padding: 14,
             borderRadius: 10,
-            marginTop: 40,
+            marginTop: 20,
           }}
         >
           <Text
@@ -178,6 +226,7 @@ const AppointmentsScreen = () => {
             Mark as Attended
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => {
             toggleModal();
@@ -267,7 +316,13 @@ const AppointmentsScreen = () => {
                   key={index}
                   onPress={() => openBottomSheet(patient)}
                 >
-                  <View style={styles.patientCard}>
+                  <View
+                    style={{
+                      ...styles.patientCard,
+                      borderColor: "#000",
+                      borderWidth: patient?.type === "online" ? 0 : 2,
+                    }}
+                  >
                     <View>
                       <Image
                         source={{

@@ -139,31 +139,50 @@ const Appointments = () => {
       console.log(err);
     }
   };
-  useEffect(() => {
-    fetchDoctors();
-  }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Handle form submission logic here
     const formData = form.values;
     try {
-      const { data } = axios.post(
+      // Assuming your API call returns a promise, so we'll use await
+      const { data } = await axios.post(
         "/api/appointment/walk_in/register",
         formData
       );
-
       console.log(data);
+      alert("Appointment Booked");
+
+      window.location.reload();
     } catch (err) {
       console.log(err);
     }
     console.log(formData);
   };
 
+  const getCheckIn = async () => {
+    try {
+      const { data } = await axios.get(
+        `/api/appointment/walk_in/today/${cookie._id}`
+      );
+      console.log(cookie._id);
+      console.log("data");
+
+      setPatientsWaiting(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDoctors();
+    getCheckIn();
+  }, []);
+
   return (
     <div>
       <div className="container-fluid">
         <div className="c-card">
-          <h4>Book an Appointment</h4>
+          <h4>Walk In Appointments</h4>
           <div className="container-fluid p-0 mt-3">
             <div className="row">
               <div className="col-md-6">
@@ -295,7 +314,7 @@ const Appointments = () => {
       </div>
       <div className="mt-4 c-card">
         <div className="d-flex flex-column flex-md-row align-items-start align-content-md-center justify-content-between w-100">
-          <h4 className="mb-2 ">Patients List</h4>
+          <h4 className="mb-2 ">Walk In Patient List</h4>
           <div
             className="d-flex align-items-center w-100 my-3 my-md-0"
             style={{ maxWidth: "300px" }}
@@ -309,10 +328,46 @@ const Appointments = () => {
           </div>
         </div>
         <div className="mt-2">
-          <Table
+          <div
+            className="inner-container"
+            style={{ overflowY: "auto", maxHeight: "80vh" }}
+          >
+            <table className="table table-hover text-no-wrap">
+              <thead>
+                <tr>
+                  <th scope="col" className="text-no-wrap">
+                    Name
+                  </th>
+                  <th scope="col" className="text-no-wrap">
+                    Doctor
+                  </th>
+                  <th scope="col" className="text-no-wrap">
+                    Slot
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {patientsWaiting &&
+                  patientsWaiting.map((item, index) => (
+                    <tr>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        {item?.patient?.name}
+                      </td>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        {item?.doctor.name}
+                      </td>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        {item?.time_slot}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+          {/* <Table
             data={patientsWaiting && patientsWaiting}
             columns={["Name", "Date", "Doctor", "TimeSlot"]}
-          />
+          /> */}
         </div>
       </div>
     </div>

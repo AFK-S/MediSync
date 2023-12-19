@@ -308,10 +308,7 @@ const Dashboard = () => {
       {/* Waiting Patients */}
       <div className="container-fluid c-card my-4">
         <h4 className="mb-2">Patients Waiting</h4>
-        {/* <Table
-          data={patientsWaiting && patientsWaiting}
-          columns={["Name", "Date", "Doctor", "TimeSlot"]}
-        /> */}
+
         <div
           className="inner-container"
           style={{ overflowY: "auto", maxHeight: "40vh" }}
@@ -330,6 +327,9 @@ const Dashboard = () => {
                 </th>
                 <th scope="col" className="text-no-wrap">
                   Time
+                </th>
+                <th scope="col" className="text-no-wrap">
+                  Type
                 </th>
               </tr>
             </thead>
@@ -350,7 +350,10 @@ const Dashboard = () => {
                       ))}
                     </td>
                   </td>
-                  <td style={{ whiteSpace: "nowrap" }}>{item.time_slot}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    {item?.alloted_time || "Waiting"}
+                  </td>
+                  <td style={{ whiteSpace: "nowrap" }}>{item?.type}</td>
                 </tr>
               ))}
             </tbody>

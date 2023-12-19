@@ -8,23 +8,24 @@ import OSM from "ol/source/OSM";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
 import LineString from "ol/geom/LineString";
-import { fromLonLat, toLonLat } from "ol/proj";
+import { fromLonLat } from "ol/proj";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import { Style, Stroke, Circle, Fill } from "ol/style";
 
-const MapComponent = () => {
-  const [startLatitude] = useState(19.2098315);
-  const [startLongitude] = useState(72.9553148);
-  const [endLatitude] = useState(19.218751);
-  const [endLongitude] = useState(73.09446);
+const MapComponent = ({ location, hospitalLocation }) => {
+  console.log("Passed location:", location);
+  console.log("Passed hospital location:", hospitalLocation);
+  const [startLatitude, setStartLatitude] = useState(location?.latitude);
+  const [startLongitude, setStartLongitude] = useState(location?.longitude);
+  const [endLatitude, setEndLatitude] = useState(hospitalLocation?.latitude);
+  const [endLongitude, setEndLongitude] = useState(hospitalLocation?.longitude);
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
   const [map, setMap] = useState(null);
   const [hospitals] = useState({
-    name: "Test Hospital",
-    latitude: 19.21,
-    longitude: 72.96,
+    latitude: hospitalLocation?.latitude,
+    longitude: hospitalLocation?.longitude,
   });
 
   const calculateRoute = async (startCoords, endCoords) => {
@@ -32,10 +33,12 @@ const MapComponent = () => {
       const apiKey = "5b3ce3597851110001cf62487657974046f7450b924af3f87910c744"; // Replace with your actual OpenRouteService API key
       const routeUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords}&end=${endCoords}&options={"radiuses":[1000,1000]}`;
 
+      console.log("API Request URL:", routeUrl);
+
       const response = await fetch(routeUrl);
       const data = await response.json();
 
-      if (data.features && data.features.length > 0) {
+      if (response.ok && data.features && data.features.length > 0) {
         const routeCoordinates = data.features[0].geometry.coordinates;
         const distanceInKm =
           data.features[0].properties.segments[0].distance / 1000;
@@ -48,9 +51,11 @@ const MapComponent = () => {
           duration: Math.round(durationInSeconds / 60),
         };
       } else {
+        console.error("Error in API response:", data);
         throw new Error("No features found in the API response.");
       }
     } catch (error) {
+      console.error("Error fetching route:", error.message);
       throw new Error(`Error fetching route: ${error.message}`);
     }
   };
@@ -64,11 +69,6 @@ const MapComponent = () => {
         endCoordinates
       );
       console.log("Route details:", routeDetails);
-      // if (map !== null) {
-      //   // Clear existing layers and reset target
-      //   map.getLayers().clear();
-      //   map.setTarget(null);
-      // }
 
       const newMap = new Map({
         target: "map",
@@ -172,8 +172,25 @@ const MapComponent = () => {
   }, [map]);
 
   useEffect(() => {
-    handleCalculateRoute();
-  }, []);
+    if (
+      startLatitude !== undefined &&
+      startLongitude !== undefined &&
+      endLatitude !== undefined &&
+      endLongitude !== undefined
+    ) {
+      handleCalculateRoute();
+    }
+  }, [startLatitude, startLongitude, endLatitude, endLongitude]);
+
+  useEffect(() => {
+    setStartLatitude(location?.latitude);
+    setStartLongitude(location?.longitude);
+  }, [location]);
+
+  useEffect(() => {
+    setEndLatitude(hospitalLocation?.latitude);
+    setEndLongitude(hospitalLocation?.longitude);
+  }, [hospitalLocation]);
 
   return (
     <div>
@@ -186,8 +203,8 @@ const MapComponent = () => {
       <div
         id="map"
         style={{
-          width: "1300px",
-          height: "800px",
+          width: "700px",
+          height: "600px",
           border: "1px solid #ccc",
           marginBottom: "10px",
         }}

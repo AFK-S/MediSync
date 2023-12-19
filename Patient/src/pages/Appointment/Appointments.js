@@ -27,7 +27,13 @@ const Appointments = () => {
   const [isOnlineSlotsAvailable, setIsOnlineSlotsAvailable] = useState(true);
   const [isDateSelected, setIsDateSelected] = useState(false);
 
+  const [hospitalLocation, setHospitalLocation] = useState({});
+
   const [timeSlot, setTimeSlot] = useState([]);
+
+  const [location, setLocation] = useState({});
+  const [locationPermissionGranted, setLocationPermissionGranted] =
+    useState(false);
 
   const [cookies] = useCookies(["token"]);
   const BookFormData = useSelector((state) => state.app.formData);
@@ -45,14 +51,19 @@ const Appointments = () => {
   const handleSpecialization = async (hospital) => {
     const foundHospital = hospitals.find((item) => item.name === hospital);
     const hospitalId = foundHospital._id;
+    const hospitalLocation = foundHospital.coordinates;
+    setHospitalLocation(hospitalLocation);
 
     form.setValues({
       ...form.values,
       hospital: hospital,
       hospital_id: hospitalId,
+
       specialization: "",
       doctor: "",
     });
+
+    console.log("hospital location", hospitalLocation);
 
     const { data } = await axios.get(
       `/api/doctors/specialization/${hospitalId}`
@@ -127,6 +138,7 @@ const Appointments = () => {
       date: "",
       time_slot: "",
       symptoms: [],
+      coordinates: { latitude: "", longitude: "" },
     },
   });
 
@@ -141,6 +153,18 @@ const Appointments = () => {
 
     console.log(data);
     return data;
+  };
+
+  const handleReccomendation = async () => {
+    try {
+      console.log(form.values.symptoms);
+      const { data } = await axios.post("/api/suggest/doctors", {
+        symptoms: form.values.symptoms,
+      });
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleSubmit = async (values) => {
@@ -159,6 +183,52 @@ const Appointments = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    // Function to get the user's location
+    const getLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          form.setValues((values) => ({
+            ...values,
+            coordinates: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
+          }));
+        },
+
+        (error) => {
+          console.error("Error getting location:", error.message);
+        }
+      );
+      console.log(form.values.coordinates);
+    };
+
+    // Ask for location permission and get the location
+    const askForLocationPermission = () => {
+      navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        if (result.state === "granted") {
+          setLocationPermissionGranted(true);
+
+          getLocation();
+        } else if (result.state === "prompt") {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              console.log("Latitude:", position.coords.latitude);
+              console.log("Longitude:", position.coords.longitude);
+            },
+            (error) => {
+              console.error("Error getting location:", error.message);
+              setLocationPermissionGranted(false);
+            }
+          );
+        }
+      });
+    };
+
+    askForLocationPermission();
+  }, []);
 
   const isHospitalSelected = form.values.hospital;
   const isSpecializationSelected = form.values.specialization;
@@ -195,6 +265,9 @@ const Appointments = () => {
                     <Button
                       mt={23}
                       style={{ background: "#0a0059" }}
+                      onClick={() => {
+                        handleReccomendation();
+                      }}
                       className="book-btn"
                     >
                       Recommend
@@ -301,15 +374,14 @@ const Appointments = () => {
                   <Text style={{ color: "black" }}>
                     Online Slots Available: {onlineSlotsAvailable}
                   </Text>
-                  <Text style={{ color: "black" }}>
+                  {/* <Text style={{ color: "black" }}>
                     Offline Slots Available: {offlineSlotsAvailable}
-                  </Text>
+                  </Text> */}
                 </Group>
 
                 <Button
                   className="book-btn"
                   type="submit"
-                  // onClick={handleSubmit}
                   disabled={!isDateSelected || !isSlotAvailable}
                   style={{ background: "#0a0059" }}
                 >
@@ -319,9 +391,14 @@ const Appointments = () => {
             </div>
           </form>
         </div>
-        <div className="c-card mt-5">
-          <ETA />
-        </div>
+        {form.values.hospital && (
+          <div className="c-card mt-5">
+            <ETA
+              location={form.values.coordinates}
+              hospitalLocation={hospitalLocation}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

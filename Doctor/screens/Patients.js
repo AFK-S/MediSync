@@ -58,9 +58,9 @@ const Patients = () => {
         <Text style={{ ...styles.labelText, marginTop: 10 }}>
           Age: {item.age}
         </Text>
-        <Text style={{ ...styles.labelText, marginTop: 6 }}>
-          Time: {item.phone_number}
-        </Text>
+        {/* <Text style={{ ...styles.labelText, marginTop: 6 }}>
+          Time: {itemtime}
+        </Text> */}
       </View>
     </TouchableOpacity>
   );
