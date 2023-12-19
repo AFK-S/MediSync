@@ -71,6 +71,11 @@ const AppointmentCard = ({ value, index }) => {
             <span className="fw-600">Time: </span>
             {value.time_slot}
           </p>
+          <p className="card-text mt-1">
+            {" "}
+            <span className="fw-600">Confirmed Slot: </span>
+            {value.alloted_time}
+          </p>
           <Accordion
             sx={{
               ".mantine-Accordion-label": { fontWeight: 700 },

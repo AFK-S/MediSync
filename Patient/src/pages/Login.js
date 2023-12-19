@@ -48,6 +48,8 @@ export default function Login() {
       age: "",
       phone_number: "",
       gender: "",
+      habits: "",
+      lifestyle: "",
     },
     validate: {},
   });
@@ -164,6 +166,34 @@ export default function Login() {
                   form.setValues({ gender: event });
                 }}
                 value={form.values.gender}
+              />
+              <Select
+                required
+                placeholder="Select one of the following"
+                label="Do You Drink/Smoke?"
+                data={[
+                  { value: "yes", label: "Yes" },
+                  { value: "no", label: "No" },
+                ]}
+                onChange={(event) => {
+                  form.setValues({ habits: event });
+                }}
+                value={form.values.habits}
+              />
+              <Select
+                required
+                placeholder="Select Lifestyle"
+                label="Select Lifestyle"
+                data={[
+                  { value: "rural", label: "Rural" },
+                  { value: "urban", label: "Urban" },
+                  { value: "active", label: "Active" },
+                  { value: "urban-rural", label: "Urban-rural" },
+                ]}
+                onChange={(event) => {
+                  form.setValues({ lifestyle: event });
+                }}
+                value={form.values.lifestyle}
               />
             </Stack>
 

@@ -133,6 +133,21 @@ const Profile = () => {
                     <Text className="profile-text" fz="lg" c="dimmed">
                       Phone : {patient && patient.phone_number}
                     </Text>
+                    <Text className="profile-text" fz="lg" c="dimmed">
+                      Past Medical Conditions :{" "}
+                      {patient?.disease?.map((item, index) => (
+                        <span key={item}>
+                          {item}
+                          {index !== patient.disease.length - 1 && ", "}
+                        </span>
+                      ))}
+                    </Text>
+                    <Text className="profile-text" fz="lg" c="dimmed">
+                      Drinking Habits : {patient && patient.phone_number}
+                    </Text>
+                    <Text className="profile-text" fz="lg" c="dimmed">
+                      Lifestyle : {patient && patient.phone_number}
+                    </Text>
                   </div>
                 </Grid.Col>
               </Grid>
