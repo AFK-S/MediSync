@@ -57,15 +57,15 @@ export default function Login() {
   const handleSendOTP = async () => {
     try {
       const PhoneNumber = "+91" + form.values.phone_number;
-      const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        PhoneNumber,
-        recaptcha
-      );
+      // const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
+      // const confirmation = await signInWithPhoneNumber(
+      //   auth,
+      //   PhoneNumber,
+      //   recaptcha
+      // );
 
-      console.log(confirmation);
-      setUser(confirmation);
+      // console.log(confirmation);
+      // setUser(confirmation);
       alert("OTP sent successfully!");
 
       setOtpSent(true);
@@ -77,7 +77,7 @@ export default function Login() {
 
   const handleVerifyOTP = async () => {
     try {
-      await user.confirm(otp);
+      // await user.confirm(otp);
       const response = await axios.get(
         `/api/patient/verify/${form.values.phone_number}`
       );

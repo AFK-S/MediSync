@@ -26,6 +26,7 @@ const DoctorCard = ({ doctor, hospital }) => {
         hospital: hospital,
         specialization: doctor.specialization,
         experience: doctor.experience,
+        doctor_id: doctor._id,
       })
     );
     navigate("/appointments");
@@ -97,7 +98,6 @@ const AllDoctors = () => {
     try {
       const { data } = await axios.get("/api/doctors");
       setDoctors(data);
-      console.log(data);
     } catch (err) {
       console.log(err);
     }
