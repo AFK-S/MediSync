@@ -42,6 +42,11 @@ const MobileNav = ({ isMenuOpen, ToggleMenu }) => {
       path: "/profile",
       icon: "fa-solid fa-user",
     },
+    {
+      name: "Info",
+      path: "/info",
+      icon: "fa-solid fa-circle-info",
+    },
   ];
 
   return (

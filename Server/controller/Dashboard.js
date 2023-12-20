@@ -298,6 +298,44 @@ const Patient = async (req, res) => {
       {
         $unwind: "$hospital",
       },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "doctor_id",
+          foreignField: "doctor_id",
+          pipeline: [
+            {
+              $match: {
+                date: {
+                  $gte: today,
+                  $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+                },
+                treated: false,
+              },
+            },
+          ],
+          as: "today_non_treated_appointment",
+        },
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "doctor_id",
+          foreignField: "doctor_id",
+          pipeline: [
+            {
+              $match: {
+                date: {
+                  $gte: today,
+                  $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+                },
+                treated: true,
+              },
+            },
+          ],
+          as: "today_treated_appointment",
+        },
+      },
     ]).project({
       "doctor.availability": 0,
     });
@@ -336,9 +374,11 @@ const Patient = async (req, res) => {
       {
         $unwind: "$hospital",
       },
-    ]).project({
-      "doctor.availability": 0,
-    });
+    ])
+      .project({
+        "doctor.availability": 0,
+      })
+      .sort({ date: 1 });
     const sorted_past_visit = past_visit.sort(
       (dateA, dateB) => Number(dateA.date) - Number(dateB.date)
     );

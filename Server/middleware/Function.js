@@ -10,6 +10,15 @@ const calculateTotalMinutes = (startTime, endTime) => {
   return endTimeInMinutes - startTimeInMinutes;
 };
 
+const calculateEstimatedTimeGap = (allottedTime, updatedAt) => {
+  const data = calculateTotalMinutes(
+    allottedTime,
+    updatedAt.split("T")[1].split(".")[0]
+  );
+  const offsetMinutes = 5 * 60 + 30;
+  return offsetMinutes + data;
+};
+
 const addMinutes = (time, minute) => {
   var [hours, mins] = time.split(":").map(Number);
   var totalMinutes = hours * 60 + mins + minute;
@@ -26,4 +35,9 @@ const minusMinutes = (time, minute) => {
   return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
 };
 
-export { calculateTotalMinutes, addMinutes, minusMinutes };
+export {
+  calculateTotalMinutes,
+  calculateEstimatedTimeGap,
+  addMinutes,
+  minusMinutes,
+};

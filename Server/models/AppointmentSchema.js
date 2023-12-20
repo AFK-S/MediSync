@@ -77,6 +77,13 @@ const AppointmentSchema = new Schema(
         type: Number,
       },
     },
+    isRerouting: {
+      type: Boolean,
+      default: false,
+    },
+    dispensary_id: {
+      type: Schema.Types.ObjectId,
+    },
   },
   { timestamps: true }
 );
