@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Grid, Collapse, Group, Text, Accordion, Button } from "@mantine/core";
+import {
+  Grid,
+  Collapse,
+  Group,
+  Text,
+  Accordion,
+  Button,
+  Pill,
+} from "@mantine/core";
 import "./Home.css";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
@@ -120,7 +128,23 @@ const AppointmentCard = ({ value, index }) => {
                 className="p-0"
                 style={{ color: "#0a0059", fontSize: "0.9rem" }}
               >
-                More Details
+                <div className="d-flex align-items-center justify-content-between">
+                  More Details
+                  {value?.auto_booked ? (
+                    <Pill
+                      style={{
+                        backgroundColor: "transparent",
+                        marginRight: "0.5rem",
+                        color: "#0A0059",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      Auto Booked
+                    </Pill>
+                  ) : (
+                    ""
+                  )}
+                </div>
               </Accordion.Control>
 
               <Accordion.Panel>
