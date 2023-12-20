@@ -205,8 +205,11 @@ const MapComponent = () => {
         map.getView().setCenter(fromLonLat([avgLon, avgLat]));
         map.getView().setZoom(12);
       } else {
-        map.getView().setCenter(fromLonLat([0, 0]));
-        map.getView().setZoom(2);
+        const defaultCoordinates = fromLonLat([
+          76.64587720492064, 12.30806772160426,
+        ]);
+        map.getView().setCenter(defaultCoordinates);
+        map.getView().setZoom(12);
       }
     }
   }, [hospitals, hospitalVectorLayer, map]);
