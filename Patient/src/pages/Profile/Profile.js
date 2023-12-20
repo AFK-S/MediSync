@@ -166,13 +166,13 @@ const Profile = () => {
               <Grid>
                 <Grid.Col
                   className="d-flex w-100 justify-content-center align-item-center"
-                  span={{ xs: 12, sm: 6, md: 6, lg: 6 }}
+                  span={{ xs: 12, sm: 5, md: 4, lg: 6 }}
                 >
-                  <Avatar src="" size={200} style={{ borderRadius: "200px" }} />
+                  <Avatar src="" size={160} style={{ borderRadius: "200px" }} />
                 </Grid.Col>
                 <Grid.Col
                   className="d-flex w-100 justify-content-center align-item-center "
-                  span={{ xs: 12, sm: 6, md: 6, lg: 6 }}
+                  span={{ xs: 12, sm: 7, md: 8, lg: 6 }}
                 >
                   <div className="d-flex w-100 justify-content-center align-item-center flex-column">
                     <Text
@@ -233,19 +233,21 @@ const Profile = () => {
                     {patient.reports &&
                       patient.reports.map((file, index) => (
                         // <h1>ok</h1>
-                        <Image
-                          onClick={() => {
-                            window.open(file.url, "_blank");
-                          }}
-                          style={{
-                            width: "80px",
-                            margin: "5px",
-                            cursor: "pointer",
-                          }}
-                          key={index}
-                          src={file.url}
-                          alt={`Image ${index}`}
-                        />
+                        <div className="p-2 bg-light rounded mt-2">
+                          <Image
+                            onClick={() => {
+                              window.open(file.url, "_blank");
+                            }}
+                            style={{
+                              width: "80px",
+                              margin: "5px",
+                              cursor: "pointer",
+                            }}
+                            key={index}
+                            src={file.url}
+                            alt={`Image ${index}`}
+                          />
+                        </div>
                       ))}
                   </div>
                 </Grid.Col>
