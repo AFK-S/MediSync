@@ -77,6 +77,18 @@ const AppointmentSchema = new Schema(
         type: Number,
       },
     },
+    isRerouting: {
+      type: Boolean,
+      default: false,
+    },
+    dispensary_id: {
+      type: Schema.Types.ObjectId,
+    },
+    auto_booked: {
+      type: Boolean,
+      default: false,
+      required: [true, "Please provide a Auto Booked"],
+    },
   },
   { timestamps: true }
 );

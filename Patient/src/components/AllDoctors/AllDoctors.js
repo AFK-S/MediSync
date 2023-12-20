@@ -46,7 +46,11 @@ const DoctorCard = ({ doctor, hospital }) => {
           <Badge color="#EDEDED" p={12}>
             <Text
               fw={600}
-              style={{ color: "black", textTransform: "capitalize" }}
+              style={{
+                color: "black",
+                textTransform: "capitalize",
+                fontSize: "12px",
+              }}
             >
               {doctor.name}
             </Text>

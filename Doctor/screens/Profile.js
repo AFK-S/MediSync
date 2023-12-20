@@ -11,6 +11,7 @@ import StateContext from "../context/StateContext";
 import axios from "axios";
 import Timeline from "react-native-timeline-flatlist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Switch } from "react-native";
 
 const Profile = ({ navigation }) => {
   const { setIsLogin, doctorData } = useContext(StateContext);
@@ -24,6 +25,8 @@ const Profile = ({ navigation }) => {
     }
   };
 
+  const [isEnabled, setIsEnabled] = useState(true);
+  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
   function formatDate(inputDate) {
     const date = new Date(inputDate);
 
@@ -191,6 +194,29 @@ const Profile = ({ navigation }) => {
               }}
               isUsingFlatlist={true}
               innerCircle={"dot"}
+            />
+          </View>
+          <View
+            style={{
+              marginBottom: 30,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              backgroundColor: "#f2f2f2",
+              width: "100%",
+              padding: 20,
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ fontSize: 25, fontWeight: "500" }}>
+              {isEnabled ? "Available" : "Unavailable"}
+            </Text>
+            <Switch
+              // trackColor={{ false: "#767577", true: "#81b0ff" }}
+              thumbColor={isEnabled ? "#fff" : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={toggleSwitch}
+              value={isEnabled}
             />
           </View>
           <TouchableOpacity onPress={handleLogout} style={styles.logout}>

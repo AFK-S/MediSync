@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
-import { TextInput, Button, Group, Select, NumberInput } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Group,
+  Select,
+  NumberInput,
+  Checkbox,
+} from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import axios from "axios";
 import symptomsData from "./symptoms.json";
@@ -16,6 +23,62 @@ import {
 } from "@mantine/core";
 import ETA from "./ETA";
 import { useCookies } from "react-cookie";
+import doctorIcon from "../../assets/doctor.png";
+import { Card, Grid, Badge } from "@mantine/core";
+
+const DoctorCard = ({ doctor }) => {
+  const dispatch = useDispatch();
+
+  return (
+    <Card m={20} withBorder padding="lg" radius="md">
+      <div className="d-flex w-100 flex-row align-items-between justify-content-between">
+        <div className="avatar">
+          <img
+            src={doctorIcon}
+            style={{ width: "30px", height: "30px" }}
+            alt="doctor"
+          />
+        </div>
+        <Badge color="#EDEDED" p={12}>
+          <Text
+            fw={600}
+            style={{ color: "black", textTransform: "capitalize" }}
+          >
+            {doctor.name}
+          </Text>
+        </Badge>
+      </div>
+      <Text style={{ color: "black" }} fz="md" mt="lg">
+        Speciality: {doctor.specialization}
+      </Text>
+      <Text
+        fz="md"
+        style={{
+          textTransform: "capitalize",
+          color: "black",
+        }}
+      >
+        Hospital: {doctor.hospital.name}
+      </Text>
+      <button
+        style={{
+          width: "100px",
+          padding: "5px",
+          backgroundColor: "#0a0059",
+          color: "white",
+          borderRadius: "10px",
+          marginTop: "15px",
+          fontWeight: "500",
+          border: "none",
+          outline: "none",
+        }}
+        // onClick={handleBookAppointment}
+      >
+        Book
+      </button>
+    </Card>
+  );
+};
 
 const Appointments = () => {
   const [hospitals, setHospitals] = useState([]);
@@ -32,6 +95,8 @@ const Appointments = () => {
   const [timeSlot, setTimeSlot] = useState([]);
 
   const [location, setLocation] = useState({});
+  const [recommendedDoctors, setRecommendedDoctors] = useState([]);
+
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false);
 
@@ -139,6 +204,7 @@ const Appointments = () => {
       time_slot: "",
       symptoms: [],
       coordinates: { latitude: "", longitude: "" },
+      auto_booked: false,
     },
   });
 
@@ -161,6 +227,8 @@ const Appointments = () => {
       const { data } = await axios.post("/api/suggest/doctors", {
         symptoms: form.values.symptoms,
       });
+
+      setRecommendedDoctors(data);
       console.log(data);
     } catch (err) {
       console.log(err);
@@ -178,6 +246,7 @@ const Appointments = () => {
       );
       console.log(data);
       alert("Appointment booked successfully");
+      window.location.reload();
     } catch (error) {
       alert(error.response.data);
       console.log(error);
@@ -241,10 +310,11 @@ const Appointments = () => {
           <h4>Book an Appointment</h4>
           <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
             <div className="container-fluid p-0 mt-3">
-              <div className="row">
-                <div className="col-md-6">
+              <div mt="md" className="row">
+                <div mt="md" className="col-md-6">
                   <div className=" d-flex justify-content-between align-items-between g-4">
                     <MultiSelect
+                      mt="md"
                       style={{ width: "75%" }}
                       label="Enter Symptoms"
                       placeholder="Pick Symptoms"
@@ -263,7 +333,7 @@ const Appointments = () => {
                       nothingFoundMessage="Nothing found..."
                     />
                     <Button
-                      mt={23}
+                      mt={40}
                       style={{ background: "#0a0059" }}
                       onClick={() => {
                         handleReccomendation();
@@ -277,6 +347,7 @@ const Appointments = () => {
 
                 <div className="col-md-6">
                   <Select
+                    mt="md"
                     label="Select Hospital"
                     placeholder="Select Hospital"
                     data={hospitals.map((hospital) => ({
@@ -289,8 +360,9 @@ const Appointments = () => {
                     value={form.values.hospital}
                   />
                 </div>
-                <div className="col-md-6 mt-md-3 mt-md-0">
+                <div className="col-md-6">
                   <Select
+                    mt="md"
                     label="Select Specialization"
                     placeholder="Select Specialization"
                     // mt="md"
@@ -310,7 +382,7 @@ const Appointments = () => {
                     disabled={!isHospitalSelected}
                   />
                 </div>
-                <div className="col-md-6 mt-3 mt-md-0">
+                <div className="col-md-6">
                   <Select
                     label="Select Doctor"
                     placeholder="Select Doctor"
@@ -369,6 +441,21 @@ const Appointments = () => {
                   />
                 </div>
               </div>
+              <div className="col-md-6">
+                <div className="col-md-6">
+                  <Checkbox
+                    mt={30}
+                    label="Auto-Appointment"
+                    checked={form.values.auto_booked}
+                    onChange={(event) => {
+                      form.setValues({
+                        ...form.values,
+                        auto_booked: event.currentTarget.checked,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
               <Group align="center" justify="space-between" mt="xl">
                 <Group>
                   <Text style={{ color: "black" }}>
@@ -391,14 +478,24 @@ const Appointments = () => {
             </div>
           </form>
         </div>
-        {form.values.hospital && (
-          <div className="c-card mt-5">
-            <ETA
-              location={form.values.coordinates}
-              hospitalLocation={hospitalLocation}
-            />
+        <div className="c-card mt-5">
+          <div className="row">
+            {form.values.hospital && (
+              <div className="col-md-8">
+                <ETA
+                  location={form.values.coordinates}
+                  hospitalLocation={hospitalLocation}
+                />
+              </div>
+            )}
+            <div className="col-md-4">
+              <h4>Recommended Doctors</h4>
+              {recommendedDoctors.map((doctor, index) => (
+                <DoctorCard doctor={doctor} key={index} />
+              ))}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

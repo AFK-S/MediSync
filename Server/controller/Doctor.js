@@ -240,6 +240,24 @@ const HospitalSpecializedDoctors = async (req, res) => {
   }
 };
 
+const SpecializedHospitals = async (req, res) => {
+  const { specialization } = req.params;
+  try {
+    const doctors = await DoctorSchema.find({
+      specialization,
+    }).distinct("hospital_id");
+    const hospitals = await HospitalSchema.find({
+      _id: {
+        $in: doctors,
+      },
+    }).lean();
+    res.status(200).json(hospitals);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 const AllocateDoctorSlot = async () => {
   const hospitals = await HospitalSchema.find().lean();
   for (let hospital of hospitals) {
@@ -332,6 +350,7 @@ export {
   AllDoctors,
   HospitalSpecialization,
   HospitalSpecializedDoctors,
+  SpecializedHospitals,
   AllocateDoctorSlot,
   AllocateTodayDoctorSlot,
   SuggestDoctor,
