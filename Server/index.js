@@ -19,6 +19,7 @@ import {
   AllocateTodayDoctorSlot,
 } from "./controller/Doctor.js";
 import StatisticRoute from "./routes/StatisticRoute.js";
+import DispensaryRoute from "./routes/DispensaryRoute.js";
 
 const app = express();
 dotenv.config();
@@ -57,6 +58,7 @@ app.use("/api", LogRoute);
 app.use("/api", DashboardRoute);
 app.use("/api", ReportRoute);
 app.use("/api", StatisticRoute);
+app.use("/api", DispensaryRoute);
 
 app.get("/api/logout", async (req, res) => {
   res.clearCookie("_id").status(200).end();
