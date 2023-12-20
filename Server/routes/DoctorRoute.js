@@ -41,7 +41,7 @@ router.get(
   "/doctors/specialization/:hospital_id/:specialization",
   HospitalSpecializedDoctors
 );
-router.get("/doctors/specialization/:specialization", SpecializedHospitals);
+router.get("/hospitals/specialization/:specialization", SpecializedHospitals);
 router.post("/suggest/doctors", SuggestDoctor);
 
 export default router;

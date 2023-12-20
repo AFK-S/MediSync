@@ -241,14 +241,14 @@ const HospitalSpecializedDoctors = async (req, res) => {
 };
 
 const SpecializedHospitals = async (req, res) => {
-  const { specialization } = req.params;
   try {
-    const doctors = await DoctorSchema.find({
+    const { specialization } = req.params;
+    const hospital_ids = await DoctorSchema.find({
       specialization,
     }).distinct("hospital_id");
     const hospitals = await HospitalSchema.find({
       _id: {
-        $in: doctors,
+        $in: hospital_ids,
       },
     }).lean();
     res.status(200).json(hospitals);
