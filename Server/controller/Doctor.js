@@ -240,6 +240,31 @@ const HospitalSpecializedDoctors = async (req, res) => {
   }
 };
 
+const SpecializedDoctors = async (req, res) => {
+  const { specialization } = req.params;
+  try {
+    const doctors = await DoctorSchema.find({
+      specialization,
+    }).lean();
+    for (let doctor of doctors) {
+      const today = new Date();
+      const sorted_availability = doctor.availability.sort(
+        (dateA, dateB) => Number(dateA.date) - Number(dateB.date)
+      );
+      doctor.availability = sorted_availability;
+      const filter_availability = doctor.availability.filter((item) => {
+        const itemDate = new Date(item.date);
+        return itemDate >= today;
+      });
+      doctor.availability = filter_availability;
+    }
+    res.status(200).json(doctors);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 const AllocateDoctorSlot = async () => {
   const hospitals = await HospitalSchema.find().lean();
   for (let hospital of hospitals) {
@@ -332,6 +357,7 @@ export {
   AllDoctors,
   HospitalSpecialization,
   HospitalSpecializedDoctors,
+  SpecializedDoctors,
   AllocateDoctorSlot,
   AllocateTodayDoctorSlot,
   SuggestDoctor,
