@@ -52,6 +52,16 @@ const AppointmentCard = ({ value, index }) => {
         )
       : "First";
 
+  const handleCancel = (id) => {
+    try {
+      const data = axios.delete(`/api/appointment/delete/${id}`);
+      console.log(data);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
       <div
