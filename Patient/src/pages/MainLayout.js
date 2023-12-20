@@ -20,7 +20,6 @@ const MainLayout = () => {
   const [cookies] = useCookies();
 
   useEffect(() => {
-    console.log(cookies);
     if (!cookies._id) {
       console.log("cookies from main: ", cookies._id);
       navigate("/login");
@@ -34,8 +33,6 @@ const MainLayout = () => {
           `/api/dashboard/patient/${cookies._id}`
         );
         dispatch(setData(response.data));
-
-        console.log(response.data);
       } catch (error) {
         console.error(error);
       }

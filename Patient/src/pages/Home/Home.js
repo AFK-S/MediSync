@@ -6,6 +6,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { Badge } from "@mantine/core";
 
 const Table = ({ data, columns }) => {
   return (
@@ -44,13 +45,24 @@ const Table = ({ data, columns }) => {
 };
 
 const AppointmentCard = ({ value, index }) => {
+  var index = value.today_appointment.findIndex(
+    (appointment) => appointment._id === value._id
+  );
+
   return (
     <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
       <div
         key={index}
         className="c-card h-auto appointment-card "
-        style={{ borderColor: "#B6BBC4" }}
+        style={{ borderColor: "#B6BBC4", position: "relative" }}
       >
+        <Badge
+          color="blue"
+          style={{ position: "absolute", top: "1rem", right: "1rem" }}
+        >
+          {index !== undefined && index === 0 ? "Next" : `${index} in Queue`}
+        </Badge>
+
         <div className="p-0">
           <p className="card-text mt-2">
             <span className="fw-600">Date: </span>
@@ -132,11 +144,9 @@ const AppointmentCard = ({ value, index }) => {
 };
 
 const Home = () => {
-  // const [cookies] = useCookies();
   const appointmentUpcoming = useSelector(
     (state) => state.app.appData.upcoming_appointment
   );
-  console.log(appointmentUpcoming);
 
   const [doctors, setDoctors] = useState([
     {

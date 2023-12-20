@@ -234,7 +234,14 @@ const Profile = () => {
                       patient.reports.map((file, index) => (
                         // <h1>ok</h1>
                         <Image
-                          style={{ width: "80px", margin: "5px" }}
+                          onClick={() => {
+                            window.open(file.url, "_blank");
+                          }}
+                          style={{
+                            width: "80px",
+                            margin: "5px",
+                            cursor: "pointer",
+                          }}
                           key={index}
                           src={file.url}
                           alt={`Image ${index}`}
