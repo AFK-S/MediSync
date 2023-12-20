@@ -166,6 +166,20 @@ const Info = () => {
           </div>
         </div>
       </div>
+      <div
+        className="container-fluid mt-5 p-3 d-flex align-items-center justify-content-center"
+        style={{ borderRadius: "16px", color: "#fff", background: "#0a0059" }}
+      >
+        <h4 style={{ color: "#fff", fontWeight: "bolder" }}>
+          <a
+            target="_blank"
+            href="https://www.myscheme.gov.in/find-scheme"
+            style={{ color: "#fff", textDecoration: "none" }}
+          >
+            Find Your Right Scheme
+          </a>
+        </h4>
+      </div>
     </div>
   );
 };
