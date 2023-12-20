@@ -368,6 +368,20 @@ const MarkAsDone = async (req, res) => {
   }
 };
 
+const UpdateRating = async (req, res) => {
+  try {
+    const { appointment_id } = req.params;
+    const { rating } = req.body;
+    await AppointmentSchema.findByIdAndUpdate(appointment_id, {
+      rating,
+    });
+    res.status(200).send("Appointment details updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 const AllocateAppointmentSlot = async (doctor_id) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -491,6 +505,26 @@ const TodayWalkInAppointment = async (req, res) => {
   }
 };
 
+const DiseaseAppointment = async (req, res) => {
+  try {
+    const { disease } = req.params;
+    const appointment = await AppointmentSchema.aggregate([
+      {
+        $match: {
+          diagnosis_result: disease,
+          coordinates: {
+            $exists: true,
+          },
+        },
+      },
+    ]);
+    res.status(200).send(appointment);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   OnlineRegister,
   WalkInRegister,
@@ -503,7 +537,9 @@ export {
   AllDoctorAppointment,
   DoctorAvailableSlots,
   MarkAsDone,
+  UpdateRating,
   AllocateAppointmentSlot,
   AllocateTodayAppointmentSlot,
   TodayWalkInAppointment,
+  DiseaseAppointment,
 };
