@@ -4,10 +4,11 @@ import { Divider } from "@mantine/core";
 
 const Info = () => {
   const [news, setNews] = useState([]);
+  const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getInfo = async () => {
-    const options = {
+  const getNews = async () => {
+    const newsOptions = {
       method: "GET",
       url: "https://medical-articles-live.p.rapidapi.com/journals/hidradenitis",
       headers: {
@@ -17,19 +18,51 @@ const Info = () => {
     };
 
     try {
-      const response = await axios.request(options);
+      const response = await axios.request(newsOptions);
       console.log(response.data);
       setNews(response.data);
-      setLoading(false); // Set loading to false when data is loaded
     } catch (error) {
       console.error(error);
-      setLoading(false); // Set loading to false in case of an error
+    }
+  };
+
+  const getRecipes = async () => {
+    const recipeOptions = {
+      method: "GET",
+      url: "https://edamam-recipe-search.p.rapidapi.com/api/recipes/v2",
+      params: {
+        type: "public",
+        co2EmissionsClass: "A+",
+        "field[0]": "uri",
+        beta: "true",
+        random: "true",
+        "cuisineType[0]": "American",
+        "imageSize[0]": "LARGE",
+        "mealType[0]": "Breakfast",
+        "health[0]": "alcohol-cocktail",
+        "diet[0]": "balanced",
+        "dishType[0]": "Biscuits and cookies",
+      },
+      headers: {
+        "Accept-Language": "en",
+        "X-RapidAPI-Key": "c49244b646msh4410a3f6bdddea5p14946ajsn911700e6f8e3",
+        "X-RapidAPI-Host": "edamam-recipe-search.p.rapidapi.com",
+      },
+    };
+
+    try {
+      const response = await axios.request(recipeOptions);
+      console.log(response.data);
+      setRecipes(response.data.hits);
+    } catch (error) {
+      console.error(error);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      await getInfo();
+      await Promise.all([getNews(), getRecipes()]);
+      setLoading(false); // Set loading to false when data is loaded
     };
 
     fetchData();
@@ -42,7 +75,7 @@ const Info = () => {
           <div className="col-lg-6">
             <div
               className="c-card"
-              style={{ maxHeight: "40vh", overflow: "auto", padding: "14px" }}
+              style={{ maxHeight: "60vh", overflow: "auto", padding: "14px" }}
             >
               <h4 className="mb-3">News</h4>
 
@@ -67,6 +100,57 @@ const Info = () => {
                       <p>{item.abstract}</p>
                       <a
                         href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: "12px" }}
+                      >
+                        Read More
+                      </a>
+                    </div>
+                    <Divider my="sm" />
+                  </>
+                ))
+              )}
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div
+              className="c-card"
+              style={{ maxHeight: "60vh", overflow: "auto", padding: "14px" }}
+            >
+              <h4 className="mb-3 ">Recipes</h4>
+
+              {loading ? (
+                <p>Loading...</p>
+              ) : (
+                recipes?.map((recipe) => (
+                  <>
+                    <div key={recipe.recipe.uri} className="my-4">
+                      <h5
+                        className="mb-3"
+                        style={{
+                          fontSize: "16px",
+                          fontWeight: "700",
+                          color: "#0A0059",
+                        }}
+                      >
+                        {recipe.recipe.label}
+                      </h5>
+                      <div
+                        className=""
+                        style={{
+                          backgroundImage: `url(${recipe.recipe.image})`,
+                          width: "100%",
+                          height: "200px",
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          borderRadius: "10px",
+                          marginBottom: "10px",
+                        }}
+                      ></div>
+
+                      <a
+                        href={recipe.recipe.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ fontSize: "12px" }}

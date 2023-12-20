@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
-import { TextInput, Button, Group, Select, NumberInput } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Group,
+  Select,
+  NumberInput,
+  Checkbox,
+} from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import axios from "axios";
 import symptomsData from "./symptoms.json";
@@ -197,6 +204,7 @@ const Appointments = () => {
       time_slot: "",
       symptoms: [],
       coordinates: { latitude: "", longitude: "" },
+      auto_booked: false,
     },
   });
 
@@ -430,6 +438,21 @@ const Appointments = () => {
                     }}
                     nothingFoundMessage="No time slots available"
                     value={form.values.time_slot}
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div className="col-md-6">
+                  <Checkbox
+                    mt={30}
+                    label="Auto-Appointment"
+                    checked={form.values.auto_booked}
+                    onChange={(event) => {
+                      form.setValues({
+                        ...form.values,
+                        auto_booked: event.currentTarget.checked,
+                      });
+                    }}
                   />
                 </div>
               </div>
