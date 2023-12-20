@@ -18,6 +18,7 @@ const OnlineRegister = async (req, res) => {
       time_slot,
       symptoms,
       coordinates,
+      auto_booked,
     } = req.body;
     const patient = await PatientSchema.findById(patient_id).lean();
     const reports = await ReportSchema.find({ patient_id })
@@ -45,6 +46,7 @@ const OnlineRegister = async (req, res) => {
       date: date,
       time_slot,
       coordinates,
+      auto_booked,
     });
     res.status(200).send(appointment._id);
   } catch (err) {
@@ -525,6 +527,51 @@ const DiseaseAppointment = async (req, res) => {
   }
 };
 
+const AutoBookedAppointmentSlot = async (patient_id) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const appointments = await AppointmentSchema.find({
+    patient_id: patient_id,
+  });
+  for (const appointment of appointments) {
+    if (appointment.auto_booked) {
+      if (appointment.date.getMonth() != today.getMonth()) continue;
+      console.log(appointment);
+      const nextMonth = new Date(appointment.date);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      const checkAppointment = await AppointmentSchema.findOne({
+        patient_id: patient_id,
+        doctor_id: appointment.doctor_id,
+        hospital_id: appointment.hospital_id,
+        date: nextMonth,
+        time_slot: appointment.time_slot,
+        type: appointment.type,
+      });
+      if (checkAppointment) continue;
+      await AppointmentSchema.create({
+        patient_id: patient_id,
+        doctor_id: appointment.doctor_id,
+        hospital_id: appointment.hospital_id,
+        date: nextMonth,
+        time_slot: appointment.time_slot,
+        symptoms: appointment.symptoms,
+        coordinates: appointment.coordinates,
+        type: appointment.type,
+        auto_booked: true,
+      });
+      appointment.auto_booked = false;
+    }
+  }
+  await Promise.all(appointments.map((item) => item.save()));
+};
+
+const AutoBookedPatientSlot = async () => {
+  const patients = await PatientSchema.find().lean();
+  for (const patient of patients) {
+    await AutoBookedAppointmentSlot(patient._id);
+  }
+};
+
 export {
   OnlineRegister,
   WalkInRegister,
@@ -542,4 +589,5 @@ export {
   AllocateTodayAppointmentSlot,
   TodayWalkInAppointment,
   DiseaseAppointment,
+  AutoBookedPatientSlot,
 };

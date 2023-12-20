@@ -18,6 +18,7 @@ import {
   AllocateDoctorSlot,
   AllocateTodayDoctorSlot,
 } from "./controller/Doctor.js";
+import { AutoBookedPatientSlot } from "./controller/Appointment.js";
 import StatisticRoute from "./routes/StatisticRoute.js";
 import DispensaryRoute from "./routes/DispensaryRoute.js";
 
@@ -74,6 +75,7 @@ let result = [];
 // AllocateAppointmentSlot("65804330a0d8f9a9b7f8d779");
 // AllocateDoctorSlot();
 // AllocateTodayDoctorSlot();
+// AutoBookedPatientSlot();
 
 app.listen(8000, async () => {
   console.log("Server listening on port 8000");
