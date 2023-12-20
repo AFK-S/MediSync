@@ -26,6 +26,7 @@ const DoctorCard = ({ doctor, hospital }) => {
         hospital: hospital,
         specialization: doctor.specialization,
         experience: doctor.experience,
+        doctor_id: doctor._id,
       })
     );
     navigate("/appointments");
@@ -45,7 +46,11 @@ const DoctorCard = ({ doctor, hospital }) => {
           <Badge color="#EDEDED" p={12}>
             <Text
               fw={600}
-              style={{ color: "black", textTransform: "capitalize" }}
+              style={{
+                color: "black",
+                textTransform: "capitalize",
+                fontSize: "12px",
+              }}
             >
               {doctor.name}
             </Text>
@@ -97,7 +102,6 @@ const AllDoctors = () => {
     try {
       const { data } = await axios.get("/api/doctors");
       setDoctors(data);
-      console.log(data);
     } catch (err) {
       console.log(err);
     }

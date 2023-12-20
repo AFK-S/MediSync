@@ -10,7 +10,7 @@ const ReportSchema = new Schema(
     type: {
       type: String,
       trim: true,
-      enum: ["patient", "doctor"],
+      enum: ["patient", "doctor", "pathology"],
       match: [
         /^[a-zA-Z]+$/,
         (props) => `${props.value} is not a valid report type`,

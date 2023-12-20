@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8000/",
+  "proxy": "http://192.168.0.110:8000/",
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@mantine/core": "^7.3.1",
@@ -21,6 +21,8 @@
     "dayjs": "^1.11.10",
     "firebase": "^10.7.1",
     "jsonwebtoken": "^9.0.0",
+    "ol": "^8.2.0",
+    "ol-react": "^0.1.5",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.1",
     "react-bootstrap": "^2.9.1",

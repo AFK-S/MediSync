@@ -4,11 +4,14 @@ import {
   UpdateDetails as UpdateDoctor,
   DeleteDoctor,
   DoctorInfo,
+  VerifyDoctor,
   HospitalDoctorsList,
   AllHospitalDoctorsList,
   AllDoctors,
   HospitalSpecialization,
   HospitalSpecializedDoctors,
+  SpecializedHospitals,
+  SuggestDoctor,
 } from "../controller/Doctor.js";
 import { FirstTimeDoctorLogin, DoctorLogin } from "../controller/Login.js";
 import { CheckMacAddress } from "../controller/TpLink.js";
@@ -29,6 +32,7 @@ router.post(
 router.put("/doctor/update/:doctor_id", UpdateDoctor);
 router.delete("/doctor/delete/:doctor_id", DeleteDoctor);
 router.get("/doctor/:doctor_id", DoctorInfo);
+router.get("/doctor/verify/:mac_address", VerifyDoctor);
 router.get("/doctor/hospital/:hospital_id", HospitalDoctorsList);
 router.get("/doctors/hospital", AllHospitalDoctorsList);
 router.get("/doctors", AllDoctors);
@@ -37,5 +41,7 @@ router.get(
   "/doctors/specialization/:hospital_id/:specialization",
   HospitalSpecializedDoctors
 );
+router.get("/hospitals/specialization/:specialization", SpecializedHospitals);
+router.post("/suggest/doctors", SuggestDoctor);
 
 export default router;

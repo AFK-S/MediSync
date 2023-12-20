@@ -166,16 +166,16 @@ const Doctor = async (req, res) => {
       {
         $unwind: "$patient",
       },
-    ]);
-    const sorted_today_online_appointment = today_online_appointment.sort(
-      (a, b) => {
-        if (a.severity_index !== b.severity_index) {
-          return b.severity_index - a.severity_index;
-        } else {
-          return b.severity_count - a.severity_count;
-        }
-      }
-    );
+    ]).sort({ severity_index: -1, severity_count: -1 });
+    // const sorted_today_online_appointment = today_online_appointment.sort(
+    //   (a, b) => {
+    //     if (a.severity_index !== b.severity_index) {
+    //       return b.severity_index - a.severity_index;
+    //     } else {
+    //       return b.severity_count - a.severity_count;
+    //     }
+    //   }
+    // );
     const today_walk_in_appointment = await AppointmentSchema.aggregate([
       {
         $match: {
@@ -200,7 +200,7 @@ const Doctor = async (req, res) => {
       },
     ]).sort({ createdAt: 1 });
     doctor.today_appointment = [
-      ...sorted_today_online_appointment,
+      ...today_online_appointment,
       ...today_walk_in_appointment,
     ];
     doctor.next_date =
@@ -247,8 +247,7 @@ const Doctor = async (req, res) => {
       .sort({ updatedAt: -1 })
       .lean();
     doctor.treated_patient = treated_patient;
-    doctor.today_online_appointment_count =
-      sorted_today_online_appointment.length;
+    doctor.today_online_appointment_count = today_online_appointment.length;
     doctor.today_walk_in_appointment_count = today_walk_in_appointment.length;
     doctor.next_date_appointment_count = next_date_appointment.length;
     doctor.treated_patient_count = treated_patient.length;
@@ -299,6 +298,44 @@ const Patient = async (req, res) => {
       {
         $unwind: "$hospital",
       },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "doctor_id",
+          foreignField: "doctor_id",
+          pipeline: [
+            {
+              $match: {
+                date: {
+                  $gte: today,
+                  $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+                },
+                treated: false,
+              },
+            },
+          ],
+          as: "today_non_treated_appointment",
+        },
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "doctor_id",
+          foreignField: "doctor_id",
+          pipeline: [
+            {
+              $match: {
+                date: {
+                  $gte: today,
+                  $lte: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+                },
+                treated: true,
+              },
+            },
+          ],
+          as: "today_treated_appointment",
+        },
+      },
     ]).project({
       "doctor.availability": 0,
     });
@@ -337,9 +374,11 @@ const Patient = async (req, res) => {
       {
         $unwind: "$hospital",
       },
-    ]).project({
-      "doctor.availability": 0,
-    });
+    ])
+      .project({
+        "doctor.availability": 0,
+      })
+      .sort({ date: 1 });
     const sorted_past_visit = past_visit.sort(
       (dateA, dateB) => Number(dateA.date) - Number(dateB.date)
     );

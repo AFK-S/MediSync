@@ -14,13 +14,13 @@ import Search from "./Search/Search.js";
 import { useCookies } from "react-cookie";
 import { setData } from "../slice/AppSclice.js";
 import { useSelector } from "react-redux";
+import Info from "./Info.js";
 
 const MainLayout = () => {
   const navigate = useNavigate();
   const [cookies] = useCookies();
 
   useEffect(() => {
-    console.log(cookies);
     if (!cookies._id) {
       console.log("cookies from main: ", cookies._id);
       navigate("/login");
@@ -34,8 +34,6 @@ const MainLayout = () => {
           `/api/dashboard/patient/${cookies._id}`
         );
         dispatch(setData(response.data));
-
-        console.log(response.data);
       } catch (error) {
         console.error(error);
       }
@@ -74,6 +72,7 @@ const MainLayout = () => {
               <Route path="/search/*" element={<Search />} />
               <Route path="/appointments" element={<Appointments />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/info" element={<Info />} />
             </Routes>
           </div>
         </div>

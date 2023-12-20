@@ -58,6 +58,13 @@ h6 {
 .rounded {
   border-radius: 8px !important;
 }
+.c-card {
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 16px;
+  height: 100%;
+}
+
 
 .divider {
   width: 100%;

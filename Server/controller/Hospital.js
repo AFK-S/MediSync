@@ -120,7 +120,7 @@ const NearByHospitals = async (req, res) => {
           { latitude, longitude },
           hospital.coordinates
         );
-        if (distance <= 5 * 1000) return hospital._id;
+        if (distance <= 15 * 1000) return hospital._id;
       })
       .sort((a, b) => a.distance - b.distance);
     const nearby_hospitals = await HospitalSchema.aggregate([

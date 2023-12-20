@@ -1,7 +1,14 @@
 import ShortUniqueId from "short-unique-id";
 import DoctorSchema from "../models/DoctorSchema.js";
+import HospitalSchema from "../models/HospitalSchema.js";
 import bucket from "../firebase.js";
+import {
+  AllocateAppointmentSlot,
+  AllocateTodayAppointmentSlot,
+} from "./Appointment.js";
 import { calculateTotalMinutes } from "../middleware/Function.js";
+import axios from "axios";
+import { FLASK_URL } from "../config.js";
 
 const { randomUUID } = new ShortUniqueId({ length: 8 });
 
@@ -122,6 +129,18 @@ const DoctorInfo = async (req, res) => {
     res.status(400).send(err.message);
   }
 };
+const VerifyDoctor = async (req, res) => {
+  try {
+    const { mac_address } = req.params;
+    const doctor = await DoctorSchema.findOne({
+      mac_address: mac_address,
+    }).lean();
+    res.status(200).send(doctor ? true : false);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
 
 const HospitalDoctorsList = async (req, res) => {
   try {
@@ -221,14 +240,118 @@ const HospitalSpecializedDoctors = async (req, res) => {
   }
 };
 
+const SpecializedHospitals = async (req, res) => {
+  try {
+    const { specialization } = req.params;
+    const hospital_ids = await DoctorSchema.find({
+      specialization,
+    }).distinct("hospital_id");
+    const hospitals = await HospitalSchema.find({
+      _id: {
+        $in: hospital_ids,
+      },
+    }).lean();
+    res.status(200).json(hospitals);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
+const AllocateDoctorSlot = async () => {
+  const hospitals = await HospitalSchema.find().lean();
+  for (let hospital of hospitals) {
+    const doctors = await DoctorSchema.find({
+      hospital_id: hospital._id,
+    }).lean();
+    for (let doctor of doctors) {
+      await AllocateAppointmentSlot(doctor._id);
+    }
+  }
+};
+
+const AllocateTodayDoctorSlot = async () => {
+  const hospitals = await HospitalSchema.find().lean();
+  for (let hospital of hospitals) {
+    const doctors = await DoctorSchema.find({
+      hospital_id: hospital._id,
+    }).lean();
+    for (let doctor of doctors) {
+      await AllocateTodayAppointmentSlot(doctor._id);
+    }
+  }
+};
+
+const SuggestDoctor = async (req, res) => {
+  try {
+    const { symptoms } = req.body;
+    const { data } = await axios.post(
+      `${FLASK_URL}/api/max_no_of_specialization`,
+      {
+        symptoms,
+      }
+    );
+    const specialization = data;
+    const doctors = await DoctorSchema.aggregate([
+      {
+        $match: {
+          specialization,
+        },
+      },
+      {
+        $lookup: {
+          from: "hospitals",
+          localField: "hospital_id",
+          foreignField: "_id",
+          as: "hospital",
+        },
+      },
+      {
+        $unwind: "$hospital",
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "_id",
+          foreignField: "doctor_id",
+          as: "appointments",
+        },
+      },
+    ])
+      .project({
+        _id: 1,
+        name: 1,
+        specialization: 1,
+        hospital_id: 1,
+        "hospital.name": 1,
+        rating: {
+          $avg: "$appointments.rating",
+        },
+      })
+      .sort({
+        rating: -1,
+      })
+      .limit(5);
+    res.status(200).json(doctors);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   Register,
   UpdateDetails,
   DeleteDoctor,
   DoctorInfo,
+  VerifyDoctor,
   HospitalDoctorsList,
   AllHospitalDoctorsList,
   AllDoctors,
   HospitalSpecialization,
   HospitalSpecializedDoctors,
+  SpecializedHospitals,
+  AllocateDoctorSlot,
+  AllocateTodayDoctorSlot,
+  SuggestDoctor,
 };

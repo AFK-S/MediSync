@@ -18,27 +18,27 @@ const SideNavigation = () => {
     {
       name: "Dashboard",
       path: "/dashboard",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-home",
     },
     {
       name: "Doctors",
       path: "/doctors",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-user-doctor",
     },
     {
-      name: "Appointments",
+      name: "Walk In Appointments",
       path: "/appointments",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-calendar-check",
     },
     {
       name: "Patients",
       path: "/patients",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-hospital-user",
     },
     {
       name: "Register Doctor",
       path: "/reg-doc",
-      icon: "fa-solid fa-user",
+      icon: "fa-solid fa-address-card",
     },
   ];
 

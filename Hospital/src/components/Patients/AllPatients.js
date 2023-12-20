@@ -4,31 +4,14 @@ import { StateContext } from "../../context/StateContext";
 
 const AllPatients = () => {
   const { hospitalData } = useContext(StateContext);
-  console.log(hospitalData);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [doctors, setDoctors] = useState([
-    {
-      id: "657c32c9560f1eb5906adab0",
-      name: "Karandeep",
-      speciality: "ABC",
-      age: 30,
-      experience: "20+",
-    },
-    {
-      id: 2,
-      name: "Karandeep",
-      speciality: "ABC",
-      age: 30,
-      experience: "20+",
-    },
-    {
-      id: 3,
-      name: "Karandeep",
-      speciality: "ABC",
-      age: 30,
-      experience: "20+",
-    },
-  ]);
+  const filteredPatients = hospitalData.treated_patient
+    ? hospitalData.treated_patient.filter((patient) =>
+        patient.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
   return (
     <div>
       <div
@@ -40,6 +23,8 @@ const AllPatients = () => {
           type="text"
           style={{ width: "100%", outline: "none", border: "none" }}
           placeholder="Search Patient"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
@@ -64,26 +49,30 @@ const AllPatients = () => {
                 </tr>
               </thead>
               <tbody>
-                {hospitalData.treated_patient &&
-                  hospitalData.treated_patient.map((item, index) => (
-                    <tr
-                      key={index}
-                      style={{
-                        whiteSpace: "nowrap",
-                        backgroundColor: "#fff",
-                        borderRadius: "20px",
-                        padding: "1rem",
-                        border: 0,
-                        marginBottom: "1rem",
-                      }}
-                    >
-                      <td>{item.name}</td>
-                      <td>{item.age}</td>
-                      <td>
-                        <NavLink to={`profile/${item._id}`}>View More</NavLink>
-                      </td>
-                    </tr>
-                  ))}
+                {filteredPatients.map((item, index) => (
+                  <tr
+                    key={index}
+                    style={{
+                      whiteSpace: "nowrap",
+                      backgroundColor: "#fff",
+                      borderRadius: "20px",
+                      padding: "1rem",
+                      border: 0,
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    <td>{item.name}</td>
+                    <td>{item.age}</td>
+                    <td>
+                      <NavLink to={`profile/${item._id}`}>View More</NavLink>
+                    </td>
+                  </tr>
+                ))}
+                {filteredPatients.length === 0 && (
+                  <tr>
+                    <td colSpan="3">No Results Found</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

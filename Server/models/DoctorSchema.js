@@ -36,7 +36,6 @@ const DoctorSchema = new Schema(
         "general",
         "ent",
         "gynecologist",
-        "pediatrician",
         "dental",
         "dermatologist",
         "orthologist",

@@ -1,11 +1,20 @@
 import React, { useState } from "react";
-import { Grid, Collapse, Group, Text, Accordion, Button } from "@mantine/core";
+import {
+  Grid,
+  Collapse,
+  Group,
+  Text,
+  Accordion,
+  Button,
+  Pill,
+} from "@mantine/core";
 import "./Home.css";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { Badge } from "@mantine/core";
 
 const Table = ({ data, columns }) => {
   return (
@@ -44,13 +53,41 @@ const Table = ({ data, columns }) => {
 };
 
 const AppointmentCard = ({ value, index }) => {
+  var index =
+    value.today_appointment && value.today_appointment.length > 0
+      ? value.today_appointment.findIndex(
+          (appointment) => appointment._id === value._id
+        )
+      : "First";
+
+  const handleCancel = (id) => {
+    try {
+      const data = axios.delete(`/api/appointment/delete/${id}`);
+      console.log(data);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
       <div
         key={index}
         className="c-card h-auto appointment-card "
-        style={{ borderColor: "#B6BBC4" }}
+        style={{ borderColor: "#B6BBC4", position: "relative" }}
       >
+        <Badge
+          color="#0A0059"
+          style={{ position: "absolute", top: "1rem", right: "1rem" }}
+        >
+          {index !== undefined && index === 0
+            ? "Next"
+            : index === -1
+            ? "Done"
+            : `${index ? index : ""} in Queue`}
+        </Badge>
+
         <div className="p-0">
           <p className="card-text mt-2">
             <span className="fw-600">Date: </span>
@@ -71,6 +108,11 @@ const AppointmentCard = ({ value, index }) => {
             <span className="fw-600">Time: </span>
             {value.time_slot}
           </p>
+          <p className="card-text mt-1">
+            {" "}
+            <span className="fw-600">Confirmed Slot: </span>
+            {value.alloted_time}
+          </p>
           <Accordion
             sx={{
               ".mantine-Accordion-label": { fontWeight: 700 },
@@ -86,7 +128,23 @@ const AppointmentCard = ({ value, index }) => {
                 className="p-0"
                 style={{ color: "#0a0059", fontSize: "0.9rem" }}
               >
-                More Details
+                <div className="d-flex align-items-center justify-content-between">
+                  More Details
+                  {value?.auto_booked ? (
+                    <Pill
+                      style={{
+                        backgroundColor: "transparent",
+                        marginRight: "0.5rem",
+                        color: "#0A0059",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      Auto Booked
+                    </Pill>
+                  ) : (
+                    ""
+                  )}
+                </div>
               </Accordion.Control>
 
               <Accordion.Panel>
@@ -116,6 +174,10 @@ const AppointmentCard = ({ value, index }) => {
               fontWeight: 700,
               fontSize: "0.9rem",
               transition: "all 0.2s ease-in-out",
+              borderRadius: "0.5rem",
+            }}
+            onClick={() => {
+              handleCancel(value._id);
             }}
           >
             Cancel
@@ -127,11 +189,9 @@ const AppointmentCard = ({ value, index }) => {
 };
 
 const Home = () => {
-  // const [cookies] = useCookies();
   const appointmentUpcoming = useSelector(
     (state) => state.app.appData.upcoming_appointment
   );
-  console.log(appointmentUpcoming);
 
   const [doctors, setDoctors] = useState([
     {

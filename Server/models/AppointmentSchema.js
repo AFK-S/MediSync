@@ -19,10 +19,6 @@ const AppointmentSchema = new Schema(
       type: String,
       trim: true,
       enum: ["online", "walk_in"],
-      match: [
-        /^[a-zA-Z]+$/,
-        (props) => `${props.value} is not a valid appointment type`,
-      ],
       required: [true, "Please provide the Appointment Type"],
     },
     severity_index: {
@@ -62,6 +58,36 @@ const AppointmentSchema = new Schema(
       type: Number,
       default: 0,
       required: [true, "Please provide a Shift"],
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      enum: [-1, 0, 1],
+      required: [true, "Please provide a Rating"],
+    },
+    diagnosis_result: {
+      type: String,
+      trim: true,
+    },
+    coordinates: {
+      latitude: {
+        type: Number,
+      },
+      longitude: {
+        type: Number,
+      },
+    },
+    isRerouting: {
+      type: Boolean,
+      default: false,
+    },
+    dispensary_id: {
+      type: Schema.Types.ObjectId,
+    },
+    auto_booked: {
+      type: Boolean,
+      default: false,
+      required: [true, "Please provide a Auto Booked"],
     },
   },
   { timestamps: true }

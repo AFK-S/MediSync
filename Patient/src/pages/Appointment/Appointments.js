@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
-import { TextInput, Button, Group, Select, NumberInput } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Group,
+  Select,
+  NumberInput,
+  Checkbox,
+} from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import axios from "axios";
 import symptomsData from "./symptoms.json";
@@ -14,8 +21,64 @@ import {
   MultiSelect,
   Text,
 } from "@mantine/core";
-
+import ETA from "./ETA";
 import { useCookies } from "react-cookie";
+import doctorIcon from "../../assets/doctor.png";
+import { Card, Grid, Badge } from "@mantine/core";
+
+const DoctorCard = ({ doctor }) => {
+  const dispatch = useDispatch();
+
+  return (
+    <Card m={20} withBorder padding="lg" radius="md">
+      <div className="d-flex w-100 flex-row align-items-between justify-content-between">
+        <div className="avatar">
+          <img
+            src={doctorIcon}
+            style={{ width: "30px", height: "30px" }}
+            alt="doctor"
+          />
+        </div>
+        <Badge color="#EDEDED" p={12}>
+          <Text
+            fw={600}
+            style={{ color: "black", textTransform: "capitalize" }}
+          >
+            {doctor.name}
+          </Text>
+        </Badge>
+      </div>
+      <Text style={{ color: "black" }} fz="md" mt="lg">
+        Speciality: {doctor.specialization}
+      </Text>
+      <Text
+        fz="md"
+        style={{
+          textTransform: "capitalize",
+          color: "black",
+        }}
+      >
+        Hospital: {doctor.hospital.name}
+      </Text>
+      <button
+        style={{
+          width: "100px",
+          padding: "5px",
+          backgroundColor: "#0a0059",
+          color: "white",
+          borderRadius: "10px",
+          marginTop: "15px",
+          fontWeight: "500",
+          border: "none",
+          outline: "none",
+        }}
+        // onClick={handleBookAppointment}
+      >
+        Book
+      </button>
+    </Card>
+  );
+};
 
 const Appointments = () => {
   const [hospitals, setHospitals] = useState([]);
@@ -27,7 +90,15 @@ const Appointments = () => {
   const [isOnlineSlotsAvailable, setIsOnlineSlotsAvailable] = useState(true);
   const [isDateSelected, setIsDateSelected] = useState(false);
 
+  const [hospitalLocation, setHospitalLocation] = useState({});
+
   const [timeSlot, setTimeSlot] = useState([]);
+
+  const [location, setLocation] = useState({});
+  const [recommendedDoctors, setRecommendedDoctors] = useState([]);
+
+  const [locationPermissionGranted, setLocationPermissionGranted] =
+    useState(false);
 
   const [cookies] = useCookies(["token"]);
   const BookFormData = useSelector((state) => state.app.formData);
@@ -45,14 +116,19 @@ const Appointments = () => {
   const handleSpecialization = async (hospital) => {
     const foundHospital = hospitals.find((item) => item.name === hospital);
     const hospitalId = foundHospital._id;
+    const hospitalLocation = foundHospital.coordinates;
+    setHospitalLocation(hospitalLocation);
 
     form.setValues({
       ...form.values,
       hospital: hospital,
       hospital_id: hospitalId,
+
       specialization: "",
       doctor: "",
     });
+
+    console.log("hospital location", hospitalLocation);
 
     const { data } = await axios.get(
       `/api/doctors/specialization/${hospitalId}`
@@ -94,7 +170,7 @@ const Appointments = () => {
     const slots = await handleAvailableSlot(foundDate.date);
     console.log(slots);
     const slotsBooked = slots.slot_booked;
-    const slotsOnlineAvailable = slots.slot_count.online;
+    const slotsOnlineAvailable = slots.slot_count;
     const slotsOfflineAvailable = slots.slot_count.walk_in;
     console.log(slotsBooked, slotsOnlineAvailable, slotsOfflineAvailable);
 
@@ -103,7 +179,7 @@ const Appointments = () => {
       const end_time = foundDate.end_time;
       const timeSlots = [`${start_time}-${end_time}`];
       console.log(timeSlots);
-      setIsDateSelected(true); // Set the state when a date is selected
+      setIsDateSelected(true);
 
       setTimeSlot(timeSlots);
     } else {
@@ -127,6 +203,8 @@ const Appointments = () => {
       date: "",
       time_slot: "",
       symptoms: [],
+      coordinates: { latitude: "", longitude: "" },
+      auto_booked: false,
     },
   });
 
@@ -138,12 +216,28 @@ const Appointments = () => {
       `/api/appointment/doctor/slots/${type}/${doctor_id}`,
       { date: date }
     );
+
+    console.log(data);
     return data;
   };
 
+  const handleReccomendation = async () => {
+    try {
+      console.log(form.values.symptoms);
+      const { data } = await axios.post("/api/suggest/doctors", {
+        symptoms: form.values.symptoms,
+      });
+
+      setRecommendedDoctors(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleSubmit = async (values) => {
-    // console.log(values);
     values.patient_id = cookies._id;
+    console.log(values);
     try {
       // console.log(values);
       const { data } = await axios.post(
@@ -152,11 +246,58 @@ const Appointments = () => {
       );
       console.log(data);
       alert("Appointment booked successfully");
+      window.location.reload();
     } catch (error) {
       alert(error.response.data);
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    // Function to get the user's location
+    const getLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          form.setValues((values) => ({
+            ...values,
+            coordinates: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
+          }));
+        },
+
+        (error) => {
+          console.error("Error getting location:", error.message);
+        }
+      );
+      console.log(form.values.coordinates);
+    };
+
+    // Ask for location permission and get the location
+    const askForLocationPermission = () => {
+      navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        if (result.state === "granted") {
+          setLocationPermissionGranted(true);
+
+          getLocation();
+        } else if (result.state === "prompt") {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              console.log("Latitude:", position.coords.latitude);
+              console.log("Longitude:", position.coords.longitude);
+            },
+            (error) => {
+              console.error("Error getting location:", error.message);
+              setLocationPermissionGranted(false);
+            }
+          );
+        }
+      });
+    };
+
+    askForLocationPermission();
+  }, []);
 
   const isHospitalSelected = form.values.hospital;
   const isSpecializationSelected = form.values.specialization;
@@ -169,10 +310,11 @@ const Appointments = () => {
           <h4>Book an Appointment</h4>
           <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
             <div className="container-fluid p-0 mt-3">
-              <div className="row">
-                <div className="col-md-6">
+              <div mt="md" className="row">
+                <div mt="md" className="col-md-6">
                   <div className=" d-flex justify-content-between align-items-between g-4">
                     <MultiSelect
+                      mt="md"
                       style={{ width: "75%" }}
                       label="Enter Symptoms"
                       placeholder="Pick Symptoms"
@@ -190,11 +332,22 @@ const Appointments = () => {
                       searchable
                       nothingFoundMessage="Nothing found..."
                     />
+                    <Button
+                      mt={40}
+                      style={{ background: "#0a0059" }}
+                      onClick={() => {
+                        handleReccomendation();
+                      }}
+                      className="book-btn"
+                    >
+                      Recommend
+                    </Button>
                   </div>
                 </div>
 
                 <div className="col-md-6">
                   <Select
+                    mt="md"
                     label="Select Hospital"
                     placeholder="Select Hospital"
                     data={hospitals.map((hospital) => ({
@@ -207,11 +360,12 @@ const Appointments = () => {
                     value={form.values.hospital}
                   />
                 </div>
-                <div className="col-md-6 mt-3 mt-md-0">
+                <div className="col-md-6">
                   <Select
+                    mt="md"
                     label="Select Specialization"
                     placeholder="Select Specialization"
-                    mt="md"
+                    // mt="md"
                     {...form.getInputProps("specialization")}
                     data={fetchedSpecializations.map((specialization) => ({
                       value: specialization,
@@ -228,7 +382,7 @@ const Appointments = () => {
                     disabled={!isHospitalSelected}
                   />
                 </div>
-                <div className="col-md-6 mt-3 mt-md-0">
+                <div className="col-md-6">
                   <Select
                     label="Select Doctor"
                     placeholder="Select Doctor"
@@ -287,27 +441,34 @@ const Appointments = () => {
                   />
                 </div>
               </div>
+              <div className="col-md-6">
+                <div className="col-md-6">
+                  <Checkbox
+                    mt={30}
+                    label="Auto-Appointment"
+                    checked={form.values.auto_booked}
+                    onChange={(event) => {
+                      form.setValues({
+                        ...form.values,
+                        auto_booked: event.currentTarget.checked,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
               <Group align="center" justify="space-between" mt="xl">
                 <Group>
                   <Text style={{ color: "black" }}>
                     Online Slots Available: {onlineSlotsAvailable}
                   </Text>
-                  <Text style={{ color: "black" }}>
+                  {/* <Text style={{ color: "black" }}>
                     Offline Slots Available: {offlineSlotsAvailable}
-                  </Text>
+                  </Text> */}
                 </Group>
-                <Button
-                  mt={23}
-                  style={{ background: "#0a0059" }}
-                  className="book-btn"
-                >
-                  Recommend
-                </Button>
 
                 <Button
                   className="book-btn"
                   type="submit"
-                  // onClick={handleSubmit}
                   disabled={!isDateSelected || !isSlotAvailable}
                   style={{ background: "#0a0059" }}
                 >
@@ -316,6 +477,24 @@ const Appointments = () => {
               </Group>
             </div>
           </form>
+        </div>
+        <div className="c-card mt-5">
+          <div className="row">
+            {form.values.hospital && (
+              <div className="col-md-8">
+                <ETA
+                  location={form.values.coordinates}
+                  hospitalLocation={hospitalLocation}
+                />
+              </div>
+            )}
+            <div className="col-md-4">
+              <h4>Recommended Doctors</h4>
+              {recommendedDoctors.map((doctor, index) => (
+                <DoctorCard doctor={doctor} key={index} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
