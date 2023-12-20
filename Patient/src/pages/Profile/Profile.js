@@ -21,6 +21,28 @@ import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from "react-redux";
 
 const Table = ({ data, columns }) => {
+  const upvote = async (id) => {
+    try {
+      const { data } = await axios.put(`/api/appointment/rating/${id}`, {
+        rating: 1,
+      });
+      alert("Upvoted");
+    } catch (error) {
+      alert("Error in upvoting");
+    }
+  };
+  const downvote = async (id) => {
+    try {
+      const { data } = await axios.put(`/api/appointment/rating/${id}`, {
+        rating: -1,
+      });
+      alert("Downvoted");
+      console.log(data);
+    } catch (error) {
+      alert("Error in upvoting");
+    }
+  };
+
   return (
     <div
       className="inner-container"
@@ -48,6 +70,42 @@ const Table = ({ data, columns }) => {
 
                 <td>
                   <NavLink to={item.reportlink}>Report</NavLink>
+                </td>
+                <td>
+                  {item.rating === 0 ? (
+                    <div className="d-flex align-items-center justify-content-center">
+                      <button
+                        onClick={() => upvote(item._id)}
+                        style={{
+                          background: "#fff",
+                          color: "green",
+                          border: "none",
+                          borderRadius: "5px",
+                          margin: "5px",
+                          height: "30px",
+                          width: "30px",
+                        }}
+                      >
+                        <i className="fa-solid fa-up-long"></i>
+                      </button>
+                      <button
+                        onClick={() => downvote(item._id)}
+                        style={{
+                          background: "#fff",
+                          color: "red",
+                          border: "none",
+                          borderRadius: "5px",
+                          margin: "5px",
+                          height: "30px",
+                          width: "30px",
+                        }}
+                      >
+                        <i className="fa-solid fa-down-long"></i>
+                      </button>
+                    </div>
+                  ) : (
+                    "Already Voted"
+                  )}
                 </td>
               </tr>
             ))}
@@ -82,7 +140,7 @@ const Profile = () => {
       const response = await axios.post("/api/report/register", formData);
       console.log(response);
       alert("Medical History Submitted successfully");
-      form.reset();
+      window.location.reload();
     } catch (error) {
       console.error(error);
     }
@@ -303,7 +361,8 @@ const Profile = () => {
             "Date",
             "Timeslot",
             "HospitalName",
-            "",
+            "Reports",
+            "Votes",
           ]}
         />
       </div>
