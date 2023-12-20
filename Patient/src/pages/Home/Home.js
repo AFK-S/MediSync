@@ -45,9 +45,19 @@ const Table = ({ data, columns }) => {
 };
 
 const AppointmentCard = ({ value, index }) => {
-  var index = value.today_appointment.findIndex(
+  var index = value.today_appointment?.findIndex(
     (appointment) => appointment._id === value._id
   );
+
+  const handleCancel = (id) => {
+    try {
+      const data = axios.delete(`/api/appointment/delete/${id}`);
+      console.log(data);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
@@ -137,6 +147,9 @@ const AppointmentCard = ({ value, index }) => {
               fontWeight: 700,
               fontSize: "0.9rem",
               transition: "all 0.2s ease-in-out",
+            }}
+            onClick={() => {
+              handleCancel(value._id);
             }}
           >
             Cancel
