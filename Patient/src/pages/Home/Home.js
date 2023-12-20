@@ -60,7 +60,11 @@ const AppointmentCard = ({ value, index }) => {
           color="blue"
           style={{ position: "absolute", top: "1rem", right: "1rem" }}
         >
-          {index !== undefined && index === 0 ? "Next" : `${index} in Queue`}
+          {index !== undefined && index === 0
+            ? "Next"
+            : index === -1
+            ? "Done"
+            : `${index} in Queue`}
         </Badge>
 
         <div className="p-0">
