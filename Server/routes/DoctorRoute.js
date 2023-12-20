@@ -10,7 +10,7 @@ import {
   AllDoctors,
   HospitalSpecialization,
   HospitalSpecializedDoctors,
-  SpecializedDoctors,
+  SpecializedHospitals,
   SuggestDoctor,
 } from "../controller/Doctor.js";
 import { FirstTimeDoctorLogin, DoctorLogin } from "../controller/Login.js";
@@ -41,7 +41,7 @@ router.get(
   "/doctors/specialization/:hospital_id/:specialization",
   HospitalSpecializedDoctors
 );
-router.get("/doctors/specialization/:specialization", SpecializedDoctors);
+router.get("/doctors/specialization/:specialization", SpecializedHospitals);
 router.post("/suggest/doctors", SuggestDoctor);
 
 export default router;

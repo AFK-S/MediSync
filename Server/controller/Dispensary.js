@@ -61,10 +61,20 @@ const DispensaryInfo = async (req, res) => {
 const RedirectToDispensary = async (req, res) => {
   try {
     const { appointment_id, dispensary_id } = req.params;
-    await AppointmentSchema.findByIdAndUpdate(appointment_id, {
-      isRerouting: true,
-      dispensary_id,
+    const appointment = await AppointmentSchema.findById(appointment_id);
+    if (!appointment) return res.status(400).send("Appointment not found");
+    appointment.isRerouting = true;
+    appointment.dispensary_id = dispensary_id;
+    await appointment.save();
+    const alert = await AlertSchema.findOne({
+      doctor_id: appointment.doctor_id,
+      patient_id: appointment.patient_id,
+      type: "redirecting",
+      appointment_id: appointment._id,
+      status: "pending",
     });
+    alert.status = "redirected";
+    await alert.save();
     res.status(200).send("Patient Rerouted Successfully");
   } catch (err) {
     console.error(err);

@@ -2,6 +2,7 @@ import AppointmentSchema from "../models/AppointmentSchema.js";
 import DoctorSchema from "../models/DoctorSchema.js";
 import ReportSchema from "../models/ReportSchema.js";
 import PatientSchema from "../models/PatientSchema.js";
+import AlertSchema from "../models/AlertSchema.js";
 import { addMinutes, minusMinutes } from "../middleware/Function.js";
 import mongoose from "mongoose";
 import axios from "axios";
@@ -48,6 +49,14 @@ const OnlineRegister = async (req, res) => {
       coordinates,
       auto_booked,
     });
+    if (data.severity_index < 5.0) {
+      await AlertSchema.create({
+        doctor_id,
+        patient_id,
+        type: "redirecting",
+        appointment_id: appointment._id,
+      });
+    }
     res.status(200).send(appointment._id);
   } catch (err) {
     console.error(err);
