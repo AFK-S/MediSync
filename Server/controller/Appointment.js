@@ -49,7 +49,7 @@ const OnlineRegister = async (req, res) => {
       coordinates,
       auto_booked,
     });
-    if (data.severity_index < 5.0) {
+    if (data.severity_index < 1.0) {
       await AlertSchema.create({
         doctor_id,
         patient_id,
